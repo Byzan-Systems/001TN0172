@@ -1,0 +1,151 @@
+﻿@model _001TN0172.Models.AccountDetails;
+@{
+    ViewBag.Title = "Account Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+
+    <!--<link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">-->
+    <!-- Bootstrap Color Picker -->
+    <!--<link rel="stylesheet" href="../../plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">-->
+    <!-- Tempusdominus Bootstrap 4 -->
+    <!--<link rel="stylesheet" href="../../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">-->
+    <!-- Select2 -->
+    <!--<link rel="stylesheet" href="../../plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="../../plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">-->
+    <!-- Bootstrap4 Duallistbox -->
+    <!--<link rel="stylesheet" href="../../plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">-->
+    <!-- BS Stepper -->
+    <!--<link rel="stylesheet" href="../../plugins/bs-stepper/css/bs-stepper.min.css">-->
+    <!-- dropzonejs -->
+    <!--<link rel="stylesheet" href="../../plugins/dropzone/min/dropzone.min.css">-->
+</head>
+
+<div class="content-wrapper">
+
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Account Details</h1>
+            <h1> @ViewBag.PageName</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("ShowAccountDetails", "AccountDetails", FormMethod.Post, new { id = "demoForm", name = "demoForm" }))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+                    </div>
+                }
+                @*<form>*@
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Payment Type</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @*@Html.DropDownListFor(m => m.Payment_Type, new { Class = "ddlStyle", onchange = "SelectedIndexChanged()" })*@
+                            @Html.DropDownListFor(m => m.Payment_Type, new SelectList(
+        new List<Object> { new { value = "Select Payment Type", text = "Select Payment Type" }, new { value = "BT", text = "BT" },
+            new { value = "NEFT", text = "NEFT" }, new { value = "RTGS", text = "RTGS" } }, "value", "text", 0), new { @class = "form-control", id = "ddlpaytype", onchange = "SelectedIndexChanged()" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Credit Account No</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @Html.TextBoxFor(model => model.CR_Account_No, new { @placeholder = "Enter Your CR_AccountNo ...", @class = "form-control  ",@maxlength="30", id = "CR_Account_No", @required = "required" })
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Debit Account No</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+
+                            @Html.TextBoxFor(model => model.DR_Account_No, new { @placeholder = "Enter Your DB_AccountNo ...", @class = "form-control", id = "DR_Account_No", @maxlength = "30", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-app bg-success" value="Update" asp-action="UpdateAccountDetails" onclick="return validateForm()"><i class="fas fa-save"></i>Update</button>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    function validateForm() {
+                        var ddlpaytype = document.getElementById('ddlpaytype').value;
+                        var CR_Account_No = document.getElementById('CR_Account_No').value;
+                        var DR_Account_No = document.getElementById('DR_Account_No').value;
+                        if (ddlpaytype == "Select Payment Type") {
+                            alert("Select Payment Type.");
+                            return false;
+                        }
+
+                        if (CR_Account_No == "") {
+                            alert("Please Enter Your CR_AccountNo.");
+                            return false;
+                        }
+                        if (DR_Account_No == "") {
+                            alert("Please Enter Your DB_AccountNo.");
+                            return false;
+                        }
+
+                        const response = confirm("Are you sure want to Update?");
+                        if (response == true) {
+                            return true;
+                        }
+                        else { return false; }
+                    }
+                </script>
+            }
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+<script type="text/javascript">
+    function SelectedIndexChanged() {
+        //Form post
+        document.demoForm.submit();
+
+    }
+</script>

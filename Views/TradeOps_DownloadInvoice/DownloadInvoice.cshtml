@@ -1,0 +1,449 @@
+﻿
+@model _001TN0172.Models.DownloadinvFrmDeta
+
+@{
+    ViewBag.Title = "Download Invoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+
+    <!-- daterange picker -->
+    <link rel="stylesheet" href="../../plugins/daterangepicker/daterangepicker.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Bootstrap Color Picker -->
+    <link rel="stylesheet" href="../../plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="../../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="../../plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="../../plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- Bootstrap4 Duallistbox -->
+    <link rel="stylesheet" href="../../plugins/bootstrap4-duallistbox/bootstrap-duallistbox.min.css">
+    <!-- BS Stepper -->
+    <link rel="stylesheet" href="../../plugins/bs-stepper/css/bs-stepper.min.css">
+    <!-- dropzonejs -->
+    <link rel="stylesheet" href="../../plugins/dropzone/min/dropzone.min.css">
+
+    <!-- jsGrid -->
+    <!--<link rel="stylesheet" href="../../plugins/jsgrid/jsgrid.min.css">
+    <link rel="stylesheet" href="../../plugins/jsgrid/jsgrid-theme.min.css">-->
+    @*<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+        <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />*@
+
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+
+    <link href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+
+</head>
+<div class="content-wrapper">
+
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Download Invoice</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("DownloadInvoice", "TradeOps_DownloadInvoice", FormMethod.Post))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-sm-7">
+                        <div class="form-group">
+                            <label>Select Invoice and Click on Download</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <div class="form-check">
+                                @*<input class="form-check-input" type="checkbox" id="ChkInvoiceNo" onclick="CheckInvoice()">*@
+                                @Html.CheckBoxFor(m => m.ChkInvoiceNo, new { id = "ChkInvoiceNo", @class = "form-check-input", onclick = "CheckInvoice()" })
+                                @*@Html.CheckBox("IsChecked", new { id = "ChkInvoiceNo",@class = "form-check-input" })*@
+                                <label class="form-check-label">Invoice No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <div class="form-check">
+                                @*<input class="form-check-input" type="checkbox" id="ChkDate" onclick="CheckDate()">*@
+                                @Html.CheckBoxFor(m => m.ChkDate, new { id = "ChkDate", @class = "form-check-input", onclick = "CheckDate()" })
+                                <label class="form-check-label">Invoice Date</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <div class="form-check">
+
+                                @*<input class="form-check-input" type="checkbox" id="ChkReporttype" onclick="CheckReporttype()">*@
+                                @Html.CheckBoxFor(m => m.ChkReporttype, new { id = "ChkReporttype", @class = "form-check-input", onclick = "CheckReporttype()" })
+                                <label class="form-check-label">Report Type</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Invoice_Number, new { id = "Invoice_Number", disabled = "disabled", @placeholder = "Enter Your Invoice No.", @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <div class="input-group date" id="DateFrom" DateFrom data-target-input="nearest">
+                                @Html.TextBoxFor(m => m.DateFrom, new { id = "DateFrom1", disabled = "disabled", @placeholder = "From Date", @class = "form-control datetimepicker-input" })
+                                <div class="input-group-append" data-target="#DateFrom" data-toggle="datetimepicker">
+                                    <div class="input-group-text">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <div class="input-group date" id="DateTo" DateTo data-target-input="nearest">
+                                @Html.TextBoxFor(m => m.DateTo, new { id = "DateTo1", disabled = "disabled", @placeholder = "To Date", @class = "form-control datetimepicker-input" })
+                                <div class="input-group-append" data-target="#DateTo" data-toggle="datetimepicker">
+                                    <div class="input-group-text">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.RerportType, new SelectList(
+                                new List<Object>{
+                                      new { value = 0 , text = "Select Report Type"  },
+                                     new { value = "With Trade Ref.No" , text = "With Trade Ref.No"  },
+                                     new { value = "Without Trade Ref.No" , text = "Without Trade Ref.No"}}, "value", "text", 0), new { id = "ReportType", disabled = "disabled", @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <form method="post" asp-controller="Login">
+
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-app bg-success" value="Show" asp-action="Show"><i class="fas fa-clipboard-list"></i>Show</button>
+                                <button type="submit" class="btn btn-app bg-success" value="Excel" asp-action="Excel"><i class="fas fa-file-excel"></i>Excel</button>
+                                <button type="submit" class="btn btn-app bg-success" value="SelectAll" asp-action="SelectAll"><i class="fas fa-check-square"></i>Select All</button>
+                                <button type="submit" class="btn btn-app bg-success" value="DeSelectAll" asp-action="DeSelectAll"><i class="far fa-square"></i>De-Select All</button>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    @Html.ViewData
+                    <table id="employeeTable" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Invoice_Number</th>
+                                <th>Invoice_Amount</th>
+                                <th>Currency</th>
+                                <th>Vehical_ID</th>
+                                <th>DueDate</th>
+                                <th>Dealer_Name</th>
+                                <th>Dealer_Address1</th>
+                                <th>Dealer_City</th>
+                                <th>Transporter_Name</th>
+                                <th>Transport_Number</th>
+                                <th>Transport_Date</th>
+                                <th>Dealer_Code</th>
+                                <th>Transporter_Code</th>
+                                <th>Dealer_Address2</th>
+                                <th>Dealer_Address3</th>
+                                <th>Dealer_Address4</th>
+                                <th>IMEX_DEAL_NUMBER</th>
+                                <th>TradeOp_Selected_Invoice_Date</th>
+                                <th>Trade_OPs_Remarks</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+
+                    @*<div id="jsGrid1"></div>*@
+                </form>
+
+            }
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+</div>
+
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- Select2 -->
+<script src="../../plugins/select2/js/select2.full.min.js"></script>
+<!-- Bootstrap4 Duallistbox -->
+<script src="../../plugins/bootstrap4-duallistbox/jquery.bootstrap-duallistbox.min.js"></script>
+<!-- InputMask -->
+<script src="../../plugins/moment/moment.min.js"></script>
+<script src="../../plugins/inputmask/jquery.inputmask.min.js"></script>
+<!-- date-range-picker -->
+<script src="../../plugins/daterangepicker/daterangepicker.js"></script>
+<!-- bootstrap color picker -->
+<script src="../../plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<!-- Tempusdominus Bootstrap 4 -->
+<script src="../../plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+<!-- Bootstrap Switch -->
+<script src="../../plugins/bootstrap-switch/js/bootstrap-switch.min.js"></script>
+<!-- BS-Stepper -->
+<script src="../../plugins/bs-stepper/js/bs-stepper.min.js"></script>
+<!-- dropzonejs -->
+<script src="../../plugins/dropzone/min/dropzone.min.js"></script>
+
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+
+<!-- jsGrid -->
+@*<script src="../../plugins/jsgrid/demos/db.js"></script>
+    <script src="../../plugins/jsgrid/jsgrid.min.js"></script>*@
+
+@*<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>*@
+
+<script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>
+
+<!-- Page specific script -->
+<script>
+    $(function () {
+
+        var today = new Date();
+        //Date picker
+        $('#DateFrom').datetimepicker({
+            format: 'L', endDate: "today",
+            maxDate: today
+        });
+        //Date picker
+        $('#DateTo').datetimepicker({
+            format: 'L', endDate: "today",
+            maxDate: today
+        });
+
+    })
+</script>
+<script>
+    function CheckInvoice() {
+        var checkBox = document.getElementById("ChkInvoiceNo");
+        if (checkBox.checked == true) {
+            document.getElementById("Invoice_Number").disabled = false
+        }
+        else {
+            document.getElementById("Invoice_Number").disabled = true
+        }
+    };
+    function CheckDate() {
+        var checkBox = document.getElementById("ChkDate");
+        if (checkBox.checked == true) {
+            document.getElementById("DateFrom1").disabled = false
+            document.getElementById("DateTo1").disabled = false
+        }
+        else {
+            document.getElementById("DateFrom1").disabled = true
+            document.getElementById("DateTo1").disabled = true
+        }
+    };
+    function CheckReporttype() {
+        var checkBox = document.getElementById("ChkReporttype");
+        if (checkBox.checked == true) {
+            document.getElementById("ReportType").disabled = false
+        }
+        else {
+            document.getElementById("ReportType").disabled = true
+        }
+    };
+
+</script>
+
+<script>
+        var Popup, dataTable;
+        $(document).ready(function () {
+            dataTable =  $("#employeeTable").DataTable({
+                "ajax": {
+                    "url": "/TradeOps_DownloadInvoice/Show",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "Select" },
+                    { "data": "Invoice_Number" },
+                    { "data": "Invoice_Amount" },
+                    { "data": "Currency" },
+                    { "data": "Vehical_ID" },
+                    { "data": "DueDate" },
+                    { "data": "Dealer_Name" },
+                    { "data": "Dealer_Address1" },
+                    { "data": "Dealer_City" },
+                    { "data": "Transporter_Name" },
+                    { "data": "Transport_Number" },
+                    { "data": "Transport_Date" },
+                    { "data": "Dealer_Code" },
+                    { "data": "Transporter_Code" },
+                    { "data": "Dealer_Address2" },
+                    { "data": "Dealer_Address3" },
+                    { "data": "Dealer_Address4" },
+                    { "data": "IMEX_DEAL_NUMBER" },
+                    { "data": "TradeOp_Selected_Invoice_Date" },
+                    { "data": "Trade_OPs_Remarks" },                   
+                    {
+                        "orderable": false,
+                        "searchable":false,
+                        "width":"150px"
+                    }
+
+                ],
+                "language": {
+
+                    "emptyTable" : "No data found, Please click on <b>Add New</b> Button"
+                }
+            });
+        });
+
+        //function PopupForm(url) {
+        //    var formDiv = $('<div/>');
+        //    $.get(url)
+        //    .done(function (response) {
+        //        formDiv.html(response);
+
+        //        Popup = formDiv.dialog({
+        //            autoOpen: true,
+        //            resizable: false,
+        //            title: 'Fill Employee Details',
+        //            height: 500,
+        //            width: 700,
+        //            close: function () {
+        //                Popup.dialog('destroy').remove();
+        //            }
+
+        //        });
+        //    });
+        //}
+
+        //function SubmitForm(form) {
+        //    $.validator.unobtrusive.parse(form);
+        //    if($(form).valid()){
+        //        $.ajax({
+        //            type : "POST",
+        //            url : form.action,
+        //            data : $(form).serialize(),
+        //            success : function (data) {
+        //                if(data.success)
+        //                {
+        //                    Popup.dialog('close');
+        //                    dataTable.ajax.reload();
+
+        //                    $.notify(data.message,{
+        //                        globalPosition :"top center",
+        //                        className : "success"
+        //                    })
+
+        //                }
+        //            }
+        //        });
+        //    }
+        //    return false;
+        //}
+
+        @*function Delete(id) {
+            if(confirm('Are You Sure to Delete this Employee Record ?'))
+            {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Delete","Employee")/' + id,
+                    success: function (data) {
+                        if (data.success)
+                        {
+                            dataTable.ajax.reload();
+
+                            $.notify(data.message, {
+                                globalPosition: "top center",
+                                className: "success"
+                            })
+
+                        }
+                    }
+
+                });
+            }
+        }*@
+</script>
+
+
+@*<script>
+
+
+        $(function () {
+            $("#jsGrid1").jsGrid({
+                height: "100%",
+                width: "100%",
+
+                autoload: true,
+                sorting: true,
+                paging: true,
+                pageSize: 10,
+                pageButtonCount: 5,
+
+               /* data: db.clients,*/
+                   controller: {
+                    loadData: function(filter) {
+                        return $.ajax({
+                            type: "Post",
+                            url: "/TradeOps_DownloadInvoice/Show",
+                            data: filter,
+                            dataType: "json"
+                        });
+                    },
+                fields: [
+                   /* { name: "Select", type: "checkbox", title: "Is Selected" },*/
+                    { name: "Invoice_Number", type: "text", title: "Invoice Number" },
+                    { name: "Invoice_Amount", type: "number", title: "Invoice Amount" },
+                    { name: "Currency", type: "text", title: "Currency"},
+                    { name: "Vehical_ID", type: "text", title: "Vehical ID"},
+                    { name: "DueDate", type: "text", title: "Due Date"},
+                    { name: "Dealer_Name", type: "text", title: "Dealer Name"},
+                    { name: "Dealer_Address1", type: "text", title: "Dealer Address1"},
+                    { name: "Dealer_City", type: "text", title: "Dealer City" },
+                    { name: "Transporter_Name", type: "text", title: "Transporter Name"},
+                    { name: "Transport_Number", type: "text", title: "Transport Number"},
+                    { name: "Transport_Date", type: "text", title: "Transport_Date"},
+                    { name: "Dealer_Code", type: "text", title: "Dealer Code"},
+                    { name: "Transporter_Code", type: "text", title: "Transporter Code"},
+                    { name: "Dealer_Address2", type: "text", title: "Dealer Address2"},
+                    { name: "Dealer_Address3", type: "text", title: "Dealer Address3"},
+                    { name: "Dealer_Address4", type: "text", title: "Dealer Address4"},
+                    { name: "IMEX_DEAL_NUMBER", type: "text", title: "IMEX DEAL NUMBER"},
+                    { name: "TradeOp_Selected_Invoice_Date", type: "text", title: "TradeOp Date"},
+                    { name: "Trade_OPs_Remarks", type: "text", title: "Trade OPs Remarks"}
+                ]
+            });
+        });
+    </script>*@

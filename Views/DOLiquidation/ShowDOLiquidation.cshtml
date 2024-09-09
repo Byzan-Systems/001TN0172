@@ -1,0 +1,105 @@
+﻿@model _001TN0172.Models.ControlDOLiquidation
+@{
+    ViewData["Title"] = "Manual Liquidation of DO";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<div class="content-wrapper">
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Manual Liquidation of DO</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+                    </div>
+                }
+                <form method="post" enctype="multipart/form-data">
+                    <div class="card card-info" style="height:auto;">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label>Enter DO Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <input asp-for="DoNumberNew" class="form-control" id="txt_DoNumberNew" onselect="success()" onchange="success()" />
+                                        </div>
+                                        <span asp-validation-for="DoNumberNew" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <button type="submit" id="SbmButton" class="btn btn-flat bg-info" disabled asp-controller="DOLiquidation" value="ShowPayInfo" asp-action="ShowPayInfo">
+                                            <i class="fas fa-file-upload"></i>&nbsp &nbsp Show
+                                        </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                        </div>
+                    </div>
+                
+                </form>
+            }
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+</div>
+<script>
+    let input = document.querySelector("#txt_DoNumberNew");
+    let button = document.querySelector("#SbmButton");
+    button.disabled = true;
+    input.addEventListener("change", stateHandle);
+
+    function stateHandle() {
+        if (document.querySelector("#txt_DoNumberNew").value === "") {
+            button.disabled = true;
+        } else {
+            button.disabled = false;
+        }
+    }
+
+    //function success() {
+
+    //    if (document.getElementById("txt_DoNumberNew").value === "" || document.getElementById("txt_DoNumberNew").value === null) {
+
+    //        document.getElementById('SbmButton').disabled = true;
+
+    //    } else {
+
+    //        document.getElementById('SbmButton').disabled = false;
+
+    //    }
+</script>
+
+
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>

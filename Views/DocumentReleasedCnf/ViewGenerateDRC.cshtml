@@ -1,0 +1,129 @@
+﻿@model _001TN0172.Models.DRC
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#btnsbmt').on('click', function () {
+                document.getElementById('#chkboxemail').checked = false;
+                document.getElementById('#txtUTRNO').innerText = "";
+                document.getElementById('#txtVirtualAccountNo').innerText = "";
+            });
+        })
+    </script>
+</head>
+<div class="content-wrapper">
+    <div class="card card-warning">
+
+        <div class="card-header">
+            <h1 class="card-title">Document Released Confirmation</h1>
+        </div>
+        <div class="card-body class=" vw-100"">
+            <section class="content">
+                @using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    if (TempData["alertMessage"] != null)
+                    {
+                <div class="alert alert-success alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                    @TempData["alertMessage"].ToString()
+                    
+                </div>
+                    }
+
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label>UTR No</label>
+                                @Html.TextBoxFor(M => M.DRCUTRNo, new { id = "txtUTRNO", @class = "form-control" })
+                                
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label>Virtual Account No</label>
+                                @Html.TextBoxFor(M => M.DRCVirtualAcc, new { id = "txtVirtualAccountNo", @class = "form-control" })
+                                
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label>UTR No.</label>
+
+                                @Html.DropDownListFor(m => m.DRCUTRCm, new SelectList(
+                                                    new List<Object>{
+                                                          new { value = 0 , text = "Only PDF"  },
+                                                         new { value = "DRC Generate" , text = "DRC Generate"  },  new { value = "DRC Generate and Mail" , text = "DRC Generate and Mail"  },
+                                                         }, "value", "text", 0), new { id = "drpUTRNo", @class = "form-control" })
+
+                                @*<select name="@Html.NameFor(m=>m.DRCUTRCm)"  class="select2" multiple="multiple" data-placeholder="Only PDF" style="width: 100%;">
+                                <option>DRC Generate</option>
+                                <option>DRC Generate and Mail</option>
+                            </select>*@
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        @Html.CheckBoxFor(M => M.IsSelect , new { id="chkboxemail" })
+                        @Html.LabelFor(M => M.IsSelect, "Check To Send Mail To Maruti ID's")
+                    </div>
+
+                    <br>
+                    <br>
+                    <form method="post" asp-controller="DocumentReleasedCnf">
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <div class="form-group">
+                                    <button type="submit" id ="btnsbmt" class="btn btn-primary" value="GenerateDRC" asp-action="GenerateDRC"><i class="fas fa-clipboard-list"></i>Upload</button>
+                                    <a class="btn btn-danger" href="@Url.Action("HomePage","Login")">Exit</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+
+                }
+                </section>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+

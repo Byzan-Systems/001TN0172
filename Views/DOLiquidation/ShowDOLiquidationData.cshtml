@@ -1,0 +1,181 @@
+﻿@model _001TN0172.Models.ControlDOLiquidation
+@{
+    ViewData["Title"] = "Manual Liquidation of DO";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<div class="content-wrapper">
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Manual Liquidation of DO</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("", "", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+                    </div>
+                }
+                <form method="post" enctype="multipart/form-data">
+                    
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>DoNumber</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-   evzcz">
+                                <div class="input-group">
+                                    <input asp-for="DoNumber" class="form-control" id="txt_DONumber" />
+                                </div>
+                                <span asp-validation-for="DoNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>DoAmount</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input asp-for="DoAmount" class="form-control" id="txt_DOAmount" />
+                                </div>
+                                <span asp-validation-for="DoAmount" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>TotalNumberofinvoice</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input asp-for="TotalNumberofinvoice" class="form-control" id="txt_TotalNumberofinvoice" />
+                                </div>
+                                <span asp-validation-for="TotalNumberofinvoice" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>DealerName</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input asp-for="DealerName" class="form-control" id="txt_DealerName" />
+                                </div>
+                                <span asp-validation-for="DealerName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>FinancerDetails</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input asp-for="FinancerDetails" class="form-control" id="txt_FinancerDetails" />
+                                </div>
+                                <span asp-validation-for="FinancerDetails" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>PaymentType</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <script type="text/javascript">
+                                          function SetDept() {
+                                          $("#Type").val($("#drp_Payment option:selected").text());
+                                            }
+                                    </script>
+                                        <select id="drp_Payment"  asp-for="PaymentType" class="form-control" onchange="SetDept()" asp-items="@(new SelectList(Model.PaymentTypeList, "Values","Type"))" >
+                                            <option value="">--Select--</option>
+                                        </select>
+                                        <input type="hidden" asp-for="PaymentType" />
+
+                                </div>
+                                <span asp-validation-for="PaymentType" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>PaymentRefno</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input asp-for="PaymentRefno" class="form-control" id="txt_PaymentRefno" />
+                                </div>
+                                <span asp-validation-for="PaymentRefno" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>Remarks</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input asp-for="Remarks" class="form-control" id="txt_Remarks" />
+                                </div>
+                                <span asp-validation-for="Remarks" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-app bg-success" value="UpdatePayInfo" asp-action="UpdatePayInfo"><i class="fas fa-file-upload"></i>Update</button>
+                                <button type="submit" class="btn btn-app bg-blue" value="ShowDOLiquidation" asp-action="ShowDOLiquidation"><i class="fas"></i>Back</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+</div>
+
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>

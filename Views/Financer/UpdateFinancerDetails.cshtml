@@ -1,0 +1,196 @@
+﻿
+@model _001TN0172.Models.FinancerModel
+@{
+    ViewBag.Title = "Update Financer Details  ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<div class="content-wrapper">
+    @*<div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">User Master</h1>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Update Financer Details</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("", "", FormMethod.Post))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+                    </div>
+                }
+
+                @*<form>*@
+
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group" hidden="hidden">
+                            <label>ID</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group" hidden="hidden">
+                            @Html.TextBoxFor(m => m.ID, new { @Value = "0", @class = "form-control" })
+                            @*<input type="text" class="form-control" placeholder="Enter Your User Name ...">*@
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Financer Type</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.FType, new SelectList(
+      new List<Object>{
+            new { value = 0 , text = "Select Financer Type"  },
+           new { value = "A" , text = "A"  },
+           new { value = "B" , text = "B" },
+           new { value = "C" , text = "C"},
+           new { value = "D" , text = "D"},
+           new { value = "E" , text = "E"},
+           new { value = "F" , text = "F"},
+           new { value = "G" , text = "G"},
+           new { value = "H" , text = "H"},
+           new { value = "I" , text = "I"},
+           new { value = "J" , text = "J"},
+           new { value = "K" , text = "K"},
+           new { value = "L" , text = "L"},
+           new { value = "M" , text = "M"},
+           new { value = "N" , text = "N"},
+           new { value = "O" , text = "O"},
+           new { value = "P" , text = "P"},
+           new { value = "Q" , text = "Q"},
+           new { value = "R" , text = "R"},
+           new { value = "S" , text = "S"},
+           new { value = "T" , text = "T"},
+           new { value = "U" , text = "U"},
+           new { value = "V" , text = "V"},
+           new { value = "W" , text = "W"},
+           new { value = "X" , text = "X"},
+           new { value = "Y" , text = "Y"},
+           new { value = "Z" , text = "Z"}}, "value", "text", 0), new { @placeholder = "Financer Type", id = "FType", @class = "form-control" })
+                            @*<input type="password" class="form-control" placeholder="Enter Your Password ...">*@
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Financer Name</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @*<input type="password" class="form-control" placeholder="Enter Your Password ...">*@
+                            @Html.TextBoxFor(m => m.FName, new { @placeholder = "Enter Financer Name ...", id = "FName", @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>IFSC Part</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.IFSCPart, new { @placeholder = "Enter Your IFSC Part ...", id = "IFSCPart", @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Financer Code</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.FCode, new { @placeholder = "Enter Financer Code ...", id = "FCode", @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <form method="post" asp-controller="Login">
+
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-app bg-success" value="Edit" asp-action="SaveFinancerDetails" asp-route-Task="Update"  onclick=" return validateForm()"><i class="fas fa-save"></i>Edit</button>
+                                <button type="submit" class="btn btn-app bg-danger" value="Save" asp-action="ShowFinancer"><i class="fas fa-arrow-alt-circle-left"></i>Back</button>
+                                @*<a class="btn btn-danger" asp-action="Index">Back</a>*@
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                @*</form>*@
+            }
+
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+    <script>
+        function validateForm() {
+            var FType = document.getElementById("FType").value;
+            var FName = document.getElementById("FName").value;
+            var IFSCPart = document.getElementById("IFSCPart").value;
+            var FCode = document.getElementById("FCode").value;
+
+
+            if (FType == "0") {
+                alert("Please Select Report Type.");
+                return false;
+            }
+            if (FName == "" || FName == null) {
+                alert("Please Enter Financer Name.");
+                return false;
+            }
+            //if (IFSCPart == "" || IFSCPart == null) {
+            //    alert("Please Enter IFSC Part.");
+            //    return false;
+            //}
+            //if (FType != "V" && (FCode == "" || FCode == null)) {
+            //    alert("Please Enter Financer Code.");
+            //    return false;
+            //}
+            return true;
+        }
+    </script>
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+
+

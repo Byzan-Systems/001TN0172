@@ -1,0 +1,109 @@
+﻿@model IEnumerable<_001TN0172.Models.showAddMISControlPointDT>
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
+
+</head>
+<div class="content-wrapper">
+
+
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Invoice Data</h1>
+        </div>
+        <p style="text-align:right;margin-right:20px;">
+            <a class="btn btn-primary" asp-action="ExportExcel" onclick=" return validateForm()">Excel</a>
+            <a class="btn btn-danger" asp-action="Index">Back</a>
+        </p>
+        <!-- /.card-header -->
+        @*<div class="container p-3 my-3 border">*@
+        <div class="table-responsive">
+            <table id="example" class="table table-striped">
+                @*class="table table-bordered"*@
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Invoice_data_Received_Date)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.TOTAL_Invoice)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.stepdate)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.PHyInvRec)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Order_Rec)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Payment_Recev)
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Invoice_data_Received_Date)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.TOTAL_Invoice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.stepdate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PHyInvRec)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Order_Rec)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Payment_Recev)
+                            </td>
+                            <td></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <script>
+                            function validateForm() {
+                                var count ='@Model.Count()';
+                                if (count== 0 ) {
+                                    alert("No Data found to download.");
+                                    return false;
+                                }
+                                if (count == null) {
+                                    alert("No Data found to download.");
+                                    return false;
+                                }
+                            }
+            </script>
+        </div>
+    </div>
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>

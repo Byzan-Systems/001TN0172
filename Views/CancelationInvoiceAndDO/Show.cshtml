@@ -1,0 +1,189 @@
+﻿
+@using System.Data
+@model DataTable
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
+
+    <script type="text/javascript">
+        function selects() {
+            var ele = document.getElementsByName('IsSelect');
+            for (var i = 0; i < ele.length; i++) {
+                if (ele[i].type == 'checkbox')
+                    ele[i].checked = true;
+            }
+            countCheckboxes();
+        }
+        function deSelect() {
+            var ele = document.getElementsByName('IsSelect');
+            for (var i = 0; i < ele.length; i++) {
+                if (ele[i].type == 'checkbox')
+                    ele[i].checked = false;
+
+            }
+            countCheckboxes();
+        }
+        //$("#cambiarAreaE").click(function (e) {
+        //    e.preventDefault();
+
+        //    var checkedIds = new Array();
+        //    //loop through tbody > class checkboxAlistados
+        //    var selectors = $("#example tbody .checkboxAlistados:checked");
+        //    selectors.each(function () {
+        //        //get closest tr and then get Cod value
+        //        checkedIds.push($(this).closest('tr').find("td:eq(0)").text())
+
+        //    });
+        //    console.log(checkedIds)
+        //    //your ajax call ..do JSON stringify
+
+        //});
+
+
+        //yogesh
+        function countCheckboxes() {
+            var countInput = document.getElementById('count');
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].onchange = countCheckboxes;
+            }
+
+            var count = 0;
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked && !checkboxes[i].disabled)
+                    count++;
+            }
+            $("#count").html("Selected Count : " + count);
+            countInput.value = count;
+        }
+        countCheckboxes();
+        //yogesh
+
+
+
+    </script>
+
+
+</head>
+<div class="content-wrapper">
+    @using (Html.BeginForm("Show", "CancelationInvoiceAndDO", FormMethod.Post))
+    {
+
+        <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Cancellation Invoice and DD</h1>
+        </div>
+        <p style="text-align:right;margin-right:20px;margin-top: 8px;">
+            <div class="row">
+
+                <div class="col-sm-2">
+                    <label id="count" class="control-label">Selected Count : 0</label>
+                </div>
+                <div class="col-sm-2">
+
+                </div>
+                <div class="col-sm-2">
+
+                </div>
+                <div class="col-sm-2">
+
+                </div>
+
+                <div class="col-sm-4">
+                    <a class="btn btn-primary" onclick='selects()'>Select All</a>
+                    <a class="btn btn-primary" onclick='deSelect()'>De-Select All</a>
+                    <button type="submit" class="btn btn-primary" value="RecordsDelete" asp-action="RecordsDelete"><i class="fas fa-file-excel"></i>Delete</button>
+                    <a class="btn btn-danger" asp-action="ShowCancelationInvoiceAndDO">Back</a>
+                </div>
+            </div>
+        </p>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("", "", FormMethod.Post))
+            {
+            <table cellpadding="0" cellspacing="0" class="table table-bordered table-striped">
+                <tr>
+                    @if (Model != null)
+                    {
+                        <td>
+                            
+                            <label class="control-label">Select</label>
+                        </td>
+                        @foreach (DataColumn col in Model.Columns)
+                        {
+
+                            <th>@col.ColumnName</th>
+                        }
+                    }
+                    else
+                    {
+<tr>
+                        <td><div>No record Found</div></td>
+                    </tr>
+                }
+                   
+                    @if (Model != null)
+                    {
+                        @foreach (DataRow row in Model.Rows)
+                        {
+                            
+                            <tr>
+                                <td>
+                                    <input data-val="true" data-val-required="The isActive field is required." id="IsSelect" name="IsSelect" type="checkbox" onclick="countCheckboxes()" />
+                                    <input name="IsSelect" type="hidden" value="false" />
+                                </td>
+                                @foreach (DataColumn col in Model.Columns)
+                                {
+                                    <td>@row[col.ColumnName]</td>
+                                }
+                            </tr>
+
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td><div>No record Found</div></td>
+                        </tr>
+                    }
+                </table>
+                }
+            @if (ViewBag.Message != null)
+            {
+                <script type="text/javascript">
+            window.onload = function () {
+                alert("@ViewBag.Message");
+            };
+                </script>
+            }
+        </div>
+        <!-- /.card-body -->
+
+    </div>
+    }
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

@@ -1,0 +1,133 @@
+﻿@model _001TN0172.Models.AccountDetails
+@{
+    ViewBag.Title = "File Account Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+
+<div class="content-wrapper">
+
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">FillModel Account Details</h1>
+            <h1> @ViewBag.PageName</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("FillModel", "Login", FormMethod.Post))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+                    </div>
+                }
+                @*<form>*@
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Payment Type</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">                            
+
+                            @*@Html.DropDownListFor(m => m.Payment_Type, new SelectList(
+        new List<Object> { new { value = "Select Payment Type", text = "Select Payment Type" }, new { value = "BT", text = "BT" },
+            new { value = "NEFT", text = "NEFT" }, new { value = "RTGS", text = "RTGS" } }, "value", "text", 0), new { @class = "form-control", id = "ddlpaytype" })*@
+                            <button type="submit" class="btn btn-block btn-primary btn-xs" value="FillModel" asp-action="FillModel"><i class="fas fa-save"></i>Fill</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Credit Account No</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DR_Account_No, new { @placeholder = "Enter Your CR_AccountNo ...", @class = "form-control", id = "DR_Account_No" })
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Debit Account No</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+
+                            @Html.TextBoxFor(m => m.CR_Account_No, new { @placeholder = "Enter Your DB_AccountNo ...", @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-10">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-app bg-success" value="FillModelAccountDetails" asp-action="FillModelAccountDetails"><i class="fas fa-save"></i>Update</button>
+                           
+                        </div>
+                    </div>
+                </div>
+
+                @*</form>*@
+            }
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+
+@*<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#ddlpaytype").change(function () {
+                var itemId = $("#ddlpaytype").val();
+                GetItemUnitPrice(itemId);
+            });
+        });
+
+        function GetItemUnitPrice(itemId) {
+            $.ajax({
+                async: true,
+                type: 'GET',
+                dataType: 'JSON',
+                contentType: 'application/json; charset=utf-8',
+                url: '/Login/selectSBU/' + itemId,
+                data: { itemId: itemId },
+                success: function (data) {
+                    $("#DR_Account_No").val(parseFloat(data).toFixed(2));
+                },
+                error: function () {
+                    alert("There is some problem to get the Unit Price.");
+                }
+            });
+        }
+    </script>*@

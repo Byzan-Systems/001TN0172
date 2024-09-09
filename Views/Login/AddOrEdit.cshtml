@@ -1,0 +1,79 @@
+﻿@model _001TN0172.Models.LoginMST
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<div class="content-wrapper">
+
+
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">User Master</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <div class="container p-3 my-3 border">
+                    
+                <div class="row">
+                    <div class="col-sm-6">
+                        <hr />
+                        <form asp-action="AddOrEdit">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            @if (@ViewBag.IsEdit)
+                            {
+                                <input type="hidden" asp-for="LoginID" />
+                            }
+                            <div class="form-group">
+                                <label asp-for="LoginName" class="control-label">Login Name</label>
+                                <input asp-for="LoginName" class="form-control" required/>
+                                <span asp-validation-for="LoginName" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LoginType" class="control-label">Role Type</label>
+                                @*<input asp-for="Salary" class="form-control" />*@
+                                <select class="form-control" id="LoginType" name="LoginType">
+                                    <option>Select Role Type</option>
+                                    <option>ADMIN</option>
+                                    <option>CASH OPS</option>
+                                    <option>TRADE OPS</option>
+                                </select>
+                                <span asp-validation-for="LoginType" class="text-danger"></span>
+                            </div>
+                            @*<div class="form-group">
+                        <label asp-for="JoiningDate" class="control-label"></label>
+                        <input asp-for="JoiningDate" class="form-control" />
+                        <span asp-validation-for="JoiningDate" class="text-danger"></span>
+                    </div>*@
+                            <div class="form-group">
+                                <input class="btn btn-primary" type="submit" asp-action="Editupdate" value="Save" />
+                                <a class="btn btn-danger" asp-action="Index">Back</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>

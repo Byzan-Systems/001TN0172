@@ -1,0 +1,4 @@
+"Product","Remitter Name","Remitter A/ C No","Remitter Bank Name","UTR No","Amount","IFSC Code","VirtualAccountNumber","RejectedReason"
+"RTGS","VIJAY MOTOWINGS PVT LTD","/32061035912","Cholamandalam Investment and Finance Company Limited","SBINR12024062531469325","525684.58","SBIN0000812","HDFCIN9900120924450946X","Product Code is not valid"
+"","","","","","","","","Invalid Payment Type"
+"","","","","","","","","DO length is less or greater than 23"

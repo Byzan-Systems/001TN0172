@@ -1,0 +1,82 @@
+﻿@model _001TN0172.Models.ShowTradeRefNo
+{
+    ViewBag.Title = "MIS Liquidation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+
+    <!-- Theme style -->
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+
+
+</head>
+<div class="content-wrapper">
+
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">MIS Liquidation</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("ChangeTradeRefNo", "ChangeTradeRefNo", FormMethod.Post))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+
+                    </div>
+                }
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Trade Ref No</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <div class="input-group date" id="DateTo" DateTo data-target-input="nearest">
+                                @*@Html.TextBoxFor(m => m.TradeRefNum, new { id = "DateTo1", @placeholder = "Trade Ref No", @class = "form-control" })*@
+                                @Html.TextBoxFor(m => m.TradeRefNum, new { id = "TradeRefNo", @placeholder = "Trade Ref No", @class = "form-control", @maxlength=16 })
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <form method="post" asp-controller="Login">
+
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-app bg-success" value="Show" asp-action="Show"><i class="fas fa-clipboard-list"></i>Show</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+            }
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+</div>
+
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>

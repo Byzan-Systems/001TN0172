@@ -1,0 +1,140 @@
+﻿
+@model IEnumerable<_001TN0172.Models.TallyBookingFCCData>
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<div class="content-wrapper">
+
+
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Tally Booking FCC</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("", "", FormMethod.Post))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+                    </div>
+                }
+                <div class="container p-3 my-3 border">
+                    <form method="post">
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <div class="form-group">
+                                    @*<button type="submit" class="btn btn-app bg-success" value="TallyBookingFCC_Show" asp-action="TallyBookingFCC_Show"><i class="fas fa-clipboard-list"></i>Show</button>*@
+                                    <button type="submit" class="btn btn-app bg-success" value="ExportExcel" asp-action="ExportExcel" onclick=" return validateForm()"><i class="fas fa-file-excel"></i>Excel</button>
+                                    <button type="submit" class="btn btn-app bg-success" value="TallyBookingFCC" asp-action="TallyBookingFCC"><i class="fas fa-file-excel"></i>Back</button>
+
+
+                                    @*    <button type="submit" class="btn btn-app bg-success" value="SelectAll" asp-action="SelectAll"><i class="fas fa-check-square"></i>Select All</button>
+                                        <button type="submit" class="btn btn-app bg-success" value="DeSelectAll" asp-action="DeSelectAll"><i class="far fa-square"></i>De-Select All</button>*@
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.INV_Count)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Dealer_Code)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Dealer_Name)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.IMEX_DEAL_NUMBER)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.StepDate)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Inv_Amt)
+                                    </th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.INV_Count)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Dealer_Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Dealer_Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.IMEX_DEAL_NUMBER)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StepDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Inv_Amt)
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <script>
+                            function validateForm() {
+                                var count ='@Model.Count()';
+                                if (count== 0 ) {
+                                    alert("No Data found to download.");
+                                    return false;
+                                }
+                                if (count == null) {
+                                    alert("No Data found to download.");
+                                    return false;
+                                }
+                            }
+                        </script>
+                    </div>
+
+
+                </div>
+            }
+        </div>
+
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+

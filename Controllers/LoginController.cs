@@ -1,0 +1,892 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using _001TN0172.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using _001TN0172.Entities;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using System.DirectoryServices;
+using System.Security.Principal;
+using System.DirectoryServices.AccountManagement;
+using Novell.Directory.Ldap;
+
+namespace _001TN0172.Controllers
+{
+    public class LoginController : Controller
+    {
+        private readonly ILogger _logger;
+        private IWebHostEnvironment Environment;
+   
+        public LoginController(ILogger<LoginController> logger, IWebHostEnvironment _environment)
+        {
+            _logger = logger;
+            Environment = _environment;
+        }
+
+
+        public bool ValidateLDAP(string Username, string Password)
+        {
+            //return false;
+            _logger.LogInformation("In LDAP function1");
+            /////UAT
+            //string ldapHost = "ldap.hdfcbank.com";
+            //int ldapPort = 389; // Default LDAP port
+            //string username = Username;
+            //string password = Password;
+            /////UAT
+            /////Production
+            string ldapHost = "ldap.hbctxdom.com";
+            int ldapPort = 389; // Default LDAP port
+            string username = Username + "@hbctxdom.com";  ///Production
+            string password = Password;
+            ///Production
+
+            try
+            {
+                _logger.LogInformation("In LDAP function2");
+                // Create an LdapConnection object
+                LdapConnection ldapConnection = new LdapConnection();
+                // Connect to the LDAP server
+                _logger.LogInformation("Before LDAP Connect");
+                ldapConnection.Connect(ldapHost, ldapPort);
+                _logger.LogInformation("After LDAP Connect");
+                // Bind with the provided credentials
+                _logger.LogInformation("Before LDAP Bind" );
+                ldapConnection.Bind(username, password);
+                _logger.LogInformation("After LDAP Bind");
+                return true;
+                // If the bind is successful, authentication succeeded
+                //Console.WriteLine("Authentication successful");
+
+            }
+            catch (LdapException e)
+            {
+                // If an exception occurs, authentication failed
+                //Console.WriteLine($"Authentication failed: {e.Message}");
+                _logger.LogInformation(e.Message);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                //Console.WriteLine($"An error occurred: {ex.Message}");
+                _logger.LogInformation(ex.Message);
+                _logger.LogError(ex.Message + " - LoginController;ValidateLDAP");
+                return false;
+            }
+        }
+
+        public bool ValidateADUserNewConnection(string Username, string Password)
+        {
+            return false;
+            _logger.LogInformation("In LDAP function1");
+            try
+            {
+                // Set up LDAP connection parameters
+                //string ldapHost = "LDAP://ldap.hdfcbank.com"; //"ldap.example.com";
+                string ldapHost = "ldap.hdfcbank.com"; //"ldap.example.com";
+                int ldapPort = 389;
+                string ldapBindDn = "DC = corp, DC = hdfcbank, DC = com"; // "cn=admin,dc=example,dc=com";
+                //string ldapBindPassword = "admin_password";
+
+                // User credentials for authentication
+                string username = Username; //"user";
+                string password = Password; //"user_password";
+                _logger.LogInformation("In LDAP function2");
+                // Create an LDAP connection
+                LdapConnection ldapConnection = new LdapConnection();
+                _logger.LogInformation("In LDAP function3");
+                ldapConnection.Connect(ldapHost, ldapPort);
+                _logger.LogInformation("In LDAP function4");
+                //ldapConnection.Bind(ldapBindDn, ldapBindPassword);
+                //ldapConnection.Bind(ldapBindDn, Password);
+
+                //Console.WriteLine("LDAP connection successful.");
+                _logger.LogInformation("LDAP connection successful.");
+
+                // Search for the user entry to authenticate
+                string userDn = $"uid={username},ou=users,dc=hdfcbank,dc=com";
+                LdapSearchResults searchResults = ldapConnection.Search(
+                    "ou=users,dc=hdfcbank,dc=com",
+                    LdapConnection.SCOPE_SUB,
+                    $"(uid={username})",
+                    null,
+                    false
+                );
+
+                _logger.LogInformation("In LDAP function5");
+
+
+                ldapConnection.Bind(userDn, password);
+
+                // If successful, authentication is valid
+                //Console.WriteLine("Authentication successful.");
+                _logger.LogInformation("Authentication successful.");
+                return true;
+
+                ///Check if user entry exists
+                if (searchResults.hasMore())
+                {
+                    // Attempt to bind with user's credentials
+                    ldapConnection.Bind(userDn, password);
+
+                    // If successful, authentication is valid
+                    //Console.WriteLine("Authentication successful.");
+                    _logger.LogInformation("Authentication successful.");
+                    return true;
+
+                }
+                else
+                {
+                    //Console.WriteLine("User not found.");
+                    _logger.LogInformation("User not found.");
+                }
+
+                // Disconnect LDAP connection
+                ldapConnection.Disconnect();
+            }
+            catch (LdapException e)
+            {
+                //Console.WriteLine($"LDAP Exception: {e.Message}");
+                _logger.LogInformation($"LDAP Exception: {e.Message}");
+                return false;
+            }
+
+            
+
+        }
+
+        public bool ValidateADUserNew(string Username, string Password)
+        {
+            
+            _logger.LogInformation("In LDAP function1");
+            try 
+            { 
+                using (var context = new PrincipalContext(ContextType.Domain, "LDAP://ldap.hdfcbank.com:389"))
+                {
+                    _logger.LogInformation("In LDAP function2");
+                    var useri = UserPrincipal.FindByIdentity(context, Username);
+                    _logger.LogInformation("In LDAP function3");
+                    if (useri != null)
+                    {
+                        _logger.LogInformation("In LDAP function4");
+                        return true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Error :" + ex.Message.ToString());
+                _logger.LogInformation("Return False");
+                return false;
+            }
+
+            return false;
+        }
+
+        public bool ValidateADUser(string Username, string Password)
+        {
+            _logger.LogInformation("In LDAP function1");
+            //return false;
+            _logger.LogInformation("In LDAP function2");
+            /////Production
+            /////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hbctxdom.com:389/dc=hbctxdom,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
+
+            ///////UAT
+            ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://10.226.213.116/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
+            ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hdfcbank.com/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
+            var de = new DirectoryEntry("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
+
+           
+
+            _logger.LogInformation("Before connecting");
+
+            _logger.LogInformation("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com" + " " + Username + " " + Password);
+
+            
+
+            try
+            {
+                _logger.LogInformation("Authencating User");
+
+                var ds = new System.DirectoryServices.DirectorySearcher(de);
+                ds.FindOne();
+                _logger.LogInformation("Return True");
+                return true;
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogInformation("Error :" + ex.Message.ToString());
+                _logger.LogInformation("Return False");
+                return false;
+            }
+        }
+
+        public void LoginLogDB(string pExpDescp, string pError_Id, string Type, string FrmUserID)
+        {
+            try
+            {
+
+
+                string D1 = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt");
+                string strId;
+                string cmd;
+                using (var db = new Entities.DatabaseContext())
+                {
+                    var strlogId = db.Set<UAM_LoginLogout>().FromSqlRaw("select max(Convert(int, logId)) from UAM_LoginLogout").ToList();
+
+                    if (strlogId[0].LogID == "")
+                    {
+                        strId = 0.ToString();
+                    }
+                    else
+                    {
+                        strId = strlogId[0].LogID;
+                    }
+
+
+                    if (Type == "LOGIN")
+                    {
+                        strId = (strId + 1d).ToString();
+
+                        db.Database.ExecuteSqlRaw("insert into UAM_LoginLogout (logId,User_id,Logindate_time) values('" + strId + "','" + FrmUserID.ToString() + "','" + D1 + "'");
+
+                    }
+                    else
+                    {
+                        Type = "LOGOUT";
+                        db.Database.ExecuteSqlRaw("update UAM_LoginLogout set Logoutdate_time='" + D1 + "'  where User_id='" + FrmUserID.ToString() + "' and LogID='" + strId + "'");
+
+
+                    }
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //Interaction.MsgBox("Error :" + ex.Message.ToString(), (MsgBoxStyle)((int)MsgBoxStyle.Information + (int)MsgBoxStyle.OkOnly));
+                //Handle_Error(ex, "ClsBase", Information.Err().Number, "LoginLogDB");
+            }
+            finally
+            {
+
+            }
+
+        }
+
+        [HttpPost]
+        public IActionResult LoginPage(LoginMST LoginViewModel)
+        {
+            try
+            {
+                using (var db = new Entities.DatabaseContext())
+                {
+                    //var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Password == LoginViewModel.Password && a.Login_Enable == 1).FirstOrDefault();
+                    var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName  && a.Login_Enable == 1).FirstOrDefault();
+
+                    if (rec != null)
+                    {
+                        HttpContext.Session.SetString("UserName", LoginViewModel.LoginName);
+                        HttpContext.Session.SetString("LoginID", rec.LoginID.ToString());
+                       UserSession.LoginID = rec.LoginID.ToString();
+                             var builder = new ConfigurationBuilder()
+                           .SetBasePath(Directory.GetCurrentDirectory() + "\\")
+                           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+                        IConfigurationRoot configuration = builder.Build();
+                        string contentPath = Environment.ContentRootPath + "\\";
+                        HttpContext.Session.SetString("InputFilePath", contentPath + configuration.GetSection("MSILSettings:InputFilePath").Value);
+                        HttpContext.Session.SetString("OutputFilePath", contentPath + configuration.GetSection("MSILSettings:OutputFilePath").Value);
+                        HttpContext.Session.SetString("BackupFilePath", contentPath + configuration.GetSection("MSILSettings:BackupFilePath").Value);
+                        HttpContext.Session.SetString("NonConvertedFile", contentPath + configuration.GetSection("MSILSettings:NonConvertedFile").Value);
+                        HttpContext.Session.SetString("ErrorLog", contentPath + configuration.GetSection("MSILSettings:ErrorLog").Value);
+                        HttpContext.Session.SetString("AuditLog", contentPath + configuration.GetSection("MSILSettings:AuditLog").Value);
+                        HttpContext.Session.SetString("TRADE_EMAIL", configuration.GetSection("MSILSettings:TRADE_EMAIL").Value);
+                        HttpContext.Session.SetString("Frequency", configuration.GetSection("MSILSettings:Frequency").Value);
+                        HttpContext.Session.SetString("INV_CONF_EMAIL", configuration.GetSection("MSILSettings:INV_CONF_EMAIL").Value);
+                        HttpContext.Session.SetString("INV_CONF_FNAME", configuration.GetSection("MSILSettings:INV_CONF_FNAME").Value);
+                        HttpContext.Session.SetString("ORD_MIS_EMAIL", configuration.GetSection("MSILSettings:ORD_MIS_EMAIL").Value);
+                        HttpContext.Session.SetString("PAYREC_TRADE_EMAIL", configuration.GetSection("MSILSettings:PAYREC_TRADE_EMAIL").Value);
+                        HttpContext.Session.SetString("PHY_INV", configuration.GetSection("MSILSettings:PHY_INV").Value);
+                        HttpContext.Session.SetString("NO_INV", configuration.GetSection("MSILSettings:NO_INV").Value);
+                        HttpContext.Session.SetString("EOD_MIS", configuration.GetSection("MSILSettings:EOD_MIS").Value);
+                        HttpContext.Session.SetString("ORD_DEL", configuration.GetSection("MSILSettings:ORD_DEL").Value);
+                        HttpContext.Session.SetString("INV_PHY_NTRC", configuration.GetSection("MSILSettings:INV_PHY_NTRC").Value);
+                        HttpContext.Session.SetString("IntraDayPath", configuration.GetSection("MSILSettings:IntraDayPath").Value);
+                        HttpContext.Session.SetString("EOD_File_EMail", configuration.GetSection("MSILSettings:EOD_File_EMail").Value);
+                        HttpContext.Session.SetString("FCC_EMail", configuration.GetSection("MSILSettings:FCC_EMail").Value);
+                        HttpContext.Session.SetString("DRC_EMail", configuration.GetSection("MSILSettings:DRC_EMail").Value);
+                        HttpContext.Session.SetString("Payment_Rejection_EMail", configuration.GetSection("MSILSettings:Payment_Rejection_EMail").Value);
+                        HttpContext.Session.SetString("DRC_EMail_BNGR", configuration.GetSection("MSILSettings:DRC_EMail_BNGR").Value);
+                        HttpContext.Session.SetString("DRC_EMail_SLGR", configuration.GetSection("MSILSettings:DRC_EMail_SLGR").Value);
+                        HttpContext.Session.SetString("DO_Cancel_Email", configuration.GetSection("MSILSettings:DO_Cancel_Email").Value);
+                        HttpContext.Session.SetString("DO_Invoice_Cancel_Email", configuration.GetSection("MSILSettings:DO_Invoice_Cancel_Email").Value);
+                        HttpContext.Session.SetString("Invoice_Cancel_Email", configuration.GetSection("MSILSettings:Invoice_Cancel_Email").Value);
+                        HttpContext.Session.SetString("Sleep_Time_in_Mint", configuration.GetSection("MSILSettings:Sleep_Time_in_Mint").Value);
+                        HttpContext.Session.SetString("Confirmation_Mail", configuration.GetSection("EmailSetting:Confirmation_Mail").Value);
+                        HttpContext.Session.SetString("SMTP_HOST", configuration.GetSection("EmailSetting:SMTP_HOST").Value);
+                        HttpContext.Session.SetString("Port", configuration.GetSection("EmailSetting:Port").Value);
+                        HttpContext.Session.SetString("Email_FromID", configuration.GetSection("EmailSetting:Email_FromID").Value);
+                        HttpContext.Session.SetString("UserID", configuration.GetSection("EmailSetting:UserID").Value);
+                        HttpContext.Session.SetString("Password", configuration.GetSection("EmailSetting:Password").Value);
+                        HttpContext.Session.SetString("SysEmail_FromID", configuration.GetSection("SystemSetting:Pwd").Value);
+                        HttpContext.Session.SetString("PWD", configuration.GetSection("SystemSetting:Pwd").Value);
+
+                        
+                        _logger.LogInformation("The MSIL application login : User Name - " + LoginViewModel.LoginName);
+
+                        // comment validateLDAP if on UAT, otherwise check LDAP
+                        if (ValidateLDAP(LoginViewModel.LoginName, LoginViewModel.Password) == true)
+                        {
+                            _logger.LogInformation("Ldap Successfull" + LoginViewModel.LoginName);
+
+                            if (rec.LoginType == "SERVER")
+                            {
+                                return RedirectToAction("HomePage", "Server");
+                            }
+                            else if (rec.LoginType == "TRADE OPS")
+                            {
+                                return RedirectToAction("Trade_OPSHomePage", "Login");
+                            }
+                            else if (rec.LoginType == "CASH OPS")
+                            {
+                                return RedirectToAction("Cash_OPSHomePage", "Login");
+                            }
+                            else if (rec.LoginType == "CASH_Trade OPS")
+                            {
+                                return RedirectToAction("Cash_TradeHomePage", "Login");
+                            }
+                            else
+                            {
+                                return RedirectToAction("HomePage", "Login");
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogInformation("Ldap Fail" + "User" + LoginViewModel.LoginName + "Password" + LoginViewModel.Password + LoginViewModel.LoginName);
+                        }
+
+
+
+                        ////////if (rec.LoginType == "SERVER")
+                        ////////{
+                        ////////    return RedirectToAction("HomePage", "Server");
+                        ////////}
+                        ////////else
+                        ////////{
+                        ////////    return RedirectToAction("HomePage", "Login");
+                        ////////}
+
+                    }
+                    else
+                    {
+                        ViewBag.LoginStatus = 0;
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString() + " - LoginController;LoginPage");
+            }
+            return View(LoginViewModel);
+        }
+
+
+
+        public async Task<IActionResult> Index()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                using (var db = new Entities.DatabaseContext())
+                {
+
+                    var inv1 = await db.Set<ShowUserMaster>().FromSqlRaw("Select LoginID, LoginName,LoginType,Login_Enable from Login").ToListAsync();
+
+                    return View(inv1);
+                }
+            }
+        }
+        public async Task<IActionResult> Details(int? LoginID)
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                if (LoginID == null)
+                {
+                    return NotFound();
+                }
+                using (var db = new Entities.DatabaseContext())
+                {
+                    // var employee = await db.Set<DetailsUserMaster>().FromSqlRaw("Select LoginID, LoginName,LoginType,Login_Enable from Login Where LoginID=" + LoginID +"").ToListAsync();
+                    var employee = await db.LoginMSTs.FirstOrDefaultAsync(m => m.LoginID == LoginID);
+                    if (employee == null)
+                    {
+                        return NotFound();
+                    }
+                    return View(employee);
+                }
+            }
+        }
+        // GET: Employees/Delete/1
+        public async Task<IActionResult> Delete(int? LoginID)
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                if (LoginID == null)
+                {
+                    return NotFound();
+                }
+                using (var db = new Entities.DatabaseContext())
+                {
+                    var employee = await db.LoginMSTs.FirstOrDefaultAsync(m => m.LoginID == LoginID);
+
+                    if (employee == null)
+                    {
+                        return NotFound();
+                    }
+
+                    return View(employee);
+                }
+            }
+        }
+
+        // POST: Employees/Delete/1
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int LoginID)
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                using (var db = new Entities.DatabaseContext())
+                {
+                    var employee = await db.LoginMSTs.FindAsync(LoginID);
+                    db.LoginMSTs.Remove(employee);
+                    await db.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+        }
+        //AddOrEdit Get Method
+        public async Task<IActionResult> AddOrEdit(int? LoginID)
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                ViewBag.PageName = LoginID == null ? "Create User" : "Edit User";
+                ViewBag.IsEdit = LoginID == null ? false : true;
+                if (LoginID == null)
+                {
+                    return View();
+                }
+                else
+                {
+                    using (var db = new Entities.DatabaseContext())
+                    {
+                        var employee = await db.LoginMSTs.FindAsync(LoginID);
+
+                        if (employee == null)
+                        {
+                            return NotFound();
+                        }
+                        return View(employee);
+                    }
+                }
+            }
+        }
+
+        [HttpPost]
+        public IActionResult Editupdate(UserMaster userMaster )
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                int x = 0;
+
+                if (userMaster.LoginType == "0" || userMaster.LoginType == "Select Role Type")
+                {
+                    TempData["alertMessage"] = "Please select the Role Type";
+                    return RedirectToAction("Index", "Login");
+                }
+
+                try
+                {
+                    using (var db = new Entities.DatabaseContext())
+                    {
+                        //var reg = db.Database.ExecuteSqlRaw("");
+                        //db.SaveChanges();
+                        //https://www.aspsnippets.com/questions/377667/How-to-validate-user-for-Signup-using-Stored-Procedure-in-SQL-Server/
+
+                        using (var command = db.Database.GetDbConnection().CreateCommand())
+                        {
+                            command.CommandText = "Customer_Signup";
+                            command.CommandType = System.Data.CommandType.StoredProcedure;
+                            command.Parameters.Add(new SqlParameter("@LoginName", userMaster.LoginName));
+                            command.Parameters.Add(new SqlParameter("@Password", string.Empty));
+                            command.Parameters.Add(new SqlParameter("@ReTypePassword", string.Empty));
+                            command.Parameters.Add(new SqlParameter("@LoginType", userMaster.LoginType));
+                            command.Parameters.Add(new SqlParameter("@Flag", 2));
+                            db.Database.OpenConnection();
+                            using (var result = command.ExecuteReader())
+                            {
+                                if (result.HasRows)
+                                {
+                                    result.Read();
+                                    x = result.GetInt32(0); // x = your sp count value
+                                                            //return x;
+                                }
+                            }
+                            db.Database.CloseConnection();
+                        }
+                    }
+                    string message = string.Empty;
+                    switch (x)
+                    {
+                        case -1:
+                            message = "User Name has already been used \\nPlease choose a different User Name.";
+                            break;
+                        case -2:
+                            message = "Passwords do not match.";
+                            break;
+                        default:
+                            message = "User update successful.";
+                            //SendActivationEmail(userId);
+                            break;
+                    }
+                    TempData["alertMessage"] = message;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString() + " - LoginController;Editupdate");
+                }
+                //return View(userMaster);
+                return RedirectToAction("Index", "Login");
+            }
+        }
+        public IActionResult LoginPage()
+        {
+            
+                return View();
+            
+        }
+      
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            UserSession.LoginID = "0";
+            HttpContext.Session.Clear();
+            return RedirectToAction("LoginPage", "Login");
+        }
+
+        public IActionResult DashboardPage()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+
+        public IActionResult HomePage()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+        public IActionResult UserMaster()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+
+        public IActionResult SaveUser()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+
+        public IActionResult RegisterNew()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+        [HttpPost]
+        public IActionResult RegisterNew(RegisterNew registerNew)
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                int x = 0;
+
+
+                try
+                {
+                    using (var db = new Entities.DatabaseContext())
+                    {
+                        //var reg = db.Database.ExecuteSqlRaw("");
+                        //db.SaveChanges();
+                        //https://www.aspsnippets.com/questions/377667/How-to-validate-user-for-Signup-using-Stored-Procedure-in-SQL-Server/
+
+                        using (var command = db.Database.GetDbConnection().CreateCommand())
+                        {
+                            command.CommandText = "Customer_Signup";
+                            command.CommandType = System.Data.CommandType.StoredProcedure;
+                            command.Parameters.Add(new SqlParameter("@LoginName", registerNew.LoginName));
+                            command.Parameters.Add(new SqlParameter("@Password", registerNew.Password));
+                            command.Parameters.Add(new SqlParameter("@ReTypePassword", registerNew.ReTypePassword));
+                            command.Parameters.Add(new SqlParameter("@LoginType", registerNew.LoginType));
+                            command.Parameters.Add(new SqlParameter("@Flag", 1));
+
+                            db.Database.OpenConnection();
+                            using (var result = command.ExecuteReader())
+                            {
+                                if (result.HasRows)
+                                {
+                                    result.Read();
+                                    x = result.GetInt32(0); // x = your sp count value
+                                                            //return x;
+                                }
+                            }
+                            db.Database.CloseConnection();
+                        }
+                    }
+                    string message = string.Empty;
+                    switch (x)
+                    {
+                        case -1:
+                            message = "User Name has already been used \\nPlease choose a different User Name.";
+                            break;
+                        case -2:
+                            message = "Passwords do not match.";
+                            break;
+                        default:
+                            message = "Registration successful. Activation User Name has been sent.";
+                            //SendActivationEmail(userId);
+                            break;
+                    }
+                    TempData["alertMessage"] = message;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString() + " - LoginController;RegisterNew");
+                }
+                return View(registerNew);
+            }
+
+        }
+
+        [HttpPost]        
+        public IActionResult Save(UserMaster userMaster)
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                int x = 0;
+
+                if (userMaster.LoginType == "0" || userMaster.LoginType == "Select Role Type")
+                {
+                    TempData["alertMessage"] = "Please select the Role Type";
+                    return RedirectToAction("UserMaster", "Login");
+                }
+
+                try
+                {
+                    using (var db = new Entities.DatabaseContext())
+                    {
+                        //var reg = db.Database.ExecuteSqlRaw("");
+                        //db.SaveChanges();
+                        //https://www.aspsnippets.com/questions/377667/How-to-validate-user-for-Signup-using-Stored-Procedure-in-SQL-Server/
+
+                        using (var command = db.Database.GetDbConnection().CreateCommand())
+                        {
+                            command.CommandText = "Customer_Signup";
+                            command.CommandType = System.Data.CommandType.StoredProcedure;
+                            command.Parameters.Add(new SqlParameter("@LoginName", userMaster.LoginName));
+                            command.Parameters.Add(new SqlParameter("@Password", userMaster.Password));
+                            command.Parameters.Add(new SqlParameter("@ReTypePassword", userMaster.ReTypePassword));
+                            command.Parameters.Add(new SqlParameter("@LoginType", userMaster.LoginType));
+                            command.Parameters.Add(new SqlParameter("@Flag", 1));
+                            db.Database.OpenConnection();
+                            using (var result = command.ExecuteReader())
+                            {
+                                if (result.HasRows)
+                                {
+                                    result.Read();
+                                    x = result.GetInt32(0); // x = your sp count value
+                                                            //return x;
+                                }
+                            }
+                            db.Database.CloseConnection();
+                        }
+                    }
+                    string message = string.Empty;
+                    switch (x)
+                    {
+                        case -1:
+                            message = "User Name has already been used \\nPlease choose a different User Name.";
+                            break;
+                        case -2:
+                            message = "Passwords do not match.";
+                            break;
+                        default:
+                            message = "Registration successful. Activation User Name has been sent.";
+                            //SendActivationEmail(userId);
+                            break;
+                    }
+                    TempData["alertMessage"] = message;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString() + " - LoginController;Save");
+
+                }
+                //return View(userMaster);
+                return RedirectToAction("UserMaster", "Login");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult New(RegisterNew registerNew)
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                try
+                {
+                    ModelState.Clear();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString() + " - LoginController;New");
+                }
+                return RedirectToAction("UserMaster", "Login");
+            }
+        }
+
+        public IActionResult AccountDetails()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+
+
+
+        public IActionResult Trade_OPSHomePage()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+        public IActionResult Cash_OPSHomePage()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+        public IActionResult Cash_TradeHomePage()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("LoginPage", "Login"); }
+            else
+            {
+                return View();
+            }
+        }
+
+        //[HttpPost]
+        //public IActionResult AccountDetails(AccountDetails accountDetails)
+        //{
+        //    using (var db = new Entities.DatabaseContext())
+        //    {
+        //        // var reg = db.Database.ExecuteSqlRaw("");
+        //        var result = db.Account_Details.Add(accountDetails);
+        //        db.SaveChanges();
+        //       var  message = "Payment Type added successful.";             
+
+        //    TempData["alertMessage"] = message;
+        //        ModelState.Clear();
+
+        //    return View();
+        //    }
+        //}             
+
+        //public ActionResult FillModel()
+        //{
+
+        //    return View();
+
+        //}
+
+        //[HttpPost]
+        //public ActionResult FillModel(AccountDetails accde)
+        //{
+        //    //  AccountDetails accde = new AccountDetails();
+
+        //    using (var db = new Entities.DatabaseContext())
+        //    {
+        //        var inv1 = db.Set<AccountDetails>().FromSqlRaw("Select * from Account_Details where Payment_Type='" + accde.Payment_Type + "'").ToList();
+        //        if (inv1.Count > 0)
+        //        {
+
+        //            accde.CR_Account_No = inv1[0].CR_Account_No.ToString();
+        //            accde.DR_Account_No = inv1[0].DR_Account_No.ToString();
+        //        }
+
+        //        //if (Paymenttype == "Select Payment Type")
+        //        //{
+        //        //    accde.CR_Account_No = "";
+        //        //    accde.DR_Account_No = "";
+        //        //}
+        //    }
+        //  //return View(accde);
+        //     return RedirectToPage("FillModel", accde);
+        //}
+
+    }
+}
