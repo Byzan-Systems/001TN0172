@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace _001TN0172
+namespace HDFCMSILWebMVC
 {
     public class UploadProgressHub : Hub
     {

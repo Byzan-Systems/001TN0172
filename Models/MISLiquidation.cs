@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _001TN0172.Models
+namespace HDFCMSILWebMVC.Models
 {
    public class MISLiquidation
     {

@@ -9,7 +9,7 @@ using System.IO;
 using System.Net.Mail;
 using System.Text;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class Methods
     {

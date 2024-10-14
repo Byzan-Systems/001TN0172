@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using _001TN0172.Models;
+using HDFCMSILWebMVC.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
-using _001TN0172.Entities;
+using HDFCMSILWebMVC.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -16,14 +16,15 @@ using System.DirectoryServices;
 using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
 using Novell.Directory.Ldap;
+using System.Data;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class LoginController : Controller
     {
         private readonly ILogger _logger;
         private IWebHostEnvironment Environment;
-   
+        private readonly AccessMenu Accmenu;
         public LoginController(ILogger<LoginController> logger, IWebHostEnvironment _environment)
         {
             _logger = logger;
@@ -58,7 +59,7 @@ namespace _001TN0172.Controllers
                 ldapConnection.Connect(ldapHost, ldapPort);
                 _logger.LogInformation("After LDAP Connect");
                 // Bind with the provided credentials
-                _logger.LogInformation("Before LDAP Bind" );
+                _logger.LogInformation("Before LDAP Bind");
                 ldapConnection.Bind(username, password);
                 _logger.LogInformation("After LDAP Bind");
                 return true;
@@ -158,16 +159,16 @@ namespace _001TN0172.Controllers
                 return false;
             }
 
-            
+
 
         }
 
         public bool ValidateADUserNew(string Username, string Password)
         {
-            
+
             _logger.LogInformation("In LDAP function1");
-            try 
-            { 
+            try
+            {
                 using (var context = new PrincipalContext(ContextType.Domain, "LDAP://ldap.hdfcbank.com:389"))
                 {
                     _logger.LogInformation("In LDAP function2");
@@ -203,13 +204,13 @@ namespace _001TN0172.Controllers
             ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hdfcbank.com/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
             var de = new DirectoryEntry("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
 
-           
+
 
             _logger.LogInformation("Before connecting");
 
             _logger.LogInformation("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com" + " " + Username + " " + Password);
 
-            
+
 
             try
             {
@@ -289,16 +290,16 @@ namespace _001TN0172.Controllers
                 using (var db = new Entities.DatabaseContext())
                 {
                     //var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Password == LoginViewModel.Password && a.Login_Enable == 1).FirstOrDefault();
-                    var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName  && a.Login_Enable == 1).FirstOrDefault();
+                    var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Login_Enable == 1).FirstOrDefault();
 
                     if (rec != null)
                     {
                         HttpContext.Session.SetString("UserName", LoginViewModel.LoginName);
                         HttpContext.Session.SetString("LoginID", rec.LoginID.ToString());
-                       UserSession.LoginID = rec.LoginID.ToString();
-                             var builder = new ConfigurationBuilder()
-                           .SetBasePath(Directory.GetCurrentDirectory() + "\\")
-                           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                        UserSession.LoginID = rec.LoginID.ToString();
+                        var builder = new ConfigurationBuilder()
+                      .SetBasePath(Directory.GetCurrentDirectory() + "\\")
+                      .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
                         IConfigurationRoot configuration = builder.Build();
                         string contentPath = Environment.ContentRootPath + "\\";
@@ -338,17 +339,18 @@ namespace _001TN0172.Controllers
                         HttpContext.Session.SetString("Password", configuration.GetSection("EmailSetting:Password").Value);
                         HttpContext.Session.SetString("SysEmail_FromID", configuration.GetSection("SystemSetting:Pwd").Value);
                         HttpContext.Session.SetString("PWD", configuration.GetSection("SystemSetting:Pwd").Value);
-
-                        
                         _logger.LogInformation("The MSIL application login : User Name - " + LoginViewModel.LoginName);
 
-                        // comment validateLDAP if on UAT, otherwise check LDAP
+
+                        //// comment validateLDAP if on UAT, otherwise check LDAP
                         if (ValidateLDAP(LoginViewModel.LoginName, LoginViewModel.Password) == true)
                         {
                             _logger.LogInformation("Ldap Successfull" + LoginViewModel.LoginName);
 
                             if (rec.LoginType == "SERVER")
                             {
+                                ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
+
                                 return RedirectToAction("HomePage", "Server");
                             }
                             else if (rec.LoginType == "TRADE OPS")
@@ -365,6 +367,8 @@ namespace _001TN0172.Controllers
                             }
                             else
                             {
+
+                                ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
                                 return RedirectToAction("HomePage", "Login");
                             }
                         }
@@ -392,7 +396,7 @@ namespace _001TN0172.Controllers
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString() + " - LoginController;LoginPage");
             }
@@ -512,7 +516,7 @@ namespace _001TN0172.Controllers
         }
 
         [HttpPost]
-        public IActionResult Editupdate(UserMaster userMaster )
+        public IActionResult Editupdate(UserMaster userMaster)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
             { return RedirectToAction("LoginPage", "Login"); }
@@ -582,11 +586,11 @@ namespace _001TN0172.Controllers
         }
         public IActionResult LoginPage()
         {
-            
-                return View();
-            
+
+            return View();
+
         }
-      
+
         [HttpPost]
         public IActionResult Logout()
         {
@@ -607,10 +611,106 @@ namespace _001TN0172.Controllers
 
         public IActionResult HomePage()
         {
+
             if (HttpContext.Session.GetString("LoginID") == null)
             { return RedirectToAction("LoginPage", "Login"); }
             else
             {
+                //DataSet dt = Methods.getDetails_Web("Get_SubMenuAccessAsper", UserSession.LoginID, "", "", "", "", "", "", _logger);
+                //List<AccessItem> lst = Accmenu.GetMenuItems(dt.Tables[0]);
+                //if (dt.Tables.Count > 0 && dt.Tables[0].Rows.Count > 0)
+                //{
+                //    ViewData["userMaster"] = false; ViewData["FinancerMaster"] = false; ViewData["AccountDetails"] = false; 
+                //    ViewData["ChangeTradeRefNo"] = false; ViewData["EODProcess"] = false; ViewData["PhysicalReceived"] = false;
+                //    ViewData["DownloadInvoice"] = false; ViewData["UploadReceivedInvoiceData"] = false; ViewData["TallyBookingFCC"] = false;
+                //    ViewData["AdditionalMISControlPoint"] = false; ViewData["MISLiquidation"] = false; ViewData["MISLiquidationDetailInvoice"] = false;
+                //    ViewData["CancelationInvoiceAndDO"] = false; ViewData["Authorisation"] = false; ViewData["PaymentInformationCSVNew"] = false;
+                //    ViewData["DOLiquidation"] = false; ViewData["FTPayment"] = false; ViewData["PaymentReport"] = false;
+                //    ViewData["DocumentReleasedCnf"] = false; ViewData["PendingReport"] = false; ViewData["Gefu"] = false;
+                //    ViewData["DoInformation"] = false;
+                //    for (int i = 0; i < dt.Tables[0].Rows.Count - 1; i++)
+                //    {
+                //        if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim().Trim() == "UserMaster".ToString())
+                //        { ViewData["userMaster"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]); }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim().Trim() == "FinancerMaster".ToString())
+                //        { ViewData["FinancerMaster"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]); }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "AccountDetails".ToString())
+                //        { ViewData["AccountDetails"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]); }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "ChangeTradeRefNo".ToString())
+                //        { ViewData["ChangeTradeRefNo"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]); }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "EODProcess".ToString())
+                //        { ViewData["EODProcess"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]); }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "PhysicalReceived".ToString())
+                //        {
+                //            ViewData["PhysicalReceived"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "DownloadInvoice".ToString())
+                //        {
+                //            ViewData["DownloadInvoice"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "UploadReceivedInvoiceData".ToString())
+                //        {
+                //            ViewData["UploadReceivedInvoiceData"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "TallyBookingFCC".ToString())
+                //        {
+                //            ViewData["TallyBookingFCC"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "AdditionalMISControlPoint".ToString())
+                //        {
+                //            ViewData["AdditionalMISControlPoint"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "MISLiquidation".ToString())
+                //        {
+                //            ViewData["MISLiquidation"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "MISLiquidationDetailInvoice".ToString())
+                //        {
+                //            ViewData["MISLiquidationDetailInvoice"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "CancelationInvoiceAndDO".ToString())
+                //        {
+                //            ViewData["CancelationInvoiceAndDO"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "Authorisation".ToString())
+                //        {
+                //            ViewData["Authorisation"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "PaymentInformationCSVNew".ToString())
+                //        {
+                //            ViewData["PaymentInformationCSVNew"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "DOLiquidation".ToString())
+                //        {
+                //            ViewData["DOLiquidation"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "FTPayment".ToString())
+                //        {
+                //            ViewData["FTPayment"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "PaymentReport".ToString())
+                //        {
+                //            ViewData["PaymentReport"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "DocumentReleasedCnf".ToString())
+                //        {
+                //            ViewData["DocumentReleasedCnf"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "PendingReport".ToString())
+                //        {
+                //            ViewData["PendingReport"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "Gefu".ToString())
+                //        {
+                //            ViewData["Gefu"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //        else if (dt.Tables[0].Rows[i]["SubMenuName"].ToString().Trim() == "DoInformation".ToString())
+                //        {
+                //            ViewData["DoInformation"] = Convert.ToBoolean(dt.Tables[0].Rows[i]["IsAccessible"]);
+                //        }
+                //    }
+                //}
+
                 return View();
             }
         }
@@ -709,7 +809,7 @@ namespace _001TN0172.Controllers
 
         }
 
-        [HttpPost]        
+        [HttpPost]
         public IActionResult Save(UserMaster userMaster)
         {
             if (HttpContext.Session.GetString("LoginID") == null)

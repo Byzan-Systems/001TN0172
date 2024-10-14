@@ -1,4 +1,4 @@
-﻿using _001TN0172.Entities;
+﻿using HDFCMSILWebMVC.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using System.Data.OleDb;
 
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class PaymentInformationCSVController : Controller
     {

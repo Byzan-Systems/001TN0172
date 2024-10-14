@@ -1,4 +1,4 @@
-﻿using _001TN0172.Models;
+﻿using HDFCMSILWebMVC.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class DOLiquidationController : Controller
     {

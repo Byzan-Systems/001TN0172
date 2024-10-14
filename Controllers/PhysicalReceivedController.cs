@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class PhysicalReceivedController : Controller
     {
@@ -27,7 +27,6 @@ namespace _001TN0172.Controllers
             }
             
         }
-
         public IActionResult Update()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
@@ -43,9 +42,7 @@ namespace _001TN0172.Controllers
                         var message = "Physical Invoice Successfully updated.";
                         TempData["alertMessage"] = message;
                     }
-
                     _logger.LogInformation("Executed successfully" + " - PhysicalReceivedController;Update");
-
                 }
                 catch (Exception ex)
                 {

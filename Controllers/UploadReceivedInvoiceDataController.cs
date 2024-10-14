@@ -5,14 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ExcelDataReader;
-using _001TN0172.Entities;
+using HDFCMSILWebMVC.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.SignalR;
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class UploadReceivedInvoiceDataController : Controller
     {
@@ -91,13 +91,11 @@ namespace _001TN0172.Controllers
                 int srNo = dataTable.Rows.Count;
                 string fccMail = "2"; // Example value
                 int fileId = await _excelService.InsertFileDescAsync(fileName, fileType, fileDate, srNo, fccMail);
-
+                _logger.LogError($"File ID "+fileId +" created ");
                 // File description insertion progress
                 progress = 30;
                 _uploadProgress[sessionId] = progress;
                 await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
-
-
 
                 DataTable successRecords = dataTable.Clone();
                 DataTable failureRecords = dataTable.Clone();
@@ -130,7 +128,7 @@ namespace _001TN0172.Controllers
                  Remarks = row.Field<string>(19)
              })
              .ToList();
-
+                _logger.LogError($"Reading FCC File Completed.");
                 // Initial processing stage completed
                 progress = 40;
                 _uploadProgress[sessionId] = progress;
@@ -184,8 +182,9 @@ namespace _001TN0172.Controllers
                                     DateTime phy_rec_Date = DateTime.ParseExact(record.PhysicalReceivedDate, "dd/MM/yyyy", null);
 
                                     string query2 = @"UPDATE Invoice SET TradeopsFileID = @Search1,F7_MIS = 0,LoginID_TradeOps = @Search2,Invoice_Status = 'PHYSICAL INV REC',IMEX_DEAL_NUMBER = @Search3,StepDate = @Search4,Trade_OPs_Remarks = @Search5 WHERE Invoice_Number = @Search6";
-
-                                    var parameters = new[]
+                                    if (HttpContext.Session.GetString("LoginID") != null)
+                                    { UserSession.LoginID = HttpContext.Session.GetString("LoginID"); }
+                                        var parameters = new[]
                                     {
                                         new Microsoft.Data.SqlClient.SqlParameter("@Search1", fileId), new Microsoft.Data.SqlClient.SqlParameter("@Search2", UserSession.LoginID.ToString()),new Microsoft.Data.SqlClient.SqlParameter("@Search3", tradeRefNo),new Microsoft.Data.SqlClient.SqlParameter("@Search4", phy_rec_Date.ToString("yyyy-MM-dd").Trim()),new Microsoft.Data.SqlClient.SqlParameter("@Search5", record.Remarks),new Microsoft.Data.SqlClient.SqlParameter("@Search6", record.InvoiceNumber)
                                     };

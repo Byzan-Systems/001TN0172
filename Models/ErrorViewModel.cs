@@ -1,6 +1,6 @@
 using System;
 
-namespace _001TN0172.Models
+namespace HDFCMSILWebMVC.Models
 {
     public class ErrorViewModel
     {

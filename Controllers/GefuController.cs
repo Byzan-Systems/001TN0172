@@ -1,4 +1,4 @@
-﻿using _001TN0172.Models;
+﻿using HDFCMSILWebMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,7 +13,7 @@ using ClosedXML.Excel;
 using System.IO;
 using System.Reflection;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class GefuController : Controller
     {

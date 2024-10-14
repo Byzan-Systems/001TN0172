@@ -1,5 +1,5 @@
 ﻿using ClosedXML.Excel;
-using _001TN0172.Models;
+using HDFCMSILWebMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +18,7 @@ using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
 using Microsoft.AspNetCore.Http;
 using System.Globalization;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class TallyBookingFCCController : Controller
     {

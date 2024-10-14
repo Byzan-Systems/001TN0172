@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace _001TN0172.Models
+namespace HDFCMSILWebMVC.Models
 {
     public class service
     {

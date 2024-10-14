@@ -1,0 +1,2 @@
+"Product","Remitter Name","Remitter A/ C No","Remitter Bank Name","UTR No","Amount","IFSC Code","VirtualAccountNumber","RejectedReason"
+"RTGS","T R SAWHNEY AUTOMOBILES PVT LTD 08N","/35357339924","STATE BANK OF INDIA","SBINR12024100753277644","11706152.94","SBIN0018173","HDFCIN9900120924457067"," Invalid Virtual Account Number.  Product code or IFSC Code is invalid. "

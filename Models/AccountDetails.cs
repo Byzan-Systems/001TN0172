@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace _001TN0172.Models
+namespace HDFCMSILWebMVC.Models
 {
 
     //[Table("AccountDetails")]

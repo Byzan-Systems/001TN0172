@@ -1,4 +1,4 @@
-﻿using _001TN0172.Models;
+﻿using HDFCMSILWebMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -10,7 +10,7 @@ using System.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class TradeOps_DownloadInvoice : Controller
     {
@@ -111,7 +111,7 @@ namespace _001TN0172.Controllers
             { return RedirectToAction("LoginPage", "Login"); }
             else
             {
-                //int TotInv = 0;
+                int TotInv = 0;
                 IList<DownloadFillInvoice> inv = new List<DownloadFillInvoice>();
                 try
                 {

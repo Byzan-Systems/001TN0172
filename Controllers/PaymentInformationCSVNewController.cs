@@ -1,4 +1,4 @@
-﻿using _001TN0172.Entities;
+﻿using HDFCMSILWebMVC.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -21,7 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class PaymentInformationCSVNewController : Controller
     {
@@ -50,15 +50,18 @@ namespace _001TN0172.Controllers
         }
         [HttpPost]
         public async Task<IActionResult> UploadPayment(IFormFile upload, int Count, [FromServices] IHostingEnvironment hostingEnvironment)
-        {
-            var sessionId = HttpContext.Session.Id;
-            string timestamp;
-            int firstRow = 0;
+        {            
+       
             try
             {
+                var sessionId = HttpContext.Session.Id;
+                _logger.LogError(" set Session ID");  ////Enhance by chaitrali
+                string timestamp;
+                int firstRow = 0;
                 ViewBag.Count = Count + 1;
                 ViewBag.Percentage = 25;
                 int TotalRows = 0;
+             
                 Rectify();
                 TempData["alertMessage"] = "Processing.............";
                 if (HttpContext.Request.Form.Files.Count == 0 || HttpContext.Request.Form.Files[0].FileName == "")

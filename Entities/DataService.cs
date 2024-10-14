@@ -8,7 +8,7 @@ using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 
-namespace _001TN0172.Entities
+namespace HDFCMSILWebMVC.Entities
 {
     public class DataService
     {

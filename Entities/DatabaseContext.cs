@@ -1,5 +1,5 @@
 ﻿
-using _001TN0172.Models;
+using HDFCMSILWebMVC.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace _001TN0172.Entities
+namespace HDFCMSILWebMVC.Entities
 {
     public class DatabaseContext : DbContext
     {
@@ -83,6 +83,7 @@ namespace _001TN0172.Entities
             modelBuilder.Entity<PaymentDetails>().HasNoKey();
         }
         public DbSet<LoginMST> LoginMSTs { get; set; }
+
         public DbSet<FinancerModel> FinancerMST { get; set; }
         public DbSet<RegisterNew> RegisterNews { get; set; }
         public DbSet<UserMaster> UserMasters { get; set; }

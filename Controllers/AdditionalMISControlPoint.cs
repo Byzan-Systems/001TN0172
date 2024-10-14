@@ -1,5 +1,5 @@
 ﻿using ClosedXML.Excel;
-using _001TN0172.Models;
+using HDFCMSILWebMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class AdditionalMISControlPoint : Controller
     {

@@ -1,4 +1,4 @@
-﻿using _001TN0172.Models;
+﻿using HDFCMSILWebMVC.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +18,8 @@ using Microsoft.Extensions.FileProviders;
 using System.IO.Compression;
 using Microsoft.Extensions.Configuration;
 using MoreLinq;
-namespace _001TN0172.Controllers
+
+namespace HDFCMSILWebMVC.Controllers
 {
     public class DocumentReleasedCnf : Controller
     {
@@ -172,7 +173,7 @@ namespace _001TN0172.Controllers
 
 
                                 var file1 = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "\\Document_Release").GetFiles("*.*");
-                                if (!Directory.Exists(_configuration.GetValue<string>("MSILSettings:BackupFilePath"))) 
+                                if (!Directory.Exists(_configuration.GetValue<string>("MSILSettings:BackupFilePath"))) ;
                                 {
                                     System.IO.Directory.CreateDirectory(_configuration.GetValue<string>("MSILSettings:BackupFilePath"));
                                 }

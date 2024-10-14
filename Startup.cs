@@ -1,4 +1,4 @@
-using _001TN0172.Entities;
+using HDFCMSILWebMVC.Entities;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,7 +15,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace _001TN0172
+namespace HDFCMSILWebMVC
 {
     public class Startup
     {
@@ -54,6 +54,7 @@ namespace _001TN0172
                 options.MaxRequestBodySize = long.MaxValue;
             }); // Register the ExcelService
             services.AddScoped<IExcelService, ExcelService>();
+            //services.AddScoped<AccessMenu, PageAccess>();
             services.AddTransient<DataService>(provider => new DataService(Configuration.GetConnectionString("DefaultConnection")));
             services.AddSignalR();
 

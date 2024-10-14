@@ -1,4 +1,4 @@
-﻿using _001TN0172.Entities;
+﻿using HDFCMSILWebMVC.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -19,7 +19,7 @@ using Spire.Xls;
 using System.Xml.Linq;
 using System.Text;
 
-namespace _001TN0172.Controllers
+namespace HDFCMSILWebMVC.Controllers
 {
     public class PaymentInformationController : Controller
     {
