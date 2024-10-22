@@ -42,7 +42,7 @@ namespace HDFCMSILWebMVC.Controllers
         {
             if (DInvDa == null)
             {
-                _logger.LogError("Data Is Null return from model");   //log enhance by chaitrali 4/7/2024
+                _logger.LogError("Data Is Null return from model");   //log enhance by chaitrali 10/10/2024
                 return View("Index");
             }
             try
