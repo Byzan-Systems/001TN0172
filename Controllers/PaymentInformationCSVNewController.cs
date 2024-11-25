@@ -332,7 +332,7 @@ namespace HDFCMSILWebMVC.Controllers
         }
         private DataTable removebanksROws(DataTable _DtTemp)
         {
-            Boolean blnRowBlank;
+            //Boolean blnRowBlank;
             try
             {
 

@@ -201,7 +201,7 @@ namespace HDFCMSILWebMVC.Controllers
                     //}
                 }
                 catch (Exception ex)
-                { return View(); }
+                { _logger.LogInformation(ex.Message); return View(); }
                 finally
                 {
                     wb.Dispose();
@@ -290,7 +290,8 @@ namespace HDFCMSILWebMVC.Controllers
 
                 }
                 catch (Exception ex)
-                { return View(); }
+                { _logger.LogError(ex.Message); 
+                    return View(); }
                 finally
                 {
                     wb.Dispose();

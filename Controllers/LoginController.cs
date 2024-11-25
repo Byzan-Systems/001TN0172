@@ -24,7 +24,7 @@ namespace HDFCMSILWebMVC.Controllers
     {
         private readonly ILogger _logger;
         private IWebHostEnvironment Environment;
-        private readonly AccessMenu Accmenu;
+        //private readonly AccessMenu Accmenu;
         public LoginController(ILogger<LoginController> logger, IWebHostEnvironment _environment)
         {
             _logger = logger;
@@ -93,7 +93,7 @@ namespace HDFCMSILWebMVC.Controllers
                 //string ldapHost = "LDAP://ldap.hdfcbank.com"; //"ldap.example.com";
                 string ldapHost = "ldap.hdfcbank.com"; //"ldap.example.com";
                 int ldapPort = 389;
-                string ldapBindDn = "DC = corp, DC = hdfcbank, DC = com"; // "cn=admin,dc=example,dc=com";
+               // string ldapBindDn = "DC = corp, DC = hdfcbank, DC = com"; // "cn=admin,dc=example,dc=com";
                 //string ldapBindPassword = "admin_password";
 
                 // User credentials for authentication
@@ -238,7 +238,7 @@ namespace HDFCMSILWebMVC.Controllers
 
                 string D1 = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt");
                 string strId;
-                string cmd;
+               // string cmd;
                 using (var db = new Entities.DatabaseContext())
                 {
                     var strlogId = db.Set<UAM_LoginLogout>().FromSqlRaw("select max(Convert(int, logId)) from UAM_LoginLogout").ToList();

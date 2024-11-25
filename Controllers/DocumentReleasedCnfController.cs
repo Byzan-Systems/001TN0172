@@ -173,7 +173,7 @@ namespace HDFCMSILWebMVC.Controllers
 
 
                                 var file1 = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "\\Document_Release").GetFiles("*.*");
-                                if (!Directory.Exists(_configuration.GetValue<string>("MSILSettings:BackupFilePath"))) ;
+                                if (!Directory.Exists(_configuration.GetValue<string>("MSILSettings:BackupFilePath"))) 
                                 {
                                     System.IO.Directory.CreateDirectory(_configuration.GetValue<string>("MSILSettings:BackupFilePath"));
                                 }
@@ -370,7 +370,7 @@ namespace HDFCMSILWebMVC.Controllers
 
 
                 ///////Zip file create
-                string Zippath = "";
+               // string Zippath = "";
 
                 //if (comboBox1.SelectedIndex == 1 || comboBox1.SelectedIndex == 2)
                 //{
@@ -804,7 +804,7 @@ namespace HDFCMSILWebMVC.Controllers
         public void WriteConfirmationOrderTEST(string UTRNO,string VIRTUALACCNO)
         {
             int cnt;
-            string Read_Line;
+           // string Read_Line;
             string Header_Line_Temp;
             string Header_Line = "";
             string Body_Line_Temp;

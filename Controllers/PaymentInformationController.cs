@@ -54,7 +54,7 @@ namespace HDFCMSILWebMVC.Controllers
             { return RedirectToAction("LoginPage", "Login"); }
             else
             {
-                string connString;
+               // string connString;
                 string timestamp;
                 int firstRow = 0;
                 //Create a Workbook object
@@ -65,7 +65,7 @@ namespace HDFCMSILWebMVC.Controllers
                     ViewBag.Count = Count + 1;
                     ViewBag.Percentage = 25;
 
-                    int TotalRows = 0, TotalColumns = 0;
+                    int TotalRows = 0 ;// TotalColumns = 0;
                     Rectify();
                     TempData["alertMessage"] = "Processing.............";
                     if (HttpContext.Request.Form.Files[0].FileName == "")

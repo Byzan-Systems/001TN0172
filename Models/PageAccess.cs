@@ -74,7 +74,7 @@ namespace HDFCMSILWebMVC
         
         public List<AccessItem> GetMenuItems(string UserID)
         {
-            int newFileId;
+            //int newFileId;
             List<AccessItem> AccessList = new List<AccessItem>();
             DataSet dt = Methods.getDetails_Web("Get_SubMenuAccessAsper", UserSession.LoginID, "", "", "", "", "", "", _logger);
         

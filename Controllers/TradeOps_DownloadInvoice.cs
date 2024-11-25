@@ -111,7 +111,7 @@ namespace HDFCMSILWebMVC.Controllers
             { return RedirectToAction("LoginPage", "Login"); }
             else
             {
-                int TotInv = 0;
+                //int TotInv = 0;
                 IList<DownloadFillInvoice> inv = new List<DownloadFillInvoice>();
                 try
                 {

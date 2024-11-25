@@ -247,7 +247,9 @@ namespace HDFCMSILWebMVC.Controllers
                     return RedirectToAction("UpdateInvoices");
                 }
                 catch (Exception ex)
-                { return RedirectToAction("UpdateInvoices"); }
+                {
+                    _logger.LogInformation(ex.Message);// + " and Data Succesfully Converted : " + cnt + " - UploadReceivedInvoiceDataController;UploadDetails");
+                    return RedirectToAction("UpdateInvoices"); }
                 finally
                 {
                     wb.Dispose();

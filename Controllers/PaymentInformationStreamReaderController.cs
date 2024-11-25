@@ -45,7 +45,7 @@ namespace HDFCMSILWebMVC.Controllers
         [HttpPost]
         public IActionResult UploadPayment(IFormFile upload, int Count, [FromServices] IWebHostEnvironment hostingEnvironment)
         {
-            string connString;
+            //string connString;
             int firstRow = 0;
             
             if (HttpContext.Session.GetString("LoginID") == null)
@@ -59,7 +59,7 @@ namespace HDFCMSILWebMVC.Controllers
                     ViewBag.Count = Count + 1;
                     ViewBag.Percentage = 25;
 
-                    int TotalRows = 0, TotalColumns = 0;
+                    int TotalRows = 0;// TotalColumns = 0;
                     Rectify();
                     TempData["alertMessage"] = "Processing.............";
                     if (HttpContext.Request.Form.Files[0].FileName == "")
