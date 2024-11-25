@@ -45,7 +45,7 @@ namespace HDFCMSILWebMVC.Controllers
 
                 return View();
             }
-            
+
         }
         [HttpPost]
         public IActionResult UploadPayment(IFormFile upload, int Count, [FromServices] IHostingEnvironment hostingEnvironment)
@@ -127,7 +127,7 @@ namespace HDFCMSILWebMVC.Controllers
                     //Iterate through the rows
 
                     RejectPaymentFile(dt1);
-
+                    int issusccess = 0, issuccessGlobal = 1;
                     for (int i = 0; i < dt1.Rows.Count; i++)
                     {
                         if (dt1.Rows[i][0].ToString() != null)
@@ -157,7 +157,6 @@ namespace HDFCMSILWebMVC.Controllers
 
                             if (DealerVirAccNo != "0")
                             {
-
                                 if (DealerVirAccNo.Length != 23)
                                 {
 
@@ -170,7 +169,6 @@ namespace HDFCMSILWebMVC.Controllers
                                 }
                                 else if (DealerVirAccNo.Length == 23)
                                 {
-
                                     //select distinct FType from FinancerDetails
 
                                     DataTable dtabl = Methods.getDetails("GetFinancerCodeDetails", DealerVirAccNo.Substring(22, 1).ToString(), "", "", "", "", "", "", _logger);
@@ -184,9 +182,6 @@ namespace HDFCMSILWebMVC.Controllers
                                         _logger.LogInformation("Invalid Virtual Account Number. Please upload the correct file again." + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh  ////Enhance by yogesh
                                                                                                                                                                                                  //break;   
                                     }
-
-
-
                                 }
                             }
 
@@ -198,9 +193,6 @@ namespace HDFCMSILWebMVC.Controllers
                             }
                             //////For Duplicate UTR NO  Added on 23-02-2024
 
-
-
-                            //clserr.WriteLogToTxtFile("Length of Order number = " + sheet.GetRow(k).GetCell(8).StringCellValue + " is 23 digit", "Upload_Click", strFileName);
                             string Fname = DealerVirAccNo.Substring(DealerVirAccNo.Length - 1, 1);
                             string strRemitterBankName = RemittingBank;
                             //string strIFSCPart;
@@ -250,6 +242,7 @@ namespace HDFCMSILWebMVC.Controllers
                                 detailsCash[8] = DBNull.Value.ToString(); //Payment_Status
                                 detailsCash[9] = DBNull.Value.ToString(); //Attempt
                                 detailsCash[10] = System.DateTime.Now.ToString("DD/MMM/YYYY"); //Cash_Ops_Date
+
                                 detailsCash[11] = System.DateTime.Now.ToString("HH:MM:SS AMPM"); //Cash_Ops_Time
                                 detailsCash[12] = "0"; //GEFO_Flag
                                 detailsCash[13] = DBNull.Value.ToString(); //GEFO_Date
@@ -262,14 +255,11 @@ namespace HDFCMSILWebMVC.Controllers
                                 detailsCash[20] = Details[12]; //IFSC_code
                                 detailsCash[21] = Details[10]; //FNCR_code
                                 detailsCash[22] = ""; //FNCR_Name
-
-                                //clserr.WriteLogToTxtFile("In Cashops_Payment Function", "Upload_Click", strFileName);
-                                Methods.CashOps_Payments(Details, detailsCash, _logger);
+                                                      //clserr.WriteLogToTxtFile("In Cashops_Payment Function", "Upload_Click", strFileName);
+                                issusccess = Methods.CashOps_Payments(Details, detailsCash, _logger);
                                 TotalRows += 1;
-                                //clserr.WriteLogToTxtFile("End -Cashops_Payment Function", "Upload_Click", strFileName);
-                                TempData["alertMessage"] = HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded. Successfull Records " + TotalRows + ""; ////Enhance by yogesh
-                                _logger.LogInformation(HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded. Successfull Records  " + TotalRows + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
-
+                                if (issusccess == 0)
+                                    issuccessGlobal = issusccess;
                             }
                             else
                             {
@@ -282,124 +272,26 @@ namespace HDFCMSILWebMVC.Controllers
                                 _logger.LogInformation("Either Product code or IFSC Code is invalid mail sent to - " + HttpContext.Session.GetString("Payment_Rejection_EMail"));  ////Enhance by yogesh
                             }
 
+                           
                         }
+
                         firstRow += 1;
                     }
+                    if (issusccess == 0)
+                    {
+                        TempData["alertMessage"] = HttpContext.Request.Form.Files[0].FileName + " File Uploaded fail. Please ReLogin and Try again."; ////Enhance by yogesh
+                        _logger.LogInformation(HttpContext.Request.Form.Files[0].FileName + " File Uploaded fail. Please ReLogin and Try again. " + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
+
+                    }
+                    else
+                    {
+                        TempData["alertMessage"] = HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded. Successfull Records " + TotalRows + ""; ////Enhance by yogesh
+                        _logger.LogInformation(HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded. Successfull Records  " + TotalRows + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
+                    }
+
                     sheet.Dispose();
                     wb.Dispose();
 
-                    //using (var stream = System.IO.File.Open(strFileName, FileMode.Open, FileAccess.Read))
-                    //{
-
-
-                    //        using (IExcelDataReader Reader = ExcelDataReader.ExcelReaderFactory.CreateReader(stream, new ExcelReaderConfiguration() { FallbackEncoding = System.Text.Encoding.GetEncoding(1252) }))
-                    //        {
-                    //            firstRow = 0;
-                    //            while (Reader.Read())
-                    //            {
-                    //                if (Reader.GetValue(0) != null && firstRow != 0)
-                    //                {
-                    //                    DataFormatter formatter = new DataFormatter();
-                    //                    String Transaction_Id = Reader.GetValue(0).ToString(); //result.Rows[k].ItemArray[0].ToString();  //formatter.FormatCellValue(sheet.GetRow(k).GetCell(0));
-                    //                    String Product = Reader.GetValue(1).ToString(); //result.Rows[k].ItemArray[1].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(1));
-                    //                    String Party_Code = Reader.GetValue(2).ToString(); //result.Rows[k].ItemArray[2].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(2));
-                    //                    String Party_Name = Reader.GetValue(3).ToString(); //result.Rows[k].ItemArray[3].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(3));
-                    //                    String RemittingBank = Reader.GetValue(4).ToString(); //result.Rows[k].ItemArray[4].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(4));
-                    //                    String UTR_No = Reader.GetValue(5).ToString(); //result.Rows[k].ItemArray[5].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(5));
-                    //                    String Entry_Amount = Reader.GetValue(6).ToString(); //result.Rows[k].ItemArray[6].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(6));
-                    //                    String IFSC_code = Reader.GetValue(7).ToString(); //result.Rows[k].ItemArray[7].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(7));
-                    //                    String DealerVirAccNo = Reader.GetValue(8).ToString(); //result.Rows[k].ItemArray[8].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(8));
-                    //                    _logger.LogInformation(DealerVirAccNo + "Assign to variable" + "   - PaymentInformationController;UploadPayment"); ////Enhance by yogesh
-
-                    //                    if (DealerVirAccNo != "0")
-                    //                    {
-
-                    //                        if (DealerVirAccNo.Length != 23)
-                    //                        {
-                    //                            //clserr.WriteLogToTxtFile("Length of Order number = " + sheet.GetRow(k).GetCell(8).StringCellValue.ToUpper() + " is less or more than 23 digits ", "Upload_Click", strFileName);
-
-                    //                            Methods.SendEmail(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", HttpContext.Request.Form.Files[0].FileName, "Rejection of MIS-Payment File", DealerVirAccNo + "-" + "DO length is less or greater than 23", HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"));
-                    //                            //clserr.WriteLogToTxtFile("Rejection of MIS mail sent to = " + sttg.Payment_Rejection_EMail, "Upload_Click", strFileName);
-                    //                            TempData["alertMessage"] = "Rejection of MIS mail sent to = " + HttpContext.Session.GetString("Payment_Rejection_EMail");
-                    //                            _logger.LogError("Rejection of MIS mail sent to = " + HttpContext.Session.GetString("Payment_Rejection_EMail " + " - PaymentInformationController;UploadPayment"));  ////Enhance by yogesh
-                    //                        }
-                    //                        else
-                    //                        {
-                    //                            //clserr.WriteLogToTxtFile("Length of Order number = " + sheet.GetRow(k).GetCell(8).StringCellValue + " is 23 digit", "Upload_Click", strFileName);
-                    //                            string Fname = DealerVirAccNo.Substring(DealerVirAccNo.Length - 1, 1);
-                    //                            //Condition check for Financier Dealer match with B / C / F / K / V
-                    //                            if (Fname == "B" || Fname == "C" || Fname == "F" || Fname == "K" || Fname == "V" || Fname == "D")
-                    //                            {
-                    //                                Details[0] = Transaction_Id; //Transaction_Id
-                    //                                Details[1] = "C"; //Type_of_Entry
-                    //                                Details[2] = "C"; //Dr_CR
-                    //                                Details[3] = Entry_Amount; //Entry_Amount
-                    //                                Details[4] = ""; //Value_date
-                    //                                Details[5] = Product; //Product
-                    //                                Details[6] = Party_Code; //Party_Code
-                    //                                Details[7] = Party_Name; //Party_Name
-                    //                                Details[8] = DealerVirAccNo; //VA_account
-                    //                                Details[9] = ""; //Locations
-                    //                                Details[10] = RemittingBank; //RemittingBank
-                    //                                Details[11] = UTR_No; //UTR_No
-                    //                                Details[12] = IFSC_code; //IFSC_code
-                    //                                Details[13] = ""; //Dealer_Name
-                    //                                Details[14] = ""; //Dealer_Account_No
-                    //                                Details[15] = ""; //Releated_Ref_No
-                    //                                Details[16] = dtFile.Rows[0][0].ToString(); //fileID
-                    //                                Details[17] =  UserSession.LoginID; //Login ID
-
-                    //                                string[] detailsCash = new string[25];
-                    //                                detailsCash[0] = "0";   //cashopsID
-                    //                                detailsCash[1] = Details[16];   //FileID
-                    //                                detailsCash[2] = Details[5]; //CashOps_FileType
-                    //                                detailsCash[3] = ""; //NEFT_RTGS_BT_ID
-                    //                                detailsCash[4] = Details[8].Substring(0, 22); //Virtual_Account
-                    //                                detailsCash[5] = Details[11]; //UTR_No
-                    //                                detailsCash[6] = Details[3]; //Transaction_Amount
-                    //                                detailsCash[7] = "C"; //Transaction_status
-                    //                                detailsCash[8] = DBNull.Value.ToString(); //Payment_Status
-                    //                                detailsCash[9] = DBNull.Value.ToString(); //Attempt
-                    //                                detailsCash[10] = System.DateTime.Now.ToString("DD/MMM/YYYY"); //Cash_Ops_Date
-                    //                                detailsCash[11] = System.DateTime.Now.ToString("HH:MM:SS AMPM"); //Cash_Ops_Time
-                    //                                detailsCash[12] = "0"; //GEFO_Flag
-                    //                                detailsCash[13] = DBNull.Value.ToString(); //GEFO_Date
-                    //                                detailsCash[14] = DBNull.Value.ToString(); //DR_Account_No
-                    //                                detailsCash[15] = DBNull.Value.ToString(); //CR_Account_No
-                    //                                detailsCash[16] =  UserSession.LoginID; //LoginID
-                    //                                detailsCash[17] = DBNull.Value.ToString(); //EOD_MailFlag
-                    //                                detailsCash[18] = DBNull.Value.ToString(); //DRC_Generation
-                    //                                detailsCash[19] = Details[8]; //FNCR_Virtual_Account
-                    //                                detailsCash[20] = Details[12]; //IFSC_code
-                    //                                detailsCash[21] = Details[10]; //FNCR_code
-                    //                                detailsCash[22] = ""; //FNCR_Name
-
-                    //                                //clserr.WriteLogToTxtFile("In Cashops_Payment Function", "Upload_Click", strFileName);
-                    //                                Methods.CashOps_Payments(Details, detailsCash);
-                    //                                TotalRows += 1;
-                    //                                //clserr.WriteLogToTxtFile("End -Cashops_Payment Function", "Upload_Click", strFileName);
-                    //                                TempData["alertMessage"] = "File Successfully Uploaded. Successfull Records " + TotalRows + ""; ////Enhance by yogesh
-                    //                                _logger.LogInformation("File Successfully Uploaded. Successfull Records  " + TotalRows + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
-
-                    //                            }
-                    //                            else
-                    //                            {
-                    //                                //clserr.WriteLogToTxtFile("Financier Dealer Name does not match with B/C/F/K/V = " + sheet.GetRow(k).GetCell(8).StringCellValue, "Upload_Click", strFileName);
-                    //                                Methods.SendEmail(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", HttpContext.Request.Form.Files[0].FileName, "Mismatched Dealer Financier Name", DealerVirAccNo + "-" + "Mismatched Dealer Financier Name", HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"));
-                    //                                //clserr.WriteLogToTxtFile("Mismatched Fin Dealer mail sent to - " + sttg.Payment_Rejection_EMail, "Upload_Click", strFileName);
-                    //                                TempData["alertMessage"] = "Mismatched Fin Dealer mail sent to - " + HttpContext.Session.GetString("Payment_Rejection_EMail");
-
-                    //                                _logger.LogError("Mismatched Fin Dealer mail sent to - " + HttpContext.Session.GetString("Payment_Rejection_EMail"));  ////Enhance by yogesh
-                    //                            }
-
-                    //                        }
-                    //                    }
-                    //                }
-                    //                firstRow += 1;
-                    //            }
-                    //        }
-
-                    //}
 
                 }
                 catch (Exception ex)
@@ -476,7 +368,7 @@ namespace HDFCMSILWebMVC.Controllers
         {
             try
             {
-                DataTable dt = Methods.getDetails("GetOrder_CashOpsDetails", "", "", "", "", "", "", "",_logger);
+                DataTable dt = Methods.getDetails("GetOrder_CashOpsDetails", "", "", "", "", "", "", "", _logger);
                 if (dt.Rows.Count > 0)
                 {
                     for (int i = 0; i < dt.Rows.Count; i++)
@@ -486,7 +378,7 @@ namespace HDFCMSILWebMVC.Controllers
                 }
                 // thiss method get details from cashops join with invoice table as per Payment_Status = 'CREDIT MSIL and Invoice_Status<>'Payment received on'
                 // and update order_desc and invoice table as per condtions
-                DataTable dtCash = Methods.getDetails("GetCashOps_INVDetails", "", "", "", "", "", "", "",_logger);
+                DataTable dtCash = Methods.getDetails("GetCashOps_INVDetails", "", "", "", "", "", "", "", _logger);
                 if (dtCash.Rows.Count > 0)
                 {
                     //clserr.WriteLogToTxtFile("Data Updated Successfully", "Rectify", "Rectify");
@@ -500,23 +392,23 @@ namespace HDFCMSILWebMVC.Controllers
         }
 
 
-        public  Boolean RejectPaymentFile(DataTable dt)
+        public Boolean RejectPaymentFile(DataTable dt)
         {
-            try 
+            try
             {
-            Boolean rpt = true;
-            DateTime currentTime = DateTime.Now;
-            string filepath = this._environment.WebRootPath + "\\files\\" + "RejectedPaymentReason" + currentTime.ToString("hhmmss") + ".csv";
-            string line = "";
-            StringBuilder EmailBodyCtn = new StringBuilder();
+                Boolean rpt = true;
+                DateTime currentTime = DateTime.Now;
+                string filepath = this._environment.WebRootPath + "\\files\\" + "RejectedPaymentReason" + currentTime.ToString("hhmmss") + ".csv";
+                string line = "";
+                StringBuilder EmailBodyCtn = new StringBuilder();
                 const string quote = "\"";
-             using (var w = new StreamWriter(filepath))
-             {
-                line = quote + "Product" + quote + "," + quote + "Remitter Name" + quote + "," + quote + "Remitter A/ C No" + quote + "," + quote + "Remitter Bank Name" + quote + "," + quote + "UTR No" + quote + "," + quote + "Amount" + quote + "," + quote + "IFSC Code" + quote + "," + quote + "VirtualAccountNumber" + quote +","+ quote + "RejectedReason" + quote;
-                w.WriteLine(line);
-                    
-                for (int i = 0; i < dt.Rows.Count; i++)
+                using (var w = new StreamWriter(filepath))
                 {
+                    line = quote + "Product" + quote + "," + quote + "Remitter Name" + quote + "," + quote + "Remitter A/ C No" + quote + "," + quote + "Remitter Bank Name" + quote + "," + quote + "UTR No" + quote + "," + quote + "Amount" + quote + "," + quote + "IFSC Code" + quote + "," + quote + "VirtualAccountNumber" + quote + "," + quote + "RejectedReason" + quote;
+                    w.WriteLine(line);
+
+                    for (int i = 0; i < dt.Rows.Count; i++)
+                    {
 
                         String Product = dt.Rows[i][1].ToString(); //result.Rows[k].ItemArray[1].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(1));
                         String Party_Code = dt.Rows[i][2].ToString(); //result.Rows[k].ItemArray[2].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(2));
@@ -526,59 +418,59 @@ namespace HDFCMSILWebMVC.Controllers
                         String Entry_Amount = dt.Rows[i][6].ToString(); //result.Rows[k].ItemArray[6].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(6));
                         String IFSC_code = dt.Rows[i][7].ToString(); //result.Rows[k].ItemArray[7].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(7));
                         String DealerVirAccNo = dt.Rows[i][8].ToString();
-                    if (Product == "NEFT" || Product == "RTGS" || Product == "FT" || Product == "FUND TRANS")
-                    {
-                    }
-                    else
-                    {
-                        w.WriteLine(quote + Product + quote + "," + quote + Party_Code + quote + "," + quote + Party_Name + quote + "," + quote + RemittingBank + quote + "," + quote + UTR_No + quote + "," + quote + Entry_Amount + quote + "," + quote + IFSC_code + quote + ","+ quote + DealerVirAccNo + quote + "," + quote + "Invalid Payment Type" + quote);
+                        if (Product == "NEFT" || Product == "RTGS" || Product == "FT" || Product == "FUND TRANS")
+                        {
+                        }
+                        else
+                        {
+                            w.WriteLine(quote + Product + quote + "," + quote + Party_Code + quote + "," + quote + Party_Name + quote + "," + quote + RemittingBank + quote + "," + quote + UTR_No + quote + "," + quote + Entry_Amount + quote + "," + quote + IFSC_code + quote + "," + quote + DealerVirAccNo + quote + "," + quote + "Invalid Payment Type" + quote);
 
 
-                        EmailBodyCtn = EmailBodyCtn.Append("<br>" + DealerVirAccNo + "," + "Invalid Payment Type");
+                            EmailBodyCtn = EmailBodyCtn.Append("<br>" + DealerVirAccNo + "," + "Invalid Payment Type");
                             //Methods.SendEmail(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", strFileName, "Rejection of MIS-Payment File", DealerVirAccNo + "-" + "Invalid Payment Type, Please upload correct file again with Payment Type such as NEFT, RTGS, FT or FUND TRANS", HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"));
                             rpt = false;
-                    }
+                        }
 
 
 
-                    if (DealerVirAccNo != "0")
-                    {
-
-                        if (DealerVirAccNo.Length != 23)
+                        if (DealerVirAccNo != "0")
                         {
 
-                            
-                             w.WriteLine(quote + Product + quote + "," + quote + Party_Code + quote + "," + quote + Party_Name + quote + "," + quote + RemittingBank + quote + "," + quote + UTR_No + quote + "," + quote + Entry_Amount + quote + "," + quote + IFSC_code + quote + "," + quote + DealerVirAccNo + quote + "," + quote + "DO length is less or greater than 23" + quote);
-                             EmailBodyCtn = EmailBodyCtn.Append("<br>" + DealerVirAccNo + "," + "DO length is less or greater than 23");
+                            if (DealerVirAccNo.Length != 23)
+                            {
+
+
+                                w.WriteLine(quote + Product + quote + "," + quote + Party_Code + quote + "," + quote + Party_Name + quote + "," + quote + RemittingBank + quote + "," + quote + UTR_No + quote + "," + quote + Entry_Amount + quote + "," + quote + IFSC_code + quote + "," + quote + DealerVirAccNo + quote + "," + quote + "DO length is less or greater than 23" + quote);
+                                EmailBodyCtn = EmailBodyCtn.Append("<br>" + DealerVirAccNo + "," + "DO length is less or greater than 23");
                                 //Methods.SendEmail(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", strFileName, "Rejection of MIS-Payment File", DealerVirAccNo + "-" + "DO length is less or greater than 23", HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"));
                                 rpt = false;
-                        }
-                        else if (DealerVirAccNo.Length == 23)
-                        {
-
-                            //select distinct FType from FinancerDetails
-
-                            DataTable dtabl = Methods.getDetails("GetFinancerCodeDetails", DealerVirAccNo.Substring(22, 1).ToString(), "", "", "", "", "", "",_logger);
-
-                            if (dtabl.Rows.Count == 0)
-
+                            }
+                            else if (DealerVirAccNo.Length == 23)
                             {
-                                
-                                w.WriteLine(quote + Product + quote + "," + quote + Party_Code + quote + "," + quote + Party_Name + quote + "," + quote + RemittingBank + quote + "," + quote + UTR_No + quote + "," + quote + Entry_Amount + quote + "," + quote + IFSC_code + quote + "," + quote + DealerVirAccNo + quote + "," + quote + "Product Code is not valid" + quote);
-                                EmailBodyCtn = EmailBodyCtn.Append("<br>" + DealerVirAccNo + "," + "Product Code is not valid");
+
+                                //select distinct FType from FinancerDetails
+
+                                DataTable dtabl = Methods.getDetails("GetFinancerCodeDetails", DealerVirAccNo.Substring(22, 1).ToString(), "", "", "", "", "", "", _logger);
+
+                                if (dtabl.Rows.Count == 0)
+
+                                {
+
+                                    w.WriteLine(quote + Product + quote + "," + quote + Party_Code + quote + "," + quote + Party_Name + quote + "," + quote + RemittingBank + quote + "," + quote + UTR_No + quote + "," + quote + Entry_Amount + quote + "," + quote + IFSC_code + quote + "," + quote + DealerVirAccNo + quote + "," + quote + "Product Code is not valid" + quote);
+                                    EmailBodyCtn = EmailBodyCtn.Append("<br>" + DealerVirAccNo + "," + "Product Code is not valid");
                                     //Methods.SendEmail(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", strFileName, "Rejection of MIS-Payment File", DealerVirAccNo + "-" + "Product Code is not valid", HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"));
                                     rpt = false;
 
+                                }
+
+
+
                             }
-
-
-
                         }
-                    }
 
 
                         //////For Duplicate UTR NO  Added on 23-02-2024
-                        DataTable dtUTRDuplicate = Methods.getDetails("GetUTRDetailsForPaymentUpload", UTR_No, "", "", "", "", "", "",_logger);
+                        DataTable dtUTRDuplicate = Methods.getDetails("GetUTRDetailsForPaymentUpload", UTR_No, "", "", "", "", "", "", _logger);
                         if (dtUTRDuplicate.Rows.Count > 0)
                         {
                             w.WriteLine(quote + Product + quote + "," + quote + Party_Code + quote + "," + quote + Party_Name + quote + "," + quote + RemittingBank + quote + "," + quote + UTR_No + quote + "," + quote + Entry_Amount + quote + "," + quote + IFSC_code + quote + "," + quote + DealerVirAccNo + quote + "," + quote + "UTR NO is Duplicate" + quote);
@@ -593,22 +485,22 @@ namespace HDFCMSILWebMVC.Controllers
 
                     }
                     w.Close();
-                //w.Flush();
-                if (rpt == false)
+                    //w.Flush();
+                    if (rpt == false)
                     {
                         Methods.SendEmail(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", filepath, "Rejection of MIS-Payment File", "Please find the attachment.", HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"), _logger);
                         //Methods.SendEmailstrBld(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", filepath, "Rejection of MIS-Payment File",EmailBodyCtn, HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"));
                     }
 
                 }
-            
+
             }
-            
+
             catch (Exception ex)
             {
                 TempData["alertMessage"] = ex.Message + " " + ex.StackTrace;
                 _logger.LogError(ex.Message + "  " + " - PaymentInformationController;UploadPayment");
-         
+
             }
             return true;
         }

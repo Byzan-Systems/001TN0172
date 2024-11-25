@@ -20,7 +20,7 @@ namespace HDFCMSILWebMVC.Controllers
         //    _logger = logger;
         //}
 
-        public static void CashOps_Payments(string[] Details, string[] detailsCash, ILogger logger)
+        public static int CashOps_Payments(string[] Details, string[] detailsCash, ILogger logger)
         {
             try
             {
@@ -29,20 +29,26 @@ namespace HDFCMSILWebMVC.Controllers
                 if (dt.Rows.Count > 0)
                 {
                     //clserr.WriteLogToTxtFile("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", strFileName);
-                    return;
+                    return -1;
                 }
                 //clserr.WriteLogToTxtFile("Insert values in Payment Upload table", "CashOps_Payments", strFileName);
                 //clserr.WriteLogToTxtFile("VA_account =" + Details[8].Substring(0, 22) + " and UTR Number =" + Details[11], "CashOps_Payments", strFileName);
                 DataTable dtCash = Methods.Insert_PaymentUploadDetails("Save", Details, logger);
-                if (Details[2].ToUpper() == "C")
+                if (dtCash == null)
                 {
-                    Fill_CashOpsDetails(dtCash.Rows[0][0].ToString(), Details, detailsCash, logger);
+                    if (Details[2].ToUpper() == "C")
+                    {
+                        Fill_CashOpsDetails(dtCash.Rows[0][0].ToString(), Details, detailsCash, logger);
+                    }
+                    return 0;
                 }
+                return 1;
             }
             catch (Exception ex)
             {
                 //log enhance by chaitrali 3/7/2024
                 logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; CashOps_Payments");
+                return 0;
             }
         }
         //public void WriteErrorToTxtFile(string ErrorDesc, string ModuleName, string ProcName)
