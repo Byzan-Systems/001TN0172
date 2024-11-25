@@ -16,8 +16,8 @@ namespace HDFCMSILWebMVC.Controllers
         ControlDOLiquidation model = new ControlDOLiquidation();
         public Boolean ChkFlag = false;
         private readonly ILogger _logger;
-        private IHostingEnvironment _environment;
-        public DOLiquidationController(ILogger<DOLiquidationController> logger, IHostingEnvironment environment)
+        private IWebHostEnvironment _environment;
+        public DOLiquidationController(ILogger<DOLiquidationController> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;

@@ -23,9 +23,9 @@ namespace HDFCMSILWebMVC.Controllers
 {
     public class PaymentInformationController : Controller
     {
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly ILogger _logger;
-        public PaymentInformationController(ILogger<PaymentInformationController> logger, IHostingEnvironment environment)
+        public PaymentInformationController(ILogger<PaymentInformationController> logger,IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;

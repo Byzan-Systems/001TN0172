@@ -18,8 +18,8 @@ namespace HDFCMSILWebMVC.Controllers
         public string strFileName = "";
         public string strmessage = "";
         private readonly ILogger _logger;
-        private IHostingEnvironment _environment;
-        public FTPaymentController(ILogger<FTPaymentController> logger, IHostingEnvironment environment)
+        private IWebHostEnvironment _environment;
+        public FTPaymentController(ILogger<FTPaymentController> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;
