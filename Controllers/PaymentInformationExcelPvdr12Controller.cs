@@ -19,9 +19,9 @@ namespace HDFCMSILWebMVC.Controllers
 {
     public class PaymentInformationExcelPvdr12Controller : Controller
     {
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly ILogger _logger;
-        public PaymentInformationExcelPvdr12Controller(ILogger<PaymentInformationExcelPvdr12Controller> logger, IHostingEnvironment environment)
+        public PaymentInformationExcelPvdr12Controller(ILogger<PaymentInformationExcelPvdr12Controller> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;

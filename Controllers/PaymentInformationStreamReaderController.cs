@@ -19,9 +19,9 @@ namespace HDFCMSILWebMVC.Controllers
 {
     public class PaymentInformationStreamReaderController : Controller
     {
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly ILogger _logger;
-        public PaymentInformationStreamReaderController(ILogger<PaymentInformationStreamReaderController> logger, IHostingEnvironment environment)
+        public PaymentInformationStreamReaderController(ILogger<PaymentInformationStreamReaderController> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;
@@ -43,7 +43,7 @@ namespace HDFCMSILWebMVC.Controllers
             }
         }
         [HttpPost]
-        public IActionResult UploadPayment(IFormFile upload, int Count, [FromServices] IHostingEnvironment hostingEnvironment)
+        public IActionResult UploadPayment(IFormFile upload, int Count, [FromServices] IWebHostEnvironment hostingEnvironment)
         {
             string connString;
             int firstRow = 0;

@@ -19,14 +19,14 @@ namespace HDFCMSILWebMVC.Controllers
         private static Dictionary<string, int> _uploadProgress = new Dictionary<string, int>();
 
         [Obsolete]
-        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly ILogger<UploadReceivedInvoiceDataController> _logger;
         private readonly IExcelService _excelService;
         private readonly DataService _dataService;
         private readonly IHubContext<UploadProgressHub> _hubContext;
 
         [Obsolete]
-        public UploadReceivedInvoiceDataController(DataService dataService, IHostingEnvironment hostingEnvironment, ILogger<UploadReceivedInvoiceDataController> logger, IExcelService excelService, IHubContext<UploadProgressHub> hubContext)
+        public UploadReceivedInvoiceDataController(DataService dataService, IWebHostEnvironment hostingEnvironment, ILogger<UploadReceivedInvoiceDataController> logger, IExcelService excelService, IHubContext<UploadProgressHub> hubContext)
         {
             _hostingEnvironment = hostingEnvironment;
             _logger = logger;

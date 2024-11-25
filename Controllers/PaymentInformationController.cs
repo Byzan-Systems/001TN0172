@@ -48,7 +48,7 @@ namespace HDFCMSILWebMVC.Controllers
 
         }
         [HttpPost]
-        public IActionResult UploadPayment(IFormFile upload, int Count, [FromServices] IHostingEnvironment hostingEnvironment)
+        public IActionResult UploadPayment(IFormFile upload, int Count, [FromServices] IWebHostEnvironment hostingEnvironment)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
             { return RedirectToAction("LoginPage", "Login"); }

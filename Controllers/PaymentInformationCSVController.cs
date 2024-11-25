@@ -20,9 +20,9 @@ namespace HDFCMSILWebMVC.Controllers
 {
     public class PaymentInformationCSVController : Controller
     {
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly ILogger _logger;
-        public PaymentInformationCSVController(ILogger<PaymentInformationCSVController> logger, IHostingEnvironment environment)
+        public PaymentInformationCSVController(ILogger<PaymentInformationCSVController> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;

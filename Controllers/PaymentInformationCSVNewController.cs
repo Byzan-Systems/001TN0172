@@ -27,10 +27,10 @@ namespace HDFCMSILWebMVC.Controllers
     {
         private static Dictionary<string, int> _uploadProgress = new Dictionary<string, int>();
         private readonly DataService _dataService;
-        private IHostingEnvironment _environment;
+        private IWebHostEnvironment _environment;
         private readonly ILogger _logger;
         private readonly IHubContext<UploadProgressHub> _hubContext;
-        public PaymentInformationCSVNewController(DataService dataService, IHubContext<UploadProgressHub> hubContext,ILogger<PaymentInformationCSVNewController> logger, IHostingEnvironment environment)
+        public PaymentInformationCSVNewController(DataService dataService, IHubContext<UploadProgressHub> hubContext,ILogger<PaymentInformationCSVNewController> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;
@@ -49,7 +49,7 @@ namespace HDFCMSILWebMVC.Controllers
 
         }
         [HttpPost]
-        public async Task<IActionResult> UploadPayment(IFormFile upload, int Count, [FromServices] IHostingEnvironment hostingEnvironment)
+        public async Task<IActionResult> UploadPayment(IFormFile upload, int Count, [FromServices] IWebHostEnvironment hostingEnvironment)
         {            
        
             try
