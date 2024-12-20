@@ -216,55 +216,66 @@ namespace HDFCMSILWebMVC.Controllers
                         {
                             // Payment file get failed and client upload whole file again , then there may be chance to insert dublicate entry for do nuber, utr no, amount. to avoid check below condition.      // enhance by chaitrali
                             DataTable dtUTRDuplicate = Methods.getDetails("GetUTRDetails_withoutStatus", UTR_No, DealerVirAccNo.Substring(0, 22).ToString(), Entry_Amount, "", "", "", "", _logger);
+                            
                             if (dtUTRDuplicate.Rows.Count == 0)
                             {
-                                Details[0] = Transaction_Id; //Transaction_Id
-                                Details[1] = "C"; //Type_of_Entry
-                                Details[2] = "C"; //Dr_CR
-                                Details[3] = Entry_Amount; //Entry_Amount
-                                Details[4] = ""; //Value_date
-                                Details[5] = Product; //Product
-                                Details[6] = Party_Code; //Party_Code
-                                Details[7] = Party_Name; //Party_Name
-                                Details[8] = DealerVirAccNo; //VA_account
-                                Details[9] = ""; //Locations
-                                Details[10] = RemittingBank; //RemittingBank
-                                Details[11] = UTR_No; //UTR_No
-                                Details[12] = IFSC_code; //IFSC_code
-                                Details[13] = ""; //Dealer_Name
-                                Details[14] = ""; //Dealer_Account_No
-                                Details[15] = ""; //Releated_Ref_No
-                                Details[16] = dtFile.Rows[0][0].ToString(); //fileID
-                                Details[17] = UserSession.LoginID; //Login ID
+                                //UserSession.LoginID = null;
+                                if (UserSession.LoginID != null || UserSession.LoginID != "")
+                                {
+                                    Details[0] = Transaction_Id; //Transaction_Id
+                                    Details[1] = "C"; //Type_of_Entry
+                                    Details[2] = "C"; //Dr_CR
+                                    Details[3] = Entry_Amount; //Entry_Amount
+                                    Details[4] = ""; //Value_date
+                                    Details[5] = Product; //Product
+                                    Details[6] = Party_Code; //Party_Code
+                                    Details[7] = Party_Name; //Party_Name
+                                    Details[8] = DealerVirAccNo; //VA_account
+                                    Details[9] = ""; //Locations
+                                    Details[10] = RemittingBank; //RemittingBank
+                                    Details[11] = UTR_No; //UTR_No
+                                    Details[12] = IFSC_code; //IFSC_code
+                                    Details[13] = ""; //Dealer_Name
+                                    Details[14] = ""; //Dealer_Account_No
+                                    Details[15] = ""; //Releated_Ref_No
+                                    Details[16] = dtFile.Rows[0][0].ToString(); //fileID
+                                    Details[17] = UserSession.LoginID; //Login ID
 
-                                string[] detailsCash = new string[25];
-                                detailsCash[0] = "0";   //cashopsID
-                                detailsCash[1] = Details[16];   //FileID
-                                detailsCash[2] = Details[5]; //CashOps_FileType
-                                detailsCash[3] = ""; //NEFT_RTGS_BT_ID
-                                detailsCash[4] = Details[8].Substring(0, 22); //Virtual_Account
-                                detailsCash[5] = Details[11]; //UTR_No
-                                detailsCash[6] = Details[3]; //Transaction_Amount
-                                detailsCash[7] = "C"; //Transaction_status
-                                detailsCash[8] = DBNull.Value.ToString(); //Payment_Status
-                                detailsCash[9] = DBNull.Value.ToString(); //Attempt
-                                detailsCash[10] = System.DateTime.Now.ToString("DD/MMM/YYYY"); //Cash_Ops_Date
-                                detailsCash[11] = System.DateTime.Now.ToString("HH:MM:SS AMPM"); //Cash_Ops_Time
-                                detailsCash[12] = "0"; //GEFO_Flag
-                                detailsCash[13] = DBNull.Value.ToString(); //GEFO_Date
-                                detailsCash[14] = DBNull.Value.ToString(); //DR_Account_No
-                                detailsCash[15] = DBNull.Value.ToString(); //CR_Account_No
-                                detailsCash[16] = UserSession.LoginID; //LoginID
-                                detailsCash[17] = DBNull.Value.ToString(); //EOD_MailFlag
-                                detailsCash[18] = DBNull.Value.ToString(); //DRC_Generation
-                                detailsCash[19] = Details[8]; //FNCR_Virtual_Account
-                                detailsCash[20] = Details[12]; //IFSC_code
-                                detailsCash[21] = Details[10]; //FNCR_code
-                                detailsCash[22] = ""; //FNCR_Name
+                                    string[] detailsCash = new string[25];
+                                    detailsCash[0] = "0";   //cashopsID
+                                    detailsCash[1] = Details[16];   //FileID
+                                    detailsCash[2] = Details[5]; //CashOps_FileType
+                                    detailsCash[3] = ""; //NEFT_RTGS_BT_ID
+                                    detailsCash[4] = Details[8].Substring(0, 22); //Virtual_Account
+                                    detailsCash[5] = Details[11]; //UTR_No
+                                    detailsCash[6] = Details[3]; //Transaction_Amount
+                                    detailsCash[7] = "C"; //Transaction_status
+                                    detailsCash[8] = DBNull.Value.ToString(); //Payment_Status
+                                    detailsCash[9] = DBNull.Value.ToString(); //Attempt
+                                    detailsCash[10] = System.DateTime.Now.ToString("DD/MMM/YYYY"); //Cash_Ops_Date
+                                    detailsCash[11] = System.DateTime.Now.ToString("HH:MM:SS AMPM"); //Cash_Ops_Time
+                                    detailsCash[12] = "0"; //GEFO_Flag
+                                    detailsCash[13] = DBNull.Value.ToString(); //GEFO_Date
+                                    detailsCash[14] = DBNull.Value.ToString(); //DR_Account_No
+                                    detailsCash[15] = DBNull.Value.ToString(); //CR_Account_No
+                                    detailsCash[16] = UserSession.LoginID; //LoginID
+                                    detailsCash[17] = DBNull.Value.ToString(); //EOD_MailFlag
+                                    detailsCash[18] = DBNull.Value.ToString(); //DRC_Generation
+                                    detailsCash[19] = Details[8]; //FNCR_Virtual_Account
+                                    detailsCash[20] = Details[12]; //IFSC_code
+                                    detailsCash[21] = Details[10]; //FNCR_code
+                                    detailsCash[22] = ""; //FNCR_Name
 
-                                //clserr.WriteLogToTxtFile("In Cashops_Payment Function", "Upload_Click", strFileName);
-                                Methods.CashOps_Payments(Details, detailsCash, _logger);
-                                TotalRows += 1;
+                                    //clserr.WriteLogToTxtFile("In Cashops_Payment Function", "Upload_Click", strFileName);
+                                    Methods.CashOps_Payments(Details, detailsCash, _logger);
+                                    TotalRows += 1;
+                                }
+                                else
+                                {
+                                    TempData["alertMessage"] = "Session get expired. Please login again and reupload. File Name :"+HttpContext.Request.Form.Files[0].FileName ; ////Enhance by yogesh
+                                    _logger.LogInformation("Session get expired. Please login again and reupload. File Name :" + HttpContext.Request.Form.Files[0].FileName + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
+                                    return RedirectToAction("ShowPaymentInformation");
+                                }
                                 //clserr.WriteLogToTxtFile("End -Cashops_Payment Function", "Upload_Click", strFileName);
                             }
                         }
