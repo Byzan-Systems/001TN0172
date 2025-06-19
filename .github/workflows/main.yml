@@ -1,46 +1,46 @@
-name: Security Vulnerabilities Scan (.NET 5 MVC on Windows)
+name: "Security Vulnerabilities Scan (.NET 5 MVC on Windows)"
 
 on:
   push:
-    branches: Audit-Details
+    branches: [Audit-Details]
   pull_request:
-    branches: Audit-Details
+    branches: [Audit-Details]
   workflow_dispatch:
 
 jobs:
   security_scan:
-    name: Run SCA + SAST on Windows
+    name: "Run SCA + SAST on Windows"
     runs-on: windows-latest
 
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🧰 Setup .NET 5
+      - name: Setup .NET 5
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '5.0'
 
-      - name: 📦 Restore NuGet packages
+      - name: Restore NuGet packages
         run: dotnet restore
 
-      - name: 🛠 Build the project
+      - name: Build the project
         run: dotnet build --no-restore --configuration Release
 
-      - name: 🧪 Run SCA: - NuGet Vulnerability Scan
+      - name: Run SCA - NuGet Vulnerability Scan
         run: |
           dotnet list package --vulnerable > sca_report.txt
           type sca_report.txt
 
-      - name: 🛡️ Install and Run Semgrep (SAST - OWASP rules)
+      - name: Install and Run Semgrep (SAST - OWASP rules)
         shell: pwsh
         run: |
           Invoke-WebRequest -Uri "https://semgrep.dev/install.ps1" -OutFile "install.ps1"
           powershell -ExecutionPolicy Bypass -File ".\install.ps1"
           $env:Path += ";$env:USERPROFILE\.semgrep\bin"
-          semgrep scan --config=p/owasp --lang csharp --output semgrep_report.json || echo "Semgrep scan completed with findings or warnings"
+          semgrep scan --config=p/owasp --lang csharp --output semgrep_report.json || echo "Semgrep scan completed"
 
-      - name: 💾 Upload Security Reports
+      - name: Upload Security Reports
         uses: actions/upload-artifact@v3
         with:
           name: security-reports
