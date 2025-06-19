@@ -31,6 +31,15 @@ jobs:
         run: |
           dotnet list package --vulnerable > sca_report.txt
           type sca_report.txt
+          
+      - name: Install and Run Semgrep (SAST - OWASP rules)
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/returntocorp/semgrep/releases/latest/download/semgrep-windows.zip" -OutFile "semgrep.zip"
+          Expand-Archive -Path "semgrep.zip" -DestinationPath "$env:RUNNER_TEMP\semgrep"
+          $env:Path += ";$env:RUNNER_TEMP\semgrep"
+          $semgrepPath = Get-ChildItem -Path "$env:RUNNER_TEMP\semgrep" -Filter semgrep.exe -Recurse | Select-Object -First 1
+          & "$($semgrepPath.FullName)" scan --config=p/owasp --lang csharp --output semgrep_report.json || echo "Semgrep scan completed with warnings or findings"
 
       
       - name: Upload Security Reports
