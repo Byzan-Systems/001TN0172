@@ -45,7 +45,7 @@ namespace HDFCMSILWebMVC.Controllers
         [HttpPost]
         public IActionResult UploadPayment(IFormFile upload, int Count)
         {
-            string connString;
+            //string connString;
             if (HttpContext.Session.GetString("LoginID") == null)
             { return RedirectToAction("Logout", "Login"); }
             else

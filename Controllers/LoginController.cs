@@ -289,7 +289,7 @@ namespace HDFCMSILWebMVC.Controllers
                 }
             }
 
-            catch (Exception )
+            catch (Exception ex)
             {
                 _logger.LogError(ex.ToString() + " - LoginController;LoginLogDB");
             }
