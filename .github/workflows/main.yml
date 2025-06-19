@@ -27,7 +27,7 @@ jobs:
       - name: 🛠 Build the project
         run: dotnet build --no-restore --configuration Release
 
-      - name: 🧪 Run SCA: NuGet Vulnerability Scan
+      - name: 🧪 Run SCA: - NuGet Vulnerability Scan
         run: |
           dotnet list package --vulnerable > sca_report.txt
           type sca_report.txt
