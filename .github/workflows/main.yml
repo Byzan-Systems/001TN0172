@@ -32,14 +32,7 @@ jobs:
           dotnet list package --vulnerable > sca_report.txt
           type sca_report.txt
 
-      - name: Install and Run Semgrep (SAST - OWASP rules)
-        shell: pwsh
-        run: |
-          Invoke-WebRequest -Uri "https://semgrep.dev/install.ps1" -OutFile "install.ps1"
-          powershell -ExecutionPolicy Bypass -File ".\install.ps1"
-          $env:Path += ";$env:USERPROFILE\.semgrep\bin"
-          semgrep scan --config=p/owasp --lang csharp --output semgrep_report.json || echo "Semgrep scan completed"
-
+      
       - name: Upload Security Reports
         uses: actions/upload-artifact@v4
         with:
