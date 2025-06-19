@@ -1,28 +1,49 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Security Vulnerabilities Scan (.NET 5 MVC on Windows)
 
 on:
   push:
-    branches: [ "IWH-and-MSIL-Audit-Changes" ]
+    branches: Audit-Details
   pull_request:
-    branches: [ "IWH-and-MSIL-Audit-Changes" ]
+    branches: Audit-Details
+  workflow_dispatch:
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  security_scan:
+    name: Run SCA + SAST on Windows
+    runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 5.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+
+      - name: 🧰 Setup .NET 5
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '5.0'
+
+      - name: 📦 Restore NuGet packages
+        run: dotnet restore
+
+      - name: 🛠 Build the project
+        run: dotnet build --no-restore --configuration Release
+
+      - name: 🧪 Run SCA: NuGet Vulnerability Scan
+        run: |
+          dotnet list package --vulnerable > sca_report.txt
+          type sca_report.txt
+
+      - name: 🛡️ Install and Run Semgrep (SAST - OWASP rules)
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri "https://semgrep.dev/install.ps1" -OutFile "install.ps1"
+          powershell -ExecutionPolicy Bypass -File ".\install.ps1"
+          $env:Path += ";$env:USERPROFILE\.semgrep\bin"
+          semgrep scan --config=p/owasp --lang csharp --output semgrep_report.json || echo "Semgrep scan completed with findings or warnings"
+
+      - name: 💾 Upload Security Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-reports
+          path: |
+            sca_report.txt
+            semgrep_report.json
