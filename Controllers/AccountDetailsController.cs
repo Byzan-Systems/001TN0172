@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using System.Data;
 
 namespace HDFCMSILWebMVC.Controllers
 {
@@ -20,7 +21,7 @@ namespace HDFCMSILWebMVC.Controllers
         public ActionResult ShowAccountDetails()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 var AccountDetailss = new AccountDetails();
@@ -28,11 +29,19 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     using (var db = new Entities.DatabaseContext())
                     {
-                        var ss = db.Set<DBAccountDetails>().FromSqlRaw("Select * from Account_Details").ToList();
+                        
+                        AccountDetailss.Payment_Type = "Select Payment Type";
+                        AccountDetailss.CR_Account_No = "";
+                        AccountDetailss.DR_Account_No = "";
 
-                        AccountDetailss.Payment_Type = ss[0].Payment_Type;
-                        AccountDetailss.CR_Account_No = ss[0].CR_Account_No;
-                        AccountDetailss.DR_Account_No = ss[0].DR_Account_No;
+
+                        //var ss = db.Set<DBAccountDetails>().FromSqlRaw("Select * from Account_Details").ToList();
+
+                        //string DT_CR = Methods.EncryptDecryptData("Decrypt", "", ss[0].CR_Account_No, _logger);
+                        //string DT_DR = Methods.EncryptDecryptData("Decrypt", "", ss[0].DR_Account_No, _logger);
+                        //AccountDetailss.Payment_Type = ss[0].Payment_Type;
+                        //AccountDetailss.CR_Account_No = DT_CR;
+                        //AccountDetailss.DR_Account_No = DT_DR;
 
                         _logger.LogInformation("Executed successfully" + " - AccountDetailsController; ShowAccountDetails");
 
@@ -51,27 +60,43 @@ namespace HDFCMSILWebMVC.Controllers
         public ActionResult ShowAccountDetails(AccountDetails model)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 var employeeModel = new AccountDetails();
-
                 try
                 {
                     using (var db = new Entities.DatabaseContext())
                     {
-
                         var ss = db.Set<DBAccountDetails>().FromSqlRaw("Select * from Account_Details where Payment_Type ='" + model.Payment_Type + "' ").ToList();
+                        _logger.LogInformation("data read from database." + " - AccountDetailsController; ShowAccountDetails");
                         if (ss.Count > 0)
                         {
+                            string DT_CR = Methods.EncryptDecryptData("Decrypt", "", ss[0].CR_Account_No, _logger);
+                            string DT_DR = Methods.EncryptDecryptData("Decrypt", "", ss[0].DR_Account_No, _logger);
                             employeeModel.Payment_Type = ss[0].Payment_Type;
-                            employeeModel.CR_Account_No = ss[0].CR_Account_No;
-                            employeeModel.DR_Account_No = ss[0].DR_Account_No;
+                            if (DT_CR == null || DT_CR == "")
+                                employeeModel.CR_Account_No = ss[0].CR_Account_No;
+                            else
+                                employeeModel.CR_Account_No = DT_CR;
+
+                            if (DT_DR == null || DT_DR == "")
+                                employeeModel.DR_Account_No = ss[0].DR_Account_No;
+                            else
+                                employeeModel.DR_Account_No = DT_DR;
+
+                            _logger.LogInformation("Account details are present to show." + " - AccountDetailsController; ShowAccountDetails");
+                        }
+                        else
+                        {
+                            employeeModel.Payment_Type = model.Payment_Type;
+                            employeeModel.CR_Account_No = "";
+                            employeeModel.DR_Account_No = "";
+
+                            _logger.LogInformation("No data to show" + " - AccountDetailsController; ShowAccountDetails");
                         }
                         ModelState.Clear();
-
                         _logger.LogInformation("Executed successfully" + " - AccountDetailsController; ShowAccountDetails");
-
                     }
                 }
                 catch (Exception ex)
@@ -85,10 +110,10 @@ namespace HDFCMSILWebMVC.Controllers
         }
 
         [HttpPost]
-        public ActionResult UpdateAccountDetails (AccountDetails model)
+        public ActionResult UpdateAccountDetails(AccountDetails model)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 var employeeModel = new DBAccountDetails();
@@ -96,7 +121,9 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     using (var db = new Entities.DatabaseContext())
                     {
-                        db.Database.ExecuteSqlRaw("Update Account_Details set CR_Account_No='" + model.CR_Account_No + "',DR_Account_No='" + model.DR_Account_No + "' where Payment_Type ='" + model.Payment_Type + "' ");
+                        string encryptedBase64 = Methods.EncryptDecryptData("Encrypt", model.CR_Account_No, "", _logger);
+                        string encryptedBase64DR = Methods.EncryptDecryptData("Encrypt", model.DR_Account_No, "", _logger);
+                        db.Database.ExecuteSqlRaw("Update Account_Details set CR_Account_No='" + encryptedBase64 + "',DR_Account_No='" + encryptedBase64DR + "' where Payment_Type ='" + model.Payment_Type + "' ");
                         //  var ss = db.Set<DBAccountDetails>().FromSqlRaw().ToList();
 
                         TempData["alertMessage"] = "Account number update successfullly.";

@@ -33,7 +33,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowPaymentInformationCSV()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -44,7 +44,7 @@ namespace HDFCMSILWebMVC.Controllers
         {
             StreamReader objStrmReader = null;
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try

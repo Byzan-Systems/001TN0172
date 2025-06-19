@@ -23,7 +23,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -33,7 +33,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult DownloadInvoice()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -108,7 +108,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Show(DownloadinvFrmDeta DInvDa)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 //int TotInv = 0;

@@ -32,7 +32,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowPaymentInformation()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
 
@@ -45,9 +45,9 @@ namespace HDFCMSILWebMVC.Controllers
         [HttpPost]
         public IActionResult UploadPayment(IFormFile upload, int Count)
         {
-            //string connString;
+            string connString;
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 //HSSFWorkbook hssfwb = new HSSFWorkbook(); ISheet sheet;

@@ -63,11 +63,16 @@
                 <form method="post" asp-controller="PhysicalReceived">
 
                     <div class="row">
-                        <div class="col-sm-10">
+                        <div class="col-sm-2">
                             <div class="form-group">
-                                <button type="submit" class="btn btn-app bg-success" value="Update" asp-action="Update"  onclick=" return validateForm()"><i class="fas fa-clipboard-list"></i>Update</button>
+                                <button type="submit" class="btn btn-app bg-success" value="Update" asp-action="Update" onclick=" return validateForm()"><i class="fas fa-clipboard-list"></i>Update</button>
                             </div>
                         </div>
+                        @*<div class="col-sm-2">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-app bg-success" value="Stop" asp-action="StopPhysicalRecieved" onclick=" return validateFormStop()"><i class="fas fa-clipboard-list"></i>Stop</button>
+                            </div>
+                        </div>*@
                     </div>
 
                 </form>
@@ -82,7 +87,18 @@
                                 }
                                 else { return false;}
 
-                            }
+                    }
+                    function validateFormStop() {
+
+                        const response = confirm("Are you sure want to Stop Physical Received Reports. ?");
+
+                        if (response == true) {
+
+                            return true;
+                        }
+                        else { return false; }
+
+                    }
                 </script>
             }
         </div>

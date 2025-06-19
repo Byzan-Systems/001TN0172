@@ -35,7 +35,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Show(DOInformationModels req)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 if (req.DONumber == "" || req.DONumber == null)

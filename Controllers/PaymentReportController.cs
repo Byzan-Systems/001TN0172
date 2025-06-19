@@ -27,7 +27,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowPaymentReport()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -38,7 +38,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowTablePaymentReport(ShowPaymentReportSelect showpay)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 DataTable dt = new DataTable();
@@ -79,7 +79,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ExportExcel()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try

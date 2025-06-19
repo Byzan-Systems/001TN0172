@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HDFCMSILWebMVC.Models
 {
-  public class ShowPending_Report
+    public class ShowPending_Report
     {
         public bool chkSelectDate { get; set; }
         public DateTime? StartDate { get; set; }

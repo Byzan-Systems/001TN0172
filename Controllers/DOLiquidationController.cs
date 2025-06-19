@@ -25,7 +25,7 @@ namespace HDFCMSILWebMVC.Controllers
         public ActionResult ShowDOLiquidation()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View(model);
@@ -36,7 +36,7 @@ namespace HDFCMSILWebMVC.Controllers
         public ActionResult ShowPayInfo(ControlDOLiquidation model)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try
@@ -95,7 +95,7 @@ namespace HDFCMSILWebMVC.Controllers
         public  ActionResult UpdatePayInfo(ControlDOLiquidation model, string Type)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try

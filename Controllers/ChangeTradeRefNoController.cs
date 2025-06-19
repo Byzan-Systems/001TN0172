@@ -24,7 +24,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ChangeTradeRefNo()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -36,7 +36,7 @@ namespace HDFCMSILWebMVC.Controllers
         public ActionResult UpdateTradeRefNo(updateNewTradeRefNo TradeRefNo, string[] IsSelect)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try
@@ -76,7 +76,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Show(TradeRefNo req)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 if (req.TradeRefNum == "" || req.TradeRefNum == null)

@@ -25,8 +25,9 @@
     @*<link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">*@
     <!-- summernote -->
     @* <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">*@
+
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed" onclick="clicked=true;">
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -84,10 +85,16 @@
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
+                                @*<li class="nav-item">
+            <a href="@Url.Action("Index", "Login")" class="nav-link">
+                <i class="fas fa-user-plus nav-icon"></i>
+                <p>User Master</p>
+            </a>
+        </li>*@
                                 <li class="nav-item">
-                                    <a href="@Url.Action("Index", "Login")" class="nav-link">
-                                        <i class="fas fa-user-plus nav-icon"></i>
-                                        <p>User Master</p>
+                                    <a href="@Url.Action("ShowPhysicalReceived", "PhysicalReceived")" class="nav-link">
+                                        <i class="fas fa-file nav-icon"></i>
+                                        <p>Physical Received</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -96,6 +103,12 @@
                                         <p>Financer Master</p>
                                     </a>
                                 </li>
+                                @*<li class="nav-item">
+                                    <a href="@Url.Action( "ShowStockyard","Stockyard")" class="nav-link">
+                                        <i class="fas fa-user-plus nav-icon"></i>
+                                        <p>Stockyard Master</p>
+                                    </a>
+                                </li>*@
                                 <li class="nav-item">
                                     <a href="@Url.Action("ShowAccountDetails", "AccountDetails")" class="nav-link">
                                         <i class="fas fa-audio-description nav-icon"></i>
@@ -114,12 +127,7 @@
                                         <p>EOD Process</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="@Url.Action("ShowPhysicalReceived", "PhysicalReceived")" class="nav-link">
-                                        <i class="fas fa-file nav-icon"></i>
-                                        <p>Physical Received</p>
-                                    </a>
-                                </li>
+
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -307,6 +315,8 @@
         <!-- /.control-sidebar -->
     </div>
 
+
     @RenderSection("Scripts", required: false)
+
 </body>
 </html>

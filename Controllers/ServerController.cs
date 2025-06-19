@@ -21,7 +21,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult HomePage()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -32,7 +32,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult RunApplication()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();

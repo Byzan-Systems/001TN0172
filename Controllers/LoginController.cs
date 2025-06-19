@@ -17,6 +17,14 @@ using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
 using Novell.Directory.Ldap;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
+using System.Diagnostics;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace HDFCMSILWebMVC.Controllers
 {
@@ -24,13 +32,14 @@ namespace HDFCMSILWebMVC.Controllers
     {
         private readonly ILogger _logger;
         private IWebHostEnvironment Environment;
+
         //private readonly AccessMenu Accmenu;
         public LoginController(ILogger<LoginController> logger, IWebHostEnvironment _environment)
         {
             _logger = logger;
             Environment = _environment;
-        }
 
+        }
 
         public bool ValidateLDAP(string Username, string Password)
         {
@@ -234,147 +243,174 @@ namespace HDFCMSILWebMVC.Controllers
         {
             try
             {
-
-
-                string D1 = DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss tt");
-                string strId;
-               // string cmd;
-                using (var db = new Entities.DatabaseContext())
+                if (Type == "LOGIN")
                 {
-                    var strlogId = db.Set<UAM_LoginLogout>().FromSqlRaw("select max(Convert(int, logId)) from UAM_LoginLogout").ToList();
-
-                    if (strlogId[0].LogID == "")
+                    string D1 = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt");
+                    string strId;
+                    // string cmd;
+                    using (var db = new Entities.DatabaseContext())
                     {
-                        strId = 0.ToString();
+                        var strlogId = db.Set<UAM_LoginLogout>().FromSqlRaw("select Convert(varchar,max(Convert(int, logId)))LogID from MSIL_LoginLogout").ToList();
+
+                        if (strlogId[0].LogID == "" || strlogId[0].LogID == null)
+                        {
+                            strId = 0.ToString();
+                        }
+                        else
+                        {
+                            strId = strlogId[0].LogID;
+                        }
+                        strId = (int.Parse(strId) + 1).ToString();
+                        db.Database.ExecuteSqlRaw("insert into MSIL_LoginLogout (logId, User_id, Logindate_time) values('" + strId + "','" + FrmUserID.ToString() + "','" + D1 + "') ");
                     }
-                    else
+                }
+                if (Type == "LOGOUT")
+                {
+                    string D1 = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt");
+                    string strId;
+                    // string cmd;
+                    using (var db = new Entities.DatabaseContext())
                     {
-                        strId = strlogId[0].LogID;
-                    }
+                        var strlogId = db.Set<UAM_LoginLogout>().FromSqlRaw("select (Convert(varchar, max(Convert(int, LogID)))) LogID from MSIL_LoginLogout where User_id='" + FrmUserID.ToString().Trim() + "'").ToList();
 
+                        if (strlogId[0].LogID == "")
+                        {
+                            strId = 0.ToString();
+                        }
+                        else
+                        {
+                            strId = strlogId[0].LogID;
+                        }
+                        db.Database.ExecuteSqlRaw("update USER_Mst_Temp set MSIL_LogoutTime='" + D1 + "'  where User_id='" + FrmUserID.ToString().Trim() + "' ");
+                        db.Database.ExecuteSqlRaw("update UserHistory set MSIL_LogoutTime='" + D1 + "'  where User_id='" + FrmUserID.ToString().Trim() + "'");
 
-                    if (Type == "LOGIN")
-                    {
-                        strId = (strId + 1d).ToString();
-
-                        db.Database.ExecuteSqlRaw("insert into UAM_LoginLogout (logId,User_id,Logindate_time) values('" + strId + "','" + FrmUserID.ToString() + "','" + D1 + "'");
-
-                    }
-                    else
-                    {
-                        Type = "LOGOUT";
-                        db.Database.ExecuteSqlRaw("update UAM_LoginLogout set Logoutdate_time='" + D1 + "'  where User_id='" + FrmUserID.ToString() + "' and LogID='" + strId + "'");
-
-
+                        db.Database.ExecuteSqlRaw("update MSIL_LoginLogout set MSIL_LogoutDatetime='" + D1 + "'  where User_id='" + FrmUserID.ToString().Trim() + "' and LogID='" + strId + "'");
                     }
                 }
             }
 
             catch (Exception )
             {
-                //Interaction.MsgBox("Error :" + ex.Message.ToString(), (MsgBoxStyle)((int)MsgBoxStyle.Information + (int)MsgBoxStyle.OkOnly));
-                //Handle_Error(ex, "ClsBase", Information.Err().Number, "LoginLogDB");
+                _logger.LogError(ex.ToString() + " - LoginController;LoginLogDB");
             }
             finally
             {
-
             }
-
         }
 
         [HttpPost]
-        public IActionResult LoginPage(LoginMST LoginViewModel)
+        public IActionResult LoginPage(user_mst_temp LoginViewModel)
         {
             try
             {
                 using (var db = new Entities.DatabaseContext())
                 {
                     //var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Password == LoginViewModel.Password && a.Login_Enable == 1).FirstOrDefault();
-                    var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Login_Enable == 1).FirstOrDefault();
+                    var rec = db.user_mst_tempDB.Where(a => a.User_Name == LoginViewModel.User_Name).FirstOrDefault();
 
                     if (rec != null)
                     {
-                        HttpContext.Session.SetString("UserName", LoginViewModel.LoginName);
-                        HttpContext.Session.SetString("LoginID", rec.LoginID.ToString());
-                        UserSession.LoginID = rec.LoginID.ToString();
-                        var builder = new ConfigurationBuilder()
-                      .SetBasePath(Directory.GetCurrentDirectory() + "\\")
-                      .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-
-                        IConfigurationRoot configuration = builder.Build();
-                        string contentPath = Environment.ContentRootPath + "\\";
-                        HttpContext.Session.SetString("InputFilePath", contentPath + configuration.GetSection("MSILSettings:InputFilePath").Value);
-                        HttpContext.Session.SetString("OutputFilePath", contentPath + configuration.GetSection("MSILSettings:OutputFilePath").Value);
-                        HttpContext.Session.SetString("BackupFilePath", contentPath + configuration.GetSection("MSILSettings:BackupFilePath").Value);
-                        HttpContext.Session.SetString("NonConvertedFile", contentPath + configuration.GetSection("MSILSettings:NonConvertedFile").Value);
-                        HttpContext.Session.SetString("ErrorLog", contentPath + configuration.GetSection("MSILSettings:ErrorLog").Value);
-                        HttpContext.Session.SetString("AuditLog", contentPath + configuration.GetSection("MSILSettings:AuditLog").Value);
-                        HttpContext.Session.SetString("TRADE_EMAIL", configuration.GetSection("MSILSettings:TRADE_EMAIL").Value);
-                        HttpContext.Session.SetString("Frequency", configuration.GetSection("MSILSettings:Frequency").Value);
-                        HttpContext.Session.SetString("INV_CONF_EMAIL", configuration.GetSection("MSILSettings:INV_CONF_EMAIL").Value);
-                        HttpContext.Session.SetString("INV_CONF_FNAME", configuration.GetSection("MSILSettings:INV_CONF_FNAME").Value);
-                        HttpContext.Session.SetString("ORD_MIS_EMAIL", configuration.GetSection("MSILSettings:ORD_MIS_EMAIL").Value);
-                        HttpContext.Session.SetString("PAYREC_TRADE_EMAIL", configuration.GetSection("MSILSettings:PAYREC_TRADE_EMAIL").Value);
-                        HttpContext.Session.SetString("PHY_INV", configuration.GetSection("MSILSettings:PHY_INV").Value);
-                        HttpContext.Session.SetString("NO_INV", configuration.GetSection("MSILSettings:NO_INV").Value);
-                        HttpContext.Session.SetString("EOD_MIS", configuration.GetSection("MSILSettings:EOD_MIS").Value);
-                        HttpContext.Session.SetString("ORD_DEL", configuration.GetSection("MSILSettings:ORD_DEL").Value);
-                        HttpContext.Session.SetString("INV_PHY_NTRC", configuration.GetSection("MSILSettings:INV_PHY_NTRC").Value);
-                        HttpContext.Session.SetString("IntraDayPath", configuration.GetSection("MSILSettings:IntraDayPath").Value);
-                        HttpContext.Session.SetString("EOD_File_EMail", configuration.GetSection("MSILSettings:EOD_File_EMail").Value);
-                        HttpContext.Session.SetString("FCC_EMail", configuration.GetSection("MSILSettings:FCC_EMail").Value);
-                        HttpContext.Session.SetString("DRC_EMail", configuration.GetSection("MSILSettings:DRC_EMail").Value);
-                        HttpContext.Session.SetString("Payment_Rejection_EMail", configuration.GetSection("MSILSettings:Payment_Rejection_EMail").Value);
-                        HttpContext.Session.SetString("DRC_EMail_BNGR", configuration.GetSection("MSILSettings:DRC_EMail_BNGR").Value);
-                        HttpContext.Session.SetString("DRC_EMail_SLGR", configuration.GetSection("MSILSettings:DRC_EMail_SLGR").Value);
-                        HttpContext.Session.SetString("DO_Cancel_Email", configuration.GetSection("MSILSettings:DO_Cancel_Email").Value);
-                        HttpContext.Session.SetString("DO_Invoice_Cancel_Email", configuration.GetSection("MSILSettings:DO_Invoice_Cancel_Email").Value);
-                        HttpContext.Session.SetString("Invoice_Cancel_Email", configuration.GetSection("MSILSettings:Invoice_Cancel_Email").Value);
-                        HttpContext.Session.SetString("Sleep_Time_in_Mint", configuration.GetSection("MSILSettings:Sleep_Time_in_Mint").Value);
-                        HttpContext.Session.SetString("Confirmation_Mail", configuration.GetSection("EmailSetting:Confirmation_Mail").Value);
-                        HttpContext.Session.SetString("SMTP_HOST", configuration.GetSection("EmailSetting:SMTP_HOST").Value);
-                        HttpContext.Session.SetString("Port", configuration.GetSection("EmailSetting:Port").Value);
-                        HttpContext.Session.SetString("Email_FromID", configuration.GetSection("EmailSetting:Email_FromID").Value);
-                        HttpContext.Session.SetString("UserID", configuration.GetSection("EmailSetting:UserID").Value);
-                        HttpContext.Session.SetString("Password", configuration.GetSection("EmailSetting:Password").Value);
-                        HttpContext.Session.SetString("SysEmail_FromID", configuration.GetSection("SystemSetting:Pwd").Value);
-                        HttpContext.Session.SetString("PWD", configuration.GetSection("SystemSetting:Pwd").Value);
-                        _logger.LogInformation("The MSIL application login : User Name - " + LoginViewModel.LoginName);
-
-
-                        //// comment validateLDAP if on UAT, otherwise check LDAP
-                        if (ValidateLDAP(LoginViewModel.LoginName, LoginViewModel.Password) == true)
+                        var recIsactive = db.user_mst_tempDB.Where(a => a.User_Name == LoginViewModel.User_Name && a.IsActive == "1").FirstOrDefault();
+                        if (recIsactive != null)
                         {
-                            _logger.LogInformation("Ldap Successfull" + LoginViewModel.LoginName);
 
-                            if (rec.LoginType == "SERVER")
-                            {
+                            HttpContext.Session.SetString("UserName", LoginViewModel.User_Name);
+                            HttpContext.Session.SetString("LoginID", rec.User_Id.ToString());
+                            UserSession.LoginID = rec.User_Id.ToString();
+                            var builder = new ConfigurationBuilder()
+                          .SetBasePath(Directory.GetCurrentDirectory() + "\\")
+                          .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+                            IConfigurationRoot configuration = builder.Build();
+                            string contentPath = Environment.ContentRootPath + "\\";
+                            HttpContext.Session.SetString("InputFilePath", contentPath + configuration.GetSection("MSILSettings:InputFilePath").Value);
+                            HttpContext.Session.SetString("OutputFilePath", contentPath + configuration.GetSection("MSILSettings:OutputFilePath").Value);
+                            HttpContext.Session.SetString("BackupFilePath", contentPath + configuration.GetSection("MSILSettings:BackupFilePath").Value);
+                            HttpContext.Session.SetString("NonConvertedFile", contentPath + configuration.GetSection("MSILSettings:NonConvertedFile").Value);
+                            HttpContext.Session.SetString("ErrorLog", contentPath + configuration.GetSection("MSILSettings:ErrorLog").Value);
+                            HttpContext.Session.SetString("AuditLog", contentPath + configuration.GetSection("MSILSettings:AuditLog").Value);
+                            HttpContext.Session.SetString("TRADE_EMAIL", configuration.GetSection("MSILSettings:TRADE_EMAIL").Value);
+                            HttpContext.Session.SetString("Frequency", configuration.GetSection("MSILSettings:Frequency").Value);
+                            HttpContext.Session.SetString("INV_CONF_EMAIL", configuration.GetSection("MSILSettings:INV_CONF_EMAIL").Value);
+                            HttpContext.Session.SetString("INV_CONF_FNAME", configuration.GetSection("MSILSettings:INV_CONF_FNAME").Value);
+                            HttpContext.Session.SetString("ORD_MIS_EMAIL", configuration.GetSection("MSILSettings:ORD_MIS_EMAIL").Value);
+                            HttpContext.Session.SetString("PAYREC_TRADE_EMAIL", configuration.GetSection("MSILSettings:PAYREC_TRADE_EMAIL").Value);
+                            HttpContext.Session.SetString("PHY_INV", configuration.GetSection("MSILSettings:PHY_INV").Value);
+                            HttpContext.Session.SetString("NO_INV", configuration.GetSection("MSILSettings:NO_INV").Value);
+                            HttpContext.Session.SetString("EOD_MIS", configuration.GetSection("MSILSettings:EOD_MIS").Value);
+                            HttpContext.Session.SetString("ORD_DEL", configuration.GetSection("MSILSettings:ORD_DEL").Value);
+                            HttpContext.Session.SetString("INV_PHY_NTRC", configuration.GetSection("MSILSettings:INV_PHY_NTRC").Value);
+                            HttpContext.Session.SetString("IntraDayPath", configuration.GetSection("MSILSettings:IntraDayPath").Value);
+                            HttpContext.Session.SetString("EOD_File_EMail", configuration.GetSection("MSILSettings:EOD_File_EMail").Value);
+                            HttpContext.Session.SetString("FCC_EMail", configuration.GetSection("MSILSettings:FCC_EMail").Value);
+                            HttpContext.Session.SetString("DRC_EMail", configuration.GetSection("MSILSettings:DRC_EMail").Value);
+                            HttpContext.Session.SetString("Payment_Rejection_EMail", configuration.GetSection("MSILSettings:Payment_Rejection_EMail").Value);
+                            HttpContext.Session.SetString("DRC_EMail_BNGR", configuration.GetSection("MSILSettings:DRC_EMail_BNGR").Value);
+                            HttpContext.Session.SetString("DRC_EMail_SLGR", configuration.GetSection("MSILSettings:DRC_EMail_SLGR").Value);
+                            HttpContext.Session.SetString("DO_Cancel_Email", configuration.GetSection("MSILSettings:DO_Cancel_Email").Value);
+                            HttpContext.Session.SetString("DO_Invoice_Cancel_Email", configuration.GetSection("MSILSettings:DO_Invoice_Cancel_Email").Value);
+                            HttpContext.Session.SetString("Invoice_Cancel_Email", configuration.GetSection("MSILSettings:Invoice_Cancel_Email").Value);
+                            HttpContext.Session.SetString("Sleep_Time_in_Mint", configuration.GetSection("MSILSettings:Sleep_Time_in_Mint").Value);
+                            HttpContext.Session.SetString("Confirmation_Mail", configuration.GetSection("EmailSetting:Confirmation_Mail").Value);
+                            HttpContext.Session.SetString("SMTP_HOST", configuration.GetSection("EmailSetting:SMTP_HOST").Value);
+                            HttpContext.Session.SetString("Port", configuration.GetSection("EmailSetting:Port").Value);
+                            HttpContext.Session.SetString("Email_FromID", configuration.GetSection("EmailSetting:Email_FromID").Value);
+                            HttpContext.Session.SetString("UserID", configuration.GetSection("EmailSetting:UserID").Value);
+                            HttpContext.Session.SetString("Password", configuration.GetSection("EmailSetting:Password").Value);
+                            HttpContext.Session.SetString("SysEmail_FromID", configuration.GetSection("SystemSetting:Pwd").Value);
+                            HttpContext.Session.SetString("PWD", configuration.GetSection("SystemSetting:Pwd").Value);
+                            _logger.LogInformation("The MSIL application login : User Name - " + LoginViewModel.User_Name);
+
+
+                            //// comment validateLDAP if on UAT, otherwise check LDAP
+                            ////////if (ValidateLDAP(LoginViewModel.User_Name, LoginViewModel.Password) == true)
+                            ////////{
+
+                                // Dormancy Check\
+                                int isdormant = DaysCheck(rec);
+
+
+                                _logger.LogInformation("Ldap Successfull" + LoginViewModel.User_Name);
+                                if (isdormant == 0)
+                                {
+
+                                //if (rec.LoginType == "SERVER")
+                                //{
+                                //    ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
+
+                                //    return RedirectToAction("HomePage", "Server");
+                                //}
+                                //else if (rec.LoginType == "TRADE OPS")
+                                //{
+                                //    return RedirectToAction("Trade_OPSHomePage", "Login");
+                                //}
+                                //else if (rec.LoginType == "CASH OPS")
+                                //{
+                                //    return RedirectToAction("Cash_OPSHomePage", "Login");
+                                //}
+                                //else if (rec.LoginType == "CASH_Trade OPS")
+                                //{
+                                //    return RedirectToAction("Cash_TradeHomePage", "Login");
+                                //}
+                                //else
+                                //{
+                                LoginLogDB("", "", "LOGIN", UserSession.LoginID.ToString());
                                 ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
-
-                                return RedirectToAction("HomePage", "Server");
-                            }
-                            else if (rec.LoginType == "TRADE OPS")
-                            {
-                                return RedirectToAction("Trade_OPSHomePage", "Login");
-                            }
-                            else if (rec.LoginType == "CASH OPS")
-                            {
-                                return RedirectToAction("Cash_OPSHomePage", "Login");
-                            }
-                            else if (rec.LoginType == "CASH_Trade OPS")
-                            {
-                                return RedirectToAction("Cash_TradeHomePage", "Login");
-                            }
-                            else
-                            {
-
-                                ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
-                                return RedirectToAction("HomePage", "Login");
-                            }
+                                    return RedirectToAction("HomePage", "Login");
+                                    //}
+                                }
+                                else
+                                { ViewBag.LoginStatus = -1; }
+                            ////////}
+                            ////////else
+                            ////////{
+                            ////////    _logger.LogInformation("Ldap Fail" + "User" + LoginViewModel.User_Name + "Password" + LoginViewModel.Password + LoginViewModel.User_Name);
+                            ////////}
                         }
                         else
                         {
-                            _logger.LogInformation("Ldap Fail" + "User" + LoginViewModel.LoginName + "Password" + LoginViewModel.Password + LoginViewModel.LoginName);
+                            ViewBag.LoginStatus = -1;
+                            TempData["alertMessageDormant"] = rec.Remark ;
                         }
 
 
@@ -402,13 +438,195 @@ namespace HDFCMSILWebMVC.Controllers
             }
             return View(LoginViewModel);
         }
+        public int DaysCheck(user_mst_temp user_Mst_TempS)
+        {
+            DataTable dtGetUserDetails = new DataTable();
+            int ISDormant = 0;
+            //string strDays;
+
+            try
+            {
+                using (var db = new Entities.DatabaseContext())
+                {
+                    DataTable dtDays = new DataTable();
+                    //var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Password == LoginViewModel.Password && a.Login_Enable == 1).FirstOrDefault();
+                    var row = db.user_mst_tempDB.Where(a => a.LastLogin != "NULL" && a.EmpType != "NULL" && a.IsActive != "3" && a.IsActive == "1").FirstOrDefault();
+                    // _logger.LogInformation("NO OF RECORDS: " + row.);
+                    if (row != null)
+                    {
+                        int dayCount = 0;
+
+                        if (!string.IsNullOrEmpty(row.LastLogin.ToString()))
+                        {
+                            string lastLoginStr = row.LastLogin.ToString();
+                            DateTime parsedDate = DateTime.ParseExact(lastLoginStr, "yyyy-MM-dd hh:mm:ss tt", System.Globalization.CultureInfo.InvariantCulture);
+
+                            //DateTime dbLastLoginDate = DateTime.ParseExact(parsedDate, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                            DateTime currentDate = DateTime.Now;
+
+                            dayCount = (currentDate - parsedDate).Days;
+                            _logger.LogInformation("check user - " + row.User_Id);
+                            _logger.LogInformation("total day differences - " + dayCount);
+                        }
+                        _logger.LogInformation("[ " + dayCount + " ] Days Difference");
+
+
+                        string empType = row.EmpType.ToString().ToUpper();
+                        string isActive = row.IsActive.ToString();
+                        string userId = row.User_Id.ToString();
+
+                        if (dayCount > 30 && empType == "NEW" && isActive != "3")
+                        {
+                            _logger.LogInformation($"Before value of daycount and isactive - {dayCount} and {isActive}");
+                            var query = "UPDATE USER_Mst_Temp SET IsActive='5', Remark='" + userId + " IS LOCKED DUE TO DORMANT]'  WHERE User_ID = '" + userId + "'  AND isactive = '1' AND isactive <> '3'";
+                            db.Database.ExecuteSqlRaw(query);
+                            db.SaveChanges();
+
+                            _logger.LogInformation("Update query for New Dormant users - " + query + "check user - " + row.User_Id);
+                            _logger.LogInformation($"[{userId}] IS LOCKED DUE TO DORMANT NEW USER");
+                            TempData["alertMessageDormant"] = $"[{ userId}] IS LOCKED DUE TO DORMANT. Kindly contact Administrator";
+                            ISDormant = 1;
+                        }
+                        else if (dayCount > 90 && empType == "EXISTING" && isActive != "3")
+                        {
+                            _logger.LogInformation($"Before value for existing user - daycount and isactive - {dayCount} and {isActive}");
+                            var query = "UPDATE USER_Mst_Temp SET IsActive='5', Remark='" + userId + " IS LOCKED DUE TO DORMANT]'  WHERE User_ID = '" + userId + "'  AND isactive = '1' AND isactive <> '3'";
+                            db.Database.ExecuteSqlRaw(query);
+                            db.SaveChanges();
+
+                            _logger.LogInformation("Update query for Dormant Existing users - " + query);
+                            _logger.LogInformation($"[{userId}] IS LOCKED DUE TO DORMANT EXISTING USER");
+                            ISDormant = 1;
+                            TempData["alertMessageDormant"] = $"[{ userId}] IS LOCKED DUE TO DORMANT. Kindly contact Administrator";
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ISDormant = -1;
+                TempData["alertMessageDormant"] = ex.ToString();
+                _logger.LogError(ex.ToString() + " - LoginController;DaysCheck");
+            }
+            return ISDormant;
+        }
+
+        //public IActionResult LoginPage(LoginMST LoginViewModel)
+        //{
+        //    //try
+        //    //{
+        //    //    using (var db = new Entities.DatabaseContext())
+        //    //    {
+        //    //        //var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Password == LoginViewModel.Password && a.Login_Enable == 1).FirstOrDefault();
+        //    //        var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Login_Enable == 1).FirstOrDefault();
+
+        //    //        if (rec != null)
+        //    //        {
+        //    //            HttpContext.Session.SetString("UserName", LoginViewModel.LoginName);
+        //    //            HttpContext.Session.SetString("LoginID", rec.LoginID.ToString());
+        //    //            UserSession.LoginID = rec.LoginID.ToString();
+        //    //            var builder = new ConfigurationBuilder()
+        //    //          .SetBasePath(Directory.GetCurrentDirectory() + "\\")
+        //    //          .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+        //    //            IConfigurationRoot configuration = builder.Build();
+        //    //            string contentPath = Environment.ContentRootPath + "\\";
+        //    //            HttpContext.Session.SetString("InputFilePath", contentPath + configuration.GetSection("MSILSettings:InputFilePath").Value);
+        //    //            HttpContext.Session.SetString("OutputFilePath", contentPath + configuration.GetSection("MSILSettings:OutputFilePath").Value);
+        //    //            HttpContext.Session.SetString("BackupFilePath", contentPath + configuration.GetSection("MSILSettings:BackupFilePath").Value);
+        //    //            HttpContext.Session.SetString("NonConvertedFile", contentPath + configuration.GetSection("MSILSettings:NonConvertedFile").Value);
+        //    //            HttpContext.Session.SetString("ErrorLog", contentPath + configuration.GetSection("MSILSettings:ErrorLog").Value);
+        //    //            HttpContext.Session.SetString("AuditLog", contentPath + configuration.GetSection("MSILSettings:AuditLog").Value);
+        //    //            HttpContext.Session.SetString("TRADE_EMAIL", configuration.GetSection("MSILSettings:TRADE_EMAIL").Value);
+        //    //            HttpContext.Session.SetString("Frequency", configuration.GetSection("MSILSettings:Frequency").Value);
+        //    //            HttpContext.Session.SetString("INV_CONF_EMAIL", configuration.GetSection("MSILSettings:INV_CONF_EMAIL").Value);
+        //    //            HttpContext.Session.SetString("INV_CONF_FNAME", configuration.GetSection("MSILSettings:INV_CONF_FNAME").Value);
+        //    //            HttpContext.Session.SetString("ORD_MIS_EMAIL", configuration.GetSection("MSILSettings:ORD_MIS_EMAIL").Value);
+        //    //            HttpContext.Session.SetString("PAYREC_TRADE_EMAIL", configuration.GetSection("MSILSettings:PAYREC_TRADE_EMAIL").Value);
+        //    //            HttpContext.Session.SetString("PHY_INV", configuration.GetSection("MSILSettings:PHY_INV").Value);
+        //    //            HttpContext.Session.SetString("NO_INV", configuration.GetSection("MSILSettings:NO_INV").Value);
+        //    //            HttpContext.Session.SetString("EOD_MIS", configuration.GetSection("MSILSettings:EOD_MIS").Value);
+        //    //            HttpContext.Session.SetString("ORD_DEL", configuration.GetSection("MSILSettings:ORD_DEL").Value);
+        //    //            HttpContext.Session.SetString("INV_PHY_NTRC", configuration.GetSection("MSILSettings:INV_PHY_NTRC").Value);
+        //    //            HttpContext.Session.SetString("IntraDayPath", configuration.GetSection("MSILSettings:IntraDayPath").Value);
+        //    //            HttpContext.Session.SetString("EOD_File_EMail", configuration.GetSection("MSILSettings:EOD_File_EMail").Value);
+        //    //            HttpContext.Session.SetString("FCC_EMail", configuration.GetSection("MSILSettings:FCC_EMail").Value);
+        //    //            HttpContext.Session.SetString("DRC_EMail", configuration.GetSection("MSILSettings:DRC_EMail").Value);
+        //    //            HttpContext.Session.SetString("Payment_Rejection_EMail", configuration.GetSection("MSILSettings:Payment_Rejection_EMail").Value);
+        //    //            HttpContext.Session.SetString("DRC_EMail_BNGR", configuration.GetSection("MSILSettings:DRC_EMail_BNGR").Value);
+        //    //            HttpContext.Session.SetString("DRC_EMail_SLGR", configuration.GetSection("MSILSettings:DRC_EMail_SLGR").Value);
+        //    //            HttpContext.Session.SetString("DO_Cancel_Email", configuration.GetSection("MSILSettings:DO_Cancel_Email").Value);
+        //    //            HttpContext.Session.SetString("DO_Invoice_Cancel_Email", configuration.GetSection("MSILSettings:DO_Invoice_Cancel_Email").Value);
+        //    //            HttpContext.Session.SetString("Invoice_Cancel_Email", configuration.GetSection("MSILSettings:Invoice_Cancel_Email").Value);
+        //    //            HttpContext.Session.SetString("Sleep_Time_in_Mint", configuration.GetSection("MSILSettings:Sleep_Time_in_Mint").Value);
+        //    //            HttpContext.Session.SetString("Confirmation_Mail", configuration.GetSection("EmailSetting:Confirmation_Mail").Value);
+        //    //            HttpContext.Session.SetString("SMTP_HOST", configuration.GetSection("EmailSetting:SMTP_HOST").Value);
+        //    //            HttpContext.Session.SetString("Port", configuration.GetSection("EmailSetting:Port").Value);
+        //    //            HttpContext.Session.SetString("Email_FromID", configuration.GetSection("EmailSetting:Email_FromID").Value);
+        //    //            HttpContext.Session.SetString("UserID", configuration.GetSection("EmailSetting:UserID").Value);
+        //    //            HttpContext.Session.SetString("Password", configuration.GetSection("EmailSetting:Password").Value);
+        //    //            HttpContext.Session.SetString("SysEmail_FromID", configuration.GetSection("SystemSetting:Pwd").Value);
+        //    //            HttpContext.Session.SetString("PWD", configuration.GetSection("SystemSetting:Pwd").Value);
+        //    //            _logger.LogInformation("The MSIL application login : User Name - " + LoginViewModel.LoginName);
+
+
+        //    //            //// comment validateLDAP if on UAT, otherwise check LDAP
+        //    //            if (ValidateLDAP(LoginViewModel.LoginName, LoginViewModel.Password) == true)
+        //    //            {
+        //    //                _logger.LogInformation("Ldap Successfull" + LoginViewModel.LoginName);
+
+        //    //                if (rec.LoginType == "SERVER")
+        //    //                {
+        //    //                    ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
+
+        //    //                    return RedirectToAction("HomePage", "Server");
+        //    //                }
+        //    //                else if (rec.LoginType == "TRADE OPS")
+        //    //                {
+        //    //                    return RedirectToAction("Trade_OPSHomePage", "Login");
+        //    //                }
+        //    //                else if (rec.LoginType == "CASH OPS")
+        //    //                {
+        //    //                    return RedirectToAction("Cash_OPSHomePage", "Login");
+        //    //                }
+        //    //                else if (rec.LoginType == "CASH_Trade OPS")
+        //    //                {
+        //    //                    return RedirectToAction("Cash_TradeHomePage", "Login");
+        //    //                }
+        //    //                else
+        //    //                {
+
+        //    //                    ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
+        //    //                    return RedirectToAction("HomePage", "Login");
+        //    //                }
+        //    //            }
+        //    //            else
+        //    //            {
+        //    //                _logger.LogInformation("Ldap Fail" + "User" + LoginViewModel.LoginName + "Password" + LoginViewModel.Password + LoginViewModel.LoginName);
+        //    //            }
+
+        //    //        }
+        //    //        else
+        //    //        {
+        //    //            ViewBag.LoginStatus = 0;
+        //    //        }
+
+        //    //    }
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    _logger.LogError(ex.ToString() + " - LoginController;LoginPage");
+        //    //}
+        //    return View(LoginViewModel);
+        //}
 
 
 
         public async Task<IActionResult> Index()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 using (var db = new Entities.DatabaseContext())
@@ -423,7 +641,7 @@ namespace HDFCMSILWebMVC.Controllers
         public async Task<IActionResult> Details(int? LoginID)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 if (LoginID == null)
@@ -446,7 +664,7 @@ namespace HDFCMSILWebMVC.Controllers
         public async Task<IActionResult> Delete(int? LoginID)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 if (LoginID == null)
@@ -473,7 +691,7 @@ namespace HDFCMSILWebMVC.Controllers
         public async Task<IActionResult> Delete(int LoginID)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 using (var db = new Entities.DatabaseContext())
@@ -490,7 +708,7 @@ namespace HDFCMSILWebMVC.Controllers
         public async Task<IActionResult> AddOrEdit(int? LoginID)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 ViewBag.PageName = LoginID == null ? "Create User" : "Edit User";
@@ -519,17 +737,15 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Editupdate(UserMaster userMaster)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 int x = 0;
-
                 if (userMaster.LoginType == "0" || userMaster.LoginType == "Select Role Type")
                 {
                     TempData["alertMessage"] = "Please select the Role Type";
                     return RedirectToAction("Index", "Login");
                 }
-
                 try
                 {
                     using (var db = new Entities.DatabaseContext())
@@ -586,29 +802,76 @@ namespace HDFCMSILWebMVC.Controllers
         }
         public IActionResult LoginPage()
         {
-
             return View();
-
         }
+        [DllImport("user32.dll")]
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
-        [HttpPost]
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+        const int SW_RESTORE = 3;
+
         public IActionResult Logout()
         {
-            UserSession.LoginID = "0";
-            HttpContext.Session.Clear();
-            return RedirectToAction("LoginPage", "Login");
+            try
+            {
+                //Process[] processes = Process.GetProcessesByName("MSIL_LOCAL 1.1");
+                //if (HttpContext.Session.GetString("UAMPath") == "") { Console.WriteLine("No process found with the name: " + "MSIL_LOCAL 1.1.exe"); }
+                //else
+                //{
+                    //string UAMPath = HttpContext.Session.GetString("UAMPath");
+                    //string filename = Path.GetFileNameWithoutExtension(UAMPath);
+                    //Process[] processes = Process.GetProcessesByName(filename);
+                    LoginLogDB("", "", "LOGOUT",UserSession.LoginID.ToString());
+                    //if (processes.Length > 0)
+                    //{
+                    //    foreach (var process in processes)
+                    //    {
+                    //        IntPtr hWnd = FindWindow(null, process.MainWindowTitle);
+
+                    //        if (hWnd != IntPtr.Zero)
+                    //        {
+                    //            // Restore and bring the window to the front
+                    //            ShowWindow(hWnd, SW_RESTORE);
+                    //            SetForegroundWindow(hWnd);
+                    //            _logger.LogError("Window brought to the foreground." + " - LoginController;Logout");
+                    //        }
+                    //        else
+                    //        {
+                    //            _logger.LogError("Window handle not found." + " - LoginController;Logout");
+                    //        }
+
+                    //    }
+                    //}
+                //}
+                HttpContext.Session.Clear();
+                //return View("LoginPage");
+                return RedirectToAction("LoginPage", "Login");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString() + " - LoginController;Logout");
+                TempData["alertMessageuam"] = "An error occurred while trying to access the provided URL. Please verify the link or provide more details for assistance.";
+                return View("LoginPage");
+            }
         }
 
         public IActionResult DashboardPage()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            {
+                Logout();
+                return RedirectToAction("UAMLoginNew", "LoginUAM");
+            }
             else
             {
                 return View();
             }
         }
-
         public IActionResult HomePage()
         {
 
@@ -714,10 +977,123 @@ namespace HDFCMSILWebMVC.Controllers
                 return View();
             }
         }
+        //public IActionResult HomePage(string token)
+        //{
+
+
+        //    //if (HttpContext.Session.GetString("LoginID") == null)
+        //    //{ return RedirectToAction("LoginPage", "Login"); }
+        //    //else
+        //    //{
+        //    try
+        //    {
+        //        var key = Encoding.UTF8.GetBytes("MSILApploginfail");
+        //        var tokenHandler = new JwtSecurityTokenHandler();
+
+        //        var validationParameters = new TokenValidationParameters
+        //        {
+        //            ValidateIssuerSigningKey = true,
+        //            IssuerSigningKey = new SymmetricSecurityKey(key),
+        //            ValidateIssuer = false,
+        //            ValidateAudience = false
+        //        };
+
+        //        tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+
+        //        var jwtToken = (JwtSecurityToken)validatedToken;
+        //        //var username = jwtToken.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+        //        var username = jwtToken.Claims.ElementAt(0).ToString().Split(":");
+        //        var Password = jwtToken.Claims.ElementAt(1).ToString().Split(":");
+        //        using (var db = new Entities.DatabaseContextUAM())
+        //        {
+        //            var strlogId = db.Set<UAM_LoginLogoutExist>().FromSqlRaw("select MSIL_LogoutDatetime, LogID from MSIL_LoginLogout where User_id='" + username[1].ToString().Trim() + "' order by CONVERT(int, logID) desc ").ToList();
+        //            if (strlogId.Count != 0)
+        //            {
+        //                if (strlogId[0].MSIL_LogoutDatetime == "" || strlogId[0].MSIL_LogoutDatetime == null)
+        //                {
+        //                    TempData["alertMessageuam"] = "User " + username[1].ToString().Trim() + " already logined.";
+        //                    return View("LoginPageFail");
+        //                }
+        //            }
+        //        }
+        //        // Set username in session
+        //        HttpContext.Session.SetString("LoginID", username[1].ToString().Trim());
+        //        HttpContext.Session.SetString("UserName", username[1].ToString().Trim());
+        //        HttpContext.Session.SetString("LoginID", username[1].ToString().Trim());
+        //        UserSession.LoginID = HttpContext.Session.GetString("LoginID").ToString();
+        //        LoginLogDB("", "", "LOGIN", UserSession.LoginID.ToString());
+        //        //UserSession.LoginID = rec.LoginID.ToString();
+        //        var builder = new ConfigurationBuilder()
+        //      .SetBasePath(Directory.GetCurrentDirectory() + "\\")
+        //      .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+        //        IConfigurationRoot configuration = builder.Build();
+        //        string contentPath = Environment.ContentRootPath + "\\";
+        //        HttpContext.Session.SetString("InputFilePath", contentPath + configuration.GetSection("MSILSettings:InputFilePath").Value);
+        //        HttpContext.Session.SetString("OutputFilePath", contentPath + configuration.GetSection("MSILSettings:OutputFilePath").Value);
+        //        HttpContext.Session.SetString("BackupFilePath", contentPath + configuration.GetSection("MSILSettings:BackupFilePath").Value);
+        //        HttpContext.Session.SetString("NonConvertedFile", contentPath + configuration.GetSection("MSILSettings:NonConvertedFile").Value);
+        //        HttpContext.Session.SetString("ErrorLog", contentPath + configuration.GetSection("MSILSettings:ErrorLog").Value);
+        //        HttpContext.Session.SetString("AuditLog", contentPath + configuration.GetSection("MSILSettings:AuditLog").Value);
+        //        HttpContext.Session.SetString("TRADE_EMAIL", configuration.GetSection("MSILSettings:TRADE_EMAIL").Value);
+        //        HttpContext.Session.SetString("Frequency", configuration.GetSection("MSILSettings:Frequency").Value);
+        //        HttpContext.Session.SetString("INV_CONF_EMAIL", configuration.GetSection("MSILSettings:INV_CONF_EMAIL").Value);
+        //        HttpContext.Session.SetString("INV_CONF_FNAME", configuration.GetSection("MSILSettings:INV_CONF_FNAME").Value);
+        //        HttpContext.Session.SetString("ORD_MIS_EMAIL", configuration.GetSection("MSILSettings:ORD_MIS_EMAIL").Value);
+        //        HttpContext.Session.SetString("PAYREC_TRADE_EMAIL", configuration.GetSection("MSILSettings:PAYREC_TRADE_EMAIL").Value);
+        //        HttpContext.Session.SetString("PHY_INV", configuration.GetSection("MSILSettings:PHY_INV").Value);
+        //        HttpContext.Session.SetString("NO_INV", configuration.GetSection("MSILSettings:NO_INV").Value);
+        //        HttpContext.Session.SetString("EOD_MIS", configuration.GetSection("MSILSettings:EOD_MIS").Value);
+        //        HttpContext.Session.SetString("ORD_DEL", configuration.GetSection("MSILSettings:ORD_DEL").Value);
+        //        HttpContext.Session.SetString("INV_PHY_NTRC", configuration.GetSection("MSILSettings:INV_PHY_NTRC").Value);
+        //        HttpContext.Session.SetString("IntraDayPath", configuration.GetSection("MSILSettings:IntraDayPath").Value);
+        //        HttpContext.Session.SetString("EOD_File_EMail", configuration.GetSection("MSILSettings:EOD_File_EMail").Value);
+        //        HttpContext.Session.SetString("FCC_EMail", configuration.GetSection("MSILSettings:FCC_EMail").Value);
+        //        HttpContext.Session.SetString("DRC_EMail", configuration.GetSection("MSILSettings:DRC_EMail").Value);
+        //        HttpContext.Session.SetString("Payment_Rejection_EMail", configuration.GetSection("MSILSettings:Payment_Rejection_EMail").Value);
+        //        HttpContext.Session.SetString("DRC_EMail_BNGR", configuration.GetSection("MSILSettings:DRC_EMail_BNGR").Value);
+        //        HttpContext.Session.SetString("DRC_EMail_SLGR", configuration.GetSection("MSILSettings:DRC_EMail_SLGR").Value);
+        //        HttpContext.Session.SetString("DO_Cancel_Email", configuration.GetSection("MSILSettings:DO_Cancel_Email").Value);
+        //        HttpContext.Session.SetString("DO_Invoice_Cancel_Email", configuration.GetSection("MSILSettings:DO_Invoice_Cancel_Email").Value);
+        //        HttpContext.Session.SetString("Invoice_Cancel_Email", configuration.GetSection("MSILSettings:Invoice_Cancel_Email").Value);
+        //        HttpContext.Session.SetString("Sleep_Time_in_Mint", configuration.GetSection("MSILSettings:Sleep_Time_in_Mint").Value);
+        //        HttpContext.Session.SetString("Confirmation_Mail", configuration.GetSection("EmailSetting:Confirmation_Mail").Value);
+        //        HttpContext.Session.SetString("SMTP_HOST", configuration.GetSection("EmailSetting:SMTP_HOST").Value);
+        //        HttpContext.Session.SetString("Port", configuration.GetSection("EmailSetting:Port").Value);
+        //        HttpContext.Session.SetString("Email_FromID", configuration.GetSection("EmailSetting:Email_FromID").Value);
+        //        HttpContext.Session.SetString("UserID", configuration.GetSection("EmailSetting:UserID").Value);
+        //        HttpContext.Session.SetString("Password", configuration.GetSection("EmailSetting:Password").Value);
+        //        HttpContext.Session.SetString("SysEmail_FromID", configuration.GetSection("SystemSetting:Pwd").Value);
+        //        HttpContext.Session.SetString("PWD", configuration.GetSection("SystemSetting:Pwd").Value);
+        //        HttpContext.Session.SetString("UAMPath", configuration.GetSection("MSILSettings:UAMPath").Value);
+        //        //HttpContext.Session.SetString("TabCount", "1");
+        //        _logger.LogInformation("The MSIL application login : User Name - " + username[1].ToString().Trim());
+        //        return View();
+        //        //return RedirectToAction("Index", "Home"); // Redirect to a desired page
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex.ToString() + " - LoginController;Save");
+        //        TempData["alertMessageuam"] = "An error occurred while trying to access the provided URL. Please verify the link or provide more details for assistance.";
+        //        return View("LoginPageFail");
+        //    }
+
+        //    //}
+
+        //}
+        [HttpPost]
+        public IActionResult TrackWindowClose()
+        {
+            // Your logic for handling window close event, e.g., logging, session cleanup, etc.
+            Logout();
+            // This action will be called when the client sends the beacon request.
+            return Ok();  // You can return any response (like a status message)
+        }
+
         public IActionResult UserMaster()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 return View();
@@ -727,7 +1103,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult SaveUser()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 return View();
@@ -737,7 +1113,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult RegisterNew()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 return View();
@@ -747,7 +1123,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult RegisterNew(RegisterNew registerNew)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 int x = 0;
@@ -813,7 +1189,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Save(UserMaster userMaster)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 int x = 0;
@@ -884,7 +1260,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult New(RegisterNew registerNew)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 try
@@ -902,7 +1278,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult AccountDetails()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 return View();
@@ -914,7 +1290,10 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Trade_OPSHomePage()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            {
+                Logout();
+                return RedirectToAction("UAMLoginNew", "LoginUAM");
+            }
             else
             {
                 return View();
@@ -923,7 +1302,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Cash_OPSHomePage()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { Logout(); return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 return View();
@@ -932,7 +1311,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Cash_TradeHomePage()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { Logout(); return RedirectToAction("UAMLoginNew", "LoginUAM"); }
             else
             {
                 return View();

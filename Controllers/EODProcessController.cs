@@ -19,7 +19,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowEODProcess()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -29,7 +29,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Update()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try
@@ -53,7 +53,33 @@ namespace HDFCMSILWebMVC.Controllers
                 return RedirectToAction("ShowEODProcess", "EODProcess");
             }
         }
+        public IActionResult StopEOD()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("Logout", "Login"); }
+            else
+            {
+                try
+                {
+                    using (var db = new Entities.DatabaseContext())
+                    {
+                        db.Database.ExecuteSqlRaw("update EOD_Reports set EODFlag=0");
+                        db.SaveChanges();
+                        var message = "EOD Reports Stop Successfully.";
+                        TempData["alertMessage"] = message;
+                    }
 
+                    _logger.LogInformation("Executed successfully" + " - EODProcessController;StopEOD");
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString() + " - EODProcessController;StopEOD");
+                }
+
+                return RedirectToAction("ShowEODProcess", "EODProcess");
+            }
+        }
 
     }
 }

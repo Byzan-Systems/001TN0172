@@ -27,7 +27,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowMISLiquidationDetailInvoice()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -37,7 +37,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowTableMISLiquidationDetailInvoice(ShowMISLiquidationDetailInvoice misliq)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View(GetCustomerList(misliq.StartDate.ToString(), misliq.EndtDate.ToString()));
@@ -74,7 +74,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ExportExcel()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try

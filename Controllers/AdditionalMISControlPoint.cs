@@ -27,7 +27,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -37,7 +37,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Show(showAddMISControlPoint Selectdata)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 showAddMISControlPointDT invdata = new showAddMISControlPointDT();
@@ -137,7 +137,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ExportExcel()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 var DetailsList = inv.ToList();

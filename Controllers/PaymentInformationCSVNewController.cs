@@ -30,7 +30,7 @@ namespace HDFCMSILWebMVC.Controllers
         private IWebHostEnvironment _environment;
         private readonly ILogger _logger;
         private readonly IHubContext<UploadProgressHub> _hubContext;
-        public PaymentInformationCSVNewController(DataService dataService, IHubContext<UploadProgressHub> hubContext,ILogger<PaymentInformationCSVNewController> logger, IWebHostEnvironment environment)
+        public PaymentInformationCSVNewController(DataService dataService, IHubContext<UploadProgressHub> hubContext, ILogger<PaymentInformationCSVNewController> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
             _environment = environment;
@@ -50,150 +50,169 @@ namespace HDFCMSILWebMVC.Controllers
         }
         [HttpPost]
         public async Task<IActionResult> UploadPayment(IFormFile upload, int Count, [FromServices] IWebHostEnvironment hostingEnvironment)
-        {            
-       
-            try
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("Logout", "Login"); }
+            else
             {
-                var sessionId = HttpContext.Session.Id;
-                _logger.LogError(" set Session ID");  ////Enhance by chaitrali
-                string timestamp;
-                int firstRow = 0;
-                ViewBag.Count = Count + 1;
-                ViewBag.Percentage = 25;
-                int TotalRows = 0;
-             
-                Rectify();
-                TempData["alertMessage"] = "Processing.............";
-                if (HttpContext.Request.Form.Files.Count == 0 || HttpContext.Request.Form.Files[0].FileName == "")
+                try
                 {
-                    TempData["alertMessage"] = "Please Select Input File";
-                    goto WaitFile;
-                    // MessageBox.Show("Please Select Input File....", "Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    //Txt_FileName.Text = "";
-                    //Txt_FileName.Focus();
-                }
+                    var sessionId = HttpContext.Session.Id;
+                    _logger.LogError(" set Session ID");  ////Enhance by chaitrali
+                    string timestamp;
+                    int firstRow = 0;
+                    ViewBag.Count = Count + 1;
+                    ViewBag.Percentage = 25;
+                    int TotalRows = 0;
 
-            WaitR:
-                int progress = 10;
-                _uploadProgress[sessionId] = progress;
-                await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
-                DataTable dt = Methods.getDetails("GetReportDetails", "", "", "", "", "", "", "", _logger);
-
-                if (dt.Rows.Count > 0)
-                {
-                    _logger.LogError("Waiting for Server to free.Please wait for some time.  " + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
-                    TempData["alertMessage"] = "Waiting for Server to free.Please wait for some time.";
-                    goto WaitR;
-                }
-                TempData["alertMessage"] = "";
-                strFileName = Path.GetFileName(HttpContext.Request.Form.Files[0].FileName);
-                DataTable dtFile = Methods.InsertDetails("Insert_FileDesc", strFileName, "NEFT", "0", "", "", "", "", _logger);
-
-                var uploads = Path.Combine(_environment.WebRootPath, "files");
-                string FileName = HttpContext.Request.Form.Files[0].FileName;
-                timestamp = DateTime.Now.ToString("ddMMyyyyHHmmss");
-
-
-                progress = 20;
-                _uploadProgress[sessionId] = progress;
-                await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
-                if (System.IO.File.Exists(Path.Combine(uploads, FileName)))
-                {
-                    _logger.LogInformation("File Exist at" + uploads + "\\" + FileName + " - PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
-                    System.IO.File.Delete(Path.Combine(uploads, FileName));
-                    _logger.LogInformation("File Delete at From" + uploads + " - PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
-                }
-                FileName = Path.GetFileNameWithoutExtension(FileName) + "_" + timestamp + Path.GetExtension(FileName);
-                ////Enhance by yogesh
-                //System.GC.Collect();
-                //System.GC.WaitForPendingFinalizers();
-                //_logger.LogError("Test14" + " - PaymentInformationCSVNew;UploadPayment");  ////Enhance by yogesh
-              //  _logger.LogInformation("Garbage Collector2" + "- PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
-                using (var fileStream = new FileStream(Path.Combine(uploads, FileName), FileMode.Create))
-                {
-                    HttpContext.Request.Form.Files[0].CopyTo(fileStream);
-
-                    fileStream.Dispose();
-                    fileStream.Close();
-                    _logger.LogError("File Create at" + uploads + " - PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
-                }
-
-                string[] Details = new string[20];
-                string Filtervalidate = "", FiltervalidateAll = "";
-
-                StreamReader objStrmReader = null;
-                objStrmReader = new StreamReader(Path.Combine(uploads, FileName));
-                _logger.LogInformation("Reading File from " + uploads + "\\" + FileName + "- PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
-                Boolean rpt = true;
-                DateTime currentTime = DateTime.Now;
-                string filepath = this._environment.WebRootPath + "\\files\\" + "RejectedPaymentReason" + currentTime.ToString("hhmmss") + ".csv";
-
-                StringBuilder EmailBodyCtn = new StringBuilder();
-                const string quote = "\"";
-                DataTable dt1 = new DataTable();
-                dt1 = GetDatatable_Text(uploads + "\\" + FileName);//Reading text File;+
-                dt1 = removebanksROws(dt1);
-
-                //RejectPaymentFile(dt1);
-                var w = new StreamWriter(filepath);
-                progress = 40;
-                _uploadProgress[sessionId] = progress;
-                await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
-                for (int i = 0; i < dt1.Rows.Count; i++)
-                {
-                    Filtervalidate = "";
-                    if (dt1.Rows[i][0].ToString() != null)
+                    Rectify();
+                    TempData["alertMessage"] = "Processing.............";
+                    if (HttpContext.Request.Form.Files.Count == 0 || HttpContext.Request.Form.Files[0].FileName == "")
                     {
-                        DataFormatter formatter = new DataFormatter();
-                        String Transaction_Id = dt1.Rows[i][0].ToString(); //result.Rows[k].ItemArray[0].ToString();  //formatter.FormatCellValue(sheet.GetRow(k).GetCell(0));
-                        String Product = dt1.Rows[i][1].ToString(); //result.Rows[k].ItemArray[1].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(1));
-                        String Party_Code = dt1.Rows[i][2].ToString(); //result.Rows[k].ItemArray[2].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(2));
-                        String Party_Name = dt1.Rows[i][3].ToString(); //result.Rows[k].ItemArray[3].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(3));
-                        String RemittingBank = dt1.Rows[i][4].ToString(); //result.Rows[k].ItemArray[4].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(4));
-                        String UTR_No = dt1.Rows[i][5].ToString(); //result.Rows[k].ItemArray[5].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(5));
-                        String Entry_Amount = dt1.Rows[i][6].ToString(); //result.Rows[k].ItemArray[6].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(6));
-                        String IFSC_code = dt1.Rows[i][7].ToString(); //result.Rows[k].ItemArray[7].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(7));
-                        String DealerVirAccNo = dt1.Rows[i][8].ToString(); //result.Rows[k].ItemArray[8].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(8));
-                        //_logger.LogInformation(DealerVirAccNo + "Assign to variable" + "   - PaymentInformationController;UploadPayment"); ////Enhance by yogesh
+                        TempData["alertMessage"] = "Please Select Input File";
+                        goto WaitFile;
+                        // MessageBox.Show("Please Select Input File....", "Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        //Txt_FileName.Text = "";
+                        //Txt_FileName.Focus();
+                    }
 
-                        if (Product == "NEFT" || Product == "RTGS" || Product == "FT" || Product == "FUND TRANS")
+                WaitR:
+                    int progress = 10;
+                    _uploadProgress[sessionId] = progress;
+                    await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
+                    DataTable dt = Methods.getDetails("GetReportDetails", "", "", "", "", "", "", "", _logger);
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        _logger.LogError("Waiting for Server to free.Please wait for some time.  " + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
+                        TempData["alertMessage"] = "Waiting for Server to free.Please wait for some time.";
+                        goto WaitR;
+                    }
+                    TempData["alertMessage"] = "";
+                    strFileName = Path.GetFileName(HttpContext.Request.Form.Files[0].FileName);
+                    DataTable dtFile = Methods.InsertDetails("Insert_FileDesc", strFileName, "NEFT", "0", "", "", "", "", _logger);
+
+                    var uploads = Path.Combine(_environment.WebRootPath, "files");
+                    string FileName = HttpContext.Request.Form.Files[0].FileName;
+                    timestamp = DateTime.Now.ToString("ddMMyyyyHHmmss");
+
+
+                    progress = 20;
+                    _uploadProgress[sessionId] = progress;
+                    await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
+                    if (System.IO.File.Exists(Path.Combine(uploads, FileName)))
+                    {
+                        _logger.LogInformation("File Exist at" + uploads + "\\" + FileName + " - PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
+                        System.IO.File.Delete(Path.Combine(uploads, FileName));
+                        _logger.LogInformation("File Delete at From" + uploads + " - PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
+                    }
+                    FileName = Path.GetFileNameWithoutExtension(FileName) + "_" + timestamp + Path.GetExtension(FileName);
+                    ////Enhance by yogesh
+                    //System.GC.Collect();
+                    //System.GC.WaitForPendingFinalizers();
+                    //_logger.LogError("Test14" + " - PaymentInformationCSVNew;UploadPayment");  ////Enhance by yogesh
+                    //  _logger.LogInformation("Garbage Collector2" + "- PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
+                    using (var fileStream = new FileStream(Path.Combine(uploads, FileName), FileMode.Create))
+                    {
+                        HttpContext.Request.Form.Files[0].CopyTo(fileStream);
+
+                        fileStream.Dispose();
+                        fileStream.Close();
+                        _logger.LogError("File Create at" + uploads + " - PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
+                    }
+
+                    string[] Details = new string[20];
+                    string Filtervalidate = "", FiltervalidateAll = "";
+
+                    StreamReader objStrmReader = null;
+                    objStrmReader = new StreamReader(Path.Combine(uploads, FileName));
+                    _logger.LogInformation("Reading File from " + uploads + "\\" + FileName + "- PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
+                    Boolean rpt = true;
+                    DateTime currentTime = DateTime.Now;
+                    string filepath = this._environment.WebRootPath + "\\files\\" + "RejectedPaymentReason" + currentTime.ToString("hhmmss") + ".csv";
+
+                    StringBuilder EmailBodyCtn = new StringBuilder();
+                    const string quote = "\"";
+                    DataTable dt1 = new DataTable();
+                    dt1 = GetDatatable_Text(uploads + "\\" + FileName);//Reading text File;+
+                    dt1 = removebanksROws(dt1);
+                    _logger.LogInformation("After Reading " + uploads + "\\" + FileName + "- PaymentInformationCSVController;UploadPayment");  ////Enhance by yogesh
+                    //RejectPaymentFile(dt1);
+                    var w = new StreamWriter(filepath);
+                    progress = 40;
+                    _uploadProgress[sessionId] = progress;
+                    await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
+                    for (int i = 0; i < dt1.Rows.Count; i++)
+                    {
+                        Filtervalidate = "";
+                        if (dt1.Rows[i][0].ToString() != null)
                         {
-                        }
-                        else
-                        {
-                            Filtervalidate = Filtervalidate + " Invalid Payment type. ";
-                            _logger.LogError("Invalid Payment type for DO No." + DealerVirAccNo + ". Please upload the correct file again." + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                            
-                        }
-                        if (DealerVirAccNo.Length != 23)
-                        {
-                            Filtervalidate = Filtervalidate + " Invalid Virtual Account Number. ";
-                            _logger.LogError("Invalid Virtual Account Number for DO no." + DealerVirAccNo + ". Please upload the correct file again." + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                           
-                        }
-                        else if (DealerVirAccNo.Length == 23)
-                        {
-                            //select check whether order no present in order desc table or not  // changed on 24/07/2024
-                            DataTable dt_Order = Methods.getDetails("GetOrderDetailsAsper", DealerVirAccNo.Substring(0, 22).ToString(), "", "", "", "", "", "", _logger);
-                            if (dt_Order.Rows.Count == 0)
+                            DataFormatter formatter = new DataFormatter();
+                            String Transaction_Id = dt1.Rows[i][0].ToString(); //result.Rows[k].ItemArray[0].ToString();  //formatter.FormatCellValue(sheet.GetRow(k).GetCell(0));
+                            String Product = dt1.Rows[i][1].ToString(); //result.Rows[k].ItemArray[1].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(1));
+                            String Party_Code = dt1.Rows[i][2].ToString(); //result.Rows[k].ItemArray[2].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(2));
+                            String Party_Name = dt1.Rows[i][3].ToString(); //result.Rows[k].ItemArray[3].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(3));
+                            String RemittingBank = dt1.Rows[i][4].ToString(); //result.Rows[k].ItemArray[4].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(4));
+                            String UTR_No = dt1.Rows[i][5].ToString(); //result.Rows[k].ItemArray[5].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(5));
+                            String Entry_Amount = dt1.Rows[i][6].ToString(); //result.Rows[k].ItemArray[6].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(6));
+                            String IFSC_code = dt1.Rows[i][7].ToString(); //result.Rows[k].ItemArray[7].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(7));
+                            String DealerVirAccNo = dt1.Rows[i][8].ToString(); //result.Rows[k].ItemArray[8].ToString(); //formatter.FormatCellValue(sheet.GetRow(k).GetCell(8));
+                                                                               //_logger.LogInformation(DealerVirAccNo + "Assign to variable" + "   - PaymentInformationController;UploadPayment"); ////Enhance by yogesh
+
+                            if (Product == "NEFT" || Product == "RTGS" || Product == "FT" || Product == "FUND TRANS")
                             {
-                                Filtervalidate = Filtervalidate + "DO Number not available.";
-                                _logger.LogError("Order details is not available for DO. No " + DealerVirAccNo.Substring(0, 22).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                                                                                                                                                                                                     //break;   
                             }
-                            //select distinct FType from FinancerDetails
-                            DataTable dtabl = Methods.getDetails("GetFinancerCodeDetails", DealerVirAccNo.Substring(22, 1).ToString(), "", "", "", "", "", "", _logger);
-                            if (dtabl.Rows.Count == 0)
+                            else
                             {
-                                Filtervalidate = Filtervalidate + "  Product Code is not valid. ";
-                                _logger.LogError("Invalid Product Code is not valid for " + DealerVirAccNo + ". Please upload the correct file again." + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh  ////Enhance by yogesh                                                                                                                                                                                                          
+                                Filtervalidate = Filtervalidate + " Invalid Payment type. ";
+                                _logger.LogError("Invalid Payment type for DO No." + DealerVirAccNo + ". Please upload the correct file again." + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                            
                             }
-                            //////if DO no , utr no, amount and status 'CREDIT MSIL' then rejected order already paid. changed on 24/07/2024
-                            DataTable dtUTRDuplicate = Methods.getDetails("GetUTRDetailsForPaymentUpload", UTR_No, DealerVirAccNo.Substring(0, 22).ToString(), Entry_Amount, "", "", "", "", _logger);
-                            if (dtUTRDuplicate.Rows.Count > 0)
+                            if (DealerVirAccNo.Length != 23)
                             {
-                                Filtervalidate = Filtervalidate + " UTR No. is duplicate. ";
-                                _logger.LogError("UTR No. is duplicate for DO.No " + DealerVirAccNo.Substring(0, 22).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                                    
+                                Filtervalidate = Filtervalidate + " Invalid Virtual Account Number. ";
+                                _logger.LogError("Invalid Virtual Account Number for DO no." + DealerVirAccNo + ". Please upload the correct file again." + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                           
                             }
-                        }
-                        string Fname = DealerVirAccNo.Substring(DealerVirAccNo.Length - 1, 1);
+                            else if (DealerVirAccNo.Length == 23)
+                            {
+                                //select check whether order no present in order desc table or not  // changed on 24/07/2024
+                                DataTable dt_Order = Methods.getDetails("GetOrderDetailsAsper", DealerVirAccNo.Substring(0, 22).ToString(), "", "", "", "", "", "", _logger);
+                                if (dt_Order.Rows.Count == 0)
+                                {
+                                    Filtervalidate = Filtervalidate + "DO Number not available.";
+                                    _logger.LogError("Order details is not available for DO. No " + DealerVirAccNo.Substring(0, 22).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                                                                                                                                                                                                     //break;   
+                                }
+
+                                //select distinct FType from FinancerDetails
+                                DataTable dtabl = Methods.getDetails("GetFinancerCodeDetails", DealerVirAccNo.Substring(22, 1).ToString(), "", "", "", "", "", "", _logger);
+                                if (dtabl.Rows.Count == 0)
+                                {
+                                    Filtervalidate = Filtervalidate + "  Product Code is not valid. ";
+                                    _logger.LogError("Invalid Product Code is not valid for " + DealerVirAccNo + ". Please upload the correct file again." + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh  ////Enhance by yogesh                                                                                                                                                                                                          
+                                }
+                                //////if DO no , utr no, amount and status 'CREDIT MSIL' then rejected order already paid. changed on 24/07/2024
+                                DataTable dtUTRDuplicate = Methods.getDetails("GetUTRDetailsForPaymentUpload", UTR_No, DealerVirAccNo.Substring(0, 22).ToString(), Entry_Amount, "", "", "", "", _logger);
+                                if (dtUTRDuplicate.Rows.Count > 0)
+                                {
+                                    Filtervalidate = Filtervalidate + " UTR No. is duplicate. ";
+                                    _logger.LogError("UTR No. is duplicate for DO.No " + DealerVirAccNo.Substring(0, 22).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                                    
+                                }
+                                else
+                                {
+                                    DataTable dt_Orderstatus = Methods.getDetails("GetOrderDetailsAsStatus", DealerVirAccNo.Substring(0, 22).ToString(), "", "", "", "", "", "", _logger);
+                                    DataTable dt_UTR = Methods.getDetails("GetUniqueUTR", UTR_No, "", "", "", "", "", "", _logger);
+                                    if (dt_Orderstatus.Rows.Count > 0)
+                                    {
+                                        Filtervalidate = Filtervalidate + "Duplicate DO Number.";
+                                        _logger.LogError("Duplicate DO Number " + DealerVirAccNo.Substring(0, 22).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                                                                                                                                                                                                     //break;   
+                                    }
+                                    else if (dt_UTR.Rows.Count > 0)
+                                    {
+                                        Filtervalidate = Filtervalidate + "Duplicate UTR Number.";
+                                        _logger.LogError("Duplicate UTR Number " + DealerVirAccNo.Substring(0, 22).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                                                                                                                                                                                                     //break;   
+                                    }
+                                }
+                            }
+                            string Fname = DealerVirAccNo.Substring(DealerVirAccNo.Length - 1, 1);
 
                         string strIFSCPart;
                         string strRemitterBankName = RemittingBank;
@@ -266,16 +285,9 @@ namespace HDFCMSILWebMVC.Controllers
                                     detailsCash[21] = Details[10]; //FNCR_code
                                     detailsCash[22] = ""; //FNCR_Name
 
-                                    //clserr.WriteLogToTxtFile("In Cashops_Payment Function", "Upload_Click", strFileName);
-                                    Methods.CashOps_Payments(Details, detailsCash, _logger);
-                                    TotalRows += 1;
-                                }
-                                else
-                                {
-                                    TempData["alertMessage"] = "Session get expired. Please login again and reupload. File Name :"+HttpContext.Request.Form.Files[0].FileName ; ////Enhance by yogesh
-                                    _logger.LogInformation("Session get expired. Please login again and reupload. File Name :" + HttpContext.Request.Form.Files[0].FileName + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
-                                    return RedirectToAction("ShowPaymentInformation");
-                                }
+                                //clserr.WriteLogToTxtFile("In Cashops_Payment Function", "Upload_Click", strFileName);
+                                Methods.CashOps_Payments(Details, detailsCash, _logger);
+                                TotalRows += 1;
                                 //clserr.WriteLogToTxtFile("End -Cashops_Payment Function", "Upload_Click", strFileName);
                             }
                         }
@@ -297,28 +309,28 @@ namespace HDFCMSILWebMVC.Controllers
                     progress = 40 + (int)(((double)i / dt1.Rows.Count) * 40);
                     _uploadProgress[sessionId] = progress;
 
-                    // Send progress update to SignalR hub
-                    await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, $" {progress}% ");
-                }
-                w.Close();
-                //w.Flush();
-                if (rpt == false)
-                {
-                    Methods.SendEmail(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", filepath, "Rejection of MIS-Payment File", "Please find the attachment.", HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"), _logger);
-                    //Methods.SendEmailstrBld(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", filepath, "Rejection of MIS-Payment File",EmailBodyCtn, HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"));
-                }
+                        // Send progress update to SignalR hub
+                        await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, $" {progress}% ");
+                    }
+                    w.Close();
+                    //w.Flush();
+                    if (rpt == false)
+                    {
+                        Methods.SendEmail(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", filepath, "Rejection of MIS-Payment File", "Please find the attachment.", HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"), _logger);
+                        //Methods.SendEmailstrBld(HttpContext.Session.GetString("Payment_Rejection_EMail"), "", "", filepath, "Rejection of MIS-Payment File",EmailBodyCtn, HttpContext.Session.GetString("Email_FromID").ToString(), HttpContext.Session.GetString("PWD").ToString(), HttpContext.Session.GetString("SMTP_HOST"), HttpContext.Session.GetString("Port"));
+                    }
 
-                if (FiltervalidateAll != "")
-                {
-                    FiltervalidateAll = FiltervalidateAll.Trim().Substring(0, FiltervalidateAll.Trim().Length - 1) + ".";
-                    if (!FiltervalidateAll.Substring(0, 3).Contains("UTR"))
-                        FiltervalidateAll = "Invalid" + FiltervalidateAll;
-                    TempData["alertMessage"] = HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded.";
-                }
-                else
-                {
-                    TempData["alertMessage"] = HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded. Successfull Records " + (dt1.Rows.Count).ToString() + ""; ////Enhance by yogesh
-                    _logger.LogInformation(HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded. Successfull Records  " + (dt1.Rows.Count).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
+                    if (FiltervalidateAll != "")
+                    {
+                        FiltervalidateAll = FiltervalidateAll.Trim().Substring(0, FiltervalidateAll.Trim().Length - 1) + ".";
+                        if (!FiltervalidateAll.Substring(0, 3).Contains("UTR"))
+                            FiltervalidateAll = "Invalid" + FiltervalidateAll;
+                        TempData["alertMessage"] = HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded.";
+                    }
+                    else
+                    {
+                        TempData["alertMessage"] = HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded. Successfull Records " + (dt1.Rows.Count).ToString() + ""; ////Enhance by yogesh
+                        _logger.LogInformation(HttpContext.Request.Form.Files[0].FileName + " File Successfully Uploaded. Successfull Records  " + (dt1.Rows.Count).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
 
                 }
                 progress = 100;
@@ -327,18 +339,20 @@ namespace HDFCMSILWebMVC.Controllers
             WaitFile: progress = 100;
             }
 
-            catch (Exception ex)
-            {
-                TempData["alertMessage"] = ex.Message + " " + ex.StackTrace;
-                //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Upload_Click");
+                catch (Exception ex)
+                {
+                    TempData["alertMessage"] = ex.Message + " " + ex.StackTrace;
+                    _logger.LogError(ex.Message + "  " + " - PaymentInformationController;UploadPayment");
+                    //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Upload_Click");
 
-                //MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //hssfwb1.Close();
-                //sheet = null;
+                    //MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //hssfwb1.Close();
+                    //sheet = null;
 
 
+                }
+                return RedirectToAction("ShowPaymentInformation");
             }
-            return RedirectToAction("ShowPaymentInformation");
 
         }
         private DataTable removebanksROws(DataTable _DtTemp)
@@ -443,16 +457,20 @@ namespace HDFCMSILWebMVC.Controllers
 
         public Boolean RejectPaymentFile(DataTable dt)
         {
+            DateTime currentTime = DateTime.Now;
+            string filepath = this._environment.WebRootPath + "\\files\\" + "RejectedPaymentReason" + currentTime.ToString("ddMMyyyyhhmmss") + ".csv";
+            var w = new StreamWriter(filepath);
             try
             {
                 Boolean rpt = true;
-                DateTime currentTime = DateTime.Now;
-                string filepath = this._environment.WebRootPath + "\\files\\" + "RejectedPaymentReason" + currentTime.ToString("hhmmss") + ".csv";
+
+
                 string line = "";
                 StringBuilder EmailBodyCtn = new StringBuilder();
                 const string quote = "\"";
-                using (var w = new StreamWriter(filepath))
+                using (w)
                 {
+
                     line = quote + "Product" + quote + "," + quote + "Remitter Name" + quote + "," + quote + "Remitter A/ C No" + quote + "," + quote + "Remitter Bank Name" + quote + "," + quote + "UTR No" + quote + "," + quote + "Amount" + quote + "," + quote + "IFSC Code" + quote + "," + quote + "VirtualAccountNumber" + quote + "," + quote + "RejectedReason" + quote;
                     w.WriteLine(line);
 
@@ -541,6 +559,7 @@ namespace HDFCMSILWebMVC.Controllers
 
             catch (Exception ex)
             {
+                w.Close();
                 TempData["alertMessage"] = ex.Message + " " + ex.StackTrace;
                 _logger.LogError(ex.Message + "  " + " - PaymentInformationController;UploadPayment");
 

@@ -18,16 +18,17 @@ namespace HDFCMSILWebMVC.Controllers
     {
         private IWebHostEnvironment _environment;
         private readonly ILogger _logger;
+      
         public FinancerController(ILogger<PaymentInformationController> logger, IWebHostEnvironment environment)
         {
             _logger = logger;
-            _environment = environment;
+            _environment = environment;            
         }
 
         public async Task<IActionResult> ShowFinancer(int pg = 1)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            {  return RedirectToAction("Logout", "Login"); }
             else
             {
                 try
@@ -63,10 +64,10 @@ namespace HDFCMSILWebMVC.Controllers
 
 
 
-        public async Task<IActionResult> CreateFinancerDetails()
+        public IActionResult CreateFinancerDetails()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View("SaveFinancerDetails");
@@ -76,7 +77,7 @@ namespace HDFCMSILWebMVC.Controllers
         public async Task<IActionResult> UpdateFinancerDetails(int? ID)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 if (ID == null)
@@ -100,7 +101,7 @@ namespace HDFCMSILWebMVC.Controllers
         public async Task<IActionResult> FinancerDisplay(int? ID)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 if (ID == null)
@@ -123,7 +124,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult SaveFinancerDetails(string Task, FinancerMaster Financer)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try

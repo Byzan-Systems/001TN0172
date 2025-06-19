@@ -63,16 +63,32 @@
                 <form method="post" asp-controller="EODProcess">
 
                     <div class="row">
-                        <div class="col-sm-10">
+                        <div class="col-sm-2">
                             <div class="form-group">
-                                <button type="submit" class="btn btn-app bg-success" value="Update" asp-action="Update"  onclick=" return validateForm()"><i class="fas fa-clipboard-list"></i>Update</button>
+                                <button type="submit" class="btn btn-app bg-success" value="Update" asp-action="Update" onclick=" return validateForm()"><i class="fas fa-clipboard-list"></i>Start</button>
                             </div>
                         </div>
+                        @*<div class="col-sm-2">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-app bg-success" value="Stop" asp-action="StopEOD" onclick=" return validateFormStop()"><i class="fas fa-clipboard-list"></i>Stop</button>
+                            </div>
+                        </div>*@
                     </div>
                     <script>
                         function validateForm() {
 
                             const response = confirm("Are you sure want to Generate EOD Reports. ?");
+
+                            if (response == true) {
+
+                                return true;
+                            }
+                            else { return false; }
+
+                        }
+                        function validateFormStop() {
+
+                            const response = confirm("Are you sure want to Stop EOD Reports. ?");
 
                             if (response == true) {
 

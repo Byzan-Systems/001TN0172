@@ -33,7 +33,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowAuthorisation()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -43,7 +43,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowTableAuthorisation(ShowAuthoriz shAuth)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
 
@@ -97,7 +97,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult DeleteCancel_DORetain_Invoices(IList<AuthorizInvDORetainInv> DInvDa, string[] IsSelect)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 XLWorkbook wb = new XLWorkbook();
@@ -229,7 +229,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult DeleteCancel_InvoicesOnly(IList<AuthorizInvDORetainInv> DInvDa, string[] IsSelect)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 XLWorkbook wb = new XLWorkbook();
@@ -304,7 +304,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult DeleteCancel_OrderNumber_Invoices(string[] IsSelect)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
 

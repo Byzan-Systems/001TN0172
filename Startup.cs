@@ -44,7 +44,7 @@ namespace HDFCMSILWebMVC
                 x.MultipartBodyLengthLimit = long.MaxValue; // Max length of multipart body
             });
             services.AddSession(optons=>
-                { optons.IdleTimeout = TimeSpan.FromMinutes(180);
+                { optons.IdleTimeout = TimeSpan.FromMinutes(30);
                 }
             );
 
@@ -62,7 +62,7 @@ namespace HDFCMSILWebMVC
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
           WebHost.CreateDefaultBuilder(args)
         .SuppressStatusMessages(true) //disable the status messages
-        .UseStartup<Startup>();
+        .UseStartup<Startup>(); 
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,9 +95,18 @@ namespace HDFCMSILWebMVC
                     name: "default",
                     pattern: "{controller=Login}/{action=LoginPage}/{id?}");
                 endpoints.MapHub<UploadProgressHub>("/uploadProgressHub");
+                //endpoints.MapControllerRoute(
+                //    name: "default",
+                //    pattern: "{controller=LoginUAM}/{action=UAMLoginNew}/{id?}");
+                //endpoints.MapHub<UploadProgressHub>("/uploadProgressHub");
             });
 
-          //  loggerFactory..AddFile($@"{Directory.GetCurrentDirectory()}\Log\log.txt");
+            //  loggerFactory..AddFile($@"{Directory.GetCurrentDirectory()}\Log\log.txt");
+
+
+            //CREATE SYMMETRIC KEY MSIL_HDFC
+            //WITH ALGORITHM = AES_256
+            //ENCRYPTION BY PASSWORD = 'Hdfc@123456789';
 
         }
     }
