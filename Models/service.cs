@@ -47,7 +47,7 @@ namespace HDFCMSILWebMVC.Models
                 }
                 
             }
-            catch (Exception ex) 
+            catch (Exception ) 
             {
                 //clserr.WriteErrorToTxtFile(ex.Message + "Service", "getDetails", ""); return null;
                 

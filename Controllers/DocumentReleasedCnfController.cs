@@ -36,8 +36,8 @@ namespace HDFCMSILWebMVC.Controllers
         string Transporter_Name;
         string Payment_Amt;
 
-        string[] Spl_Transporter_Name1, Split_String, ArrBodyLine, EmailArr, ArrFooterLine;
-        Boolean Flag_Transporter_Name1;
+        string[] Spl_Transporter_Name1, Split_String,EmailArr;
+        bool Flag_Transporter_Name1;
         int Cnt_Transporter_Name1, LInt, CnEmail = 0;
         string Transporter_Name1 = "", STp = "", STp_Full = "";
 
@@ -503,7 +503,7 @@ namespace HDFCMSILWebMVC.Controllers
                 //clserr.LogEntry("Exiting WriteConfirmationOrder Function", false);
                 //clserr.LogEntry("Exiting WriteConfirmationOrder Function", false);
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 //clserr.WriteErrorToTxtFile(ex.Message + "", "SendEmail", FileAttach);
                 //clserr.Handle_Error(ex, "SendEmail", "SendEmail");
@@ -798,7 +798,7 @@ namespace HDFCMSILWebMVC.Controllers
                     }
                 }
             }
-            catch (Exception ex) { }
+            catch (Exception ) { }
 
         }
         public void WriteConfirmationOrderTEST(string UTRNO,string VIRTUALACCNO)

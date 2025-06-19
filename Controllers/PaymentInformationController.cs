@@ -348,7 +348,7 @@ namespace HDFCMSILWebMVC.Controllers
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
             }
             finally

@@ -257,7 +257,7 @@ namespace HDFCMSILWebMVC.Controllers
                     //clserr.WriteLogToTxtFile("Data Updated Successfully", "Rectify", "Rectify");
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Rectify");
             }

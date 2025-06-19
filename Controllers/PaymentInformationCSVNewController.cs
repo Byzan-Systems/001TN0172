@@ -324,7 +324,7 @@ namespace HDFCMSILWebMVC.Controllers
                 progress = 100;
                 _uploadProgress[sessionId] = progress;
                 await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "Upload process completed");
-            WaitFile: string str = "";
+            WaitFile: progress = 100;
             }
 
             catch (Exception ex)
@@ -398,7 +398,7 @@ namespace HDFCMSILWebMVC.Controllers
 
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
             }
             finally
@@ -434,7 +434,7 @@ namespace HDFCMSILWebMVC.Controllers
                     //clserr.WriteLogToTxtFile("Data Updated Successfully", "Rectify", "Rectify");
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Rectify");
             }

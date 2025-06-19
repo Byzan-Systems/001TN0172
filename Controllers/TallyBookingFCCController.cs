@@ -68,7 +68,7 @@ namespace HDFCMSILWebMVC.Controllers
                         Fromdate = DateTime.ParseExact(Fcc.DateFrom.ToString().Substring(0, 10), "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
                         Todate = DateTime.ParseExact(Fcc.DateTo.ToString().Substring(0, 10), "dd/MM/yyyy", CultureInfo.InvariantCulture).AddDays(1).ToString("yyyy-MM-dd");
                     }
-                    catch (Exception ex)
+                    catch (Exception )
                     {
                         TempData["alertMessage"] = "Please Please proper date.";
                         return PartialView("TallyBookingFCC");
@@ -162,7 +162,7 @@ namespace HDFCMSILWebMVC.Controllers
                     return dataTable;
                 }
             }
-            catch (Exception EX) { return null; }
+            catch (Exception ) { return null; }
         }
 
     }

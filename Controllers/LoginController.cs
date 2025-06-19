@@ -83,85 +83,85 @@ namespace HDFCMSILWebMVC.Controllers
             }
         }
 
-        public bool ValidateADUserNewConnection(string Username, string Password)
-        {
-            return false;
-            _logger.LogInformation("In LDAP function1");
-            try
-            {
-                // Set up LDAP connection parameters
-                //string ldapHost = "LDAP://ldap.hdfcbank.com"; //"ldap.example.com";
-                string ldapHost = "ldap.hdfcbank.com"; //"ldap.example.com";
-                int ldapPort = 389;
-               // string ldapBindDn = "DC = corp, DC = hdfcbank, DC = com"; // "cn=admin,dc=example,dc=com";
-                //string ldapBindPassword = "admin_password";
+        //public bool ValidateADUserNewConnection(string Username, string Password)
+        //{
+        //    //return false;
+        //    _logger.LogInformation("In LDAP function1");
+        //    try
+        //    {
+        //        // Set up LDAP connection parameters
+        //        //string ldapHost = "LDAP://ldap.hdfcbank.com"; //"ldap.example.com";
+        //        string ldapHost = "ldap.hdfcbank.com"; //"ldap.example.com";
+        //        int ldapPort = 389;
+        //       // string ldapBindDn = "DC = corp, DC = hdfcbank, DC = com"; // "cn=admin,dc=example,dc=com";
+        //        //string ldapBindPassword = "admin_password";
 
-                // User credentials for authentication
-                string username = Username; //"user";
-                string password = Password; //"user_password";
-                _logger.LogInformation("In LDAP function2");
-                // Create an LDAP connection
-                LdapConnection ldapConnection = new LdapConnection();
-                _logger.LogInformation("In LDAP function3");
-                ldapConnection.Connect(ldapHost, ldapPort);
-                _logger.LogInformation("In LDAP function4");
-                //ldapConnection.Bind(ldapBindDn, ldapBindPassword);
-                //ldapConnection.Bind(ldapBindDn, Password);
+        //        // User credentials for authentication
+        //        string username = Username; //"user";
+        //        string password = Password; //"user_password";
+        //        _logger.LogInformation("In LDAP function2");
+        //        // Create an LDAP connection
+        //        LdapConnection ldapConnection = new LdapConnection();
+        //        _logger.LogInformation("In LDAP function3");
+        //        ldapConnection.Connect(ldapHost, ldapPort);
+        //        _logger.LogInformation("In LDAP function4");
+        //        //ldapConnection.Bind(ldapBindDn, ldapBindPassword);
+        //        //ldapConnection.Bind(ldapBindDn, Password);
 
-                //Console.WriteLine("LDAP connection successful.");
-                _logger.LogInformation("LDAP connection successful.");
+        //        //Console.WriteLine("LDAP connection successful.");
+        //        _logger.LogInformation("LDAP connection successful.");
 
-                // Search for the user entry to authenticate
-                string userDn = $"uid={username},ou=users,dc=hdfcbank,dc=com";
-                LdapSearchResults searchResults = ldapConnection.Search(
-                    "ou=users,dc=hdfcbank,dc=com",
-                    LdapConnection.SCOPE_SUB,
-                    $"(uid={username})",
-                    null,
-                    false
-                );
+        //        // Search for the user entry to authenticate
+        //        string userDn = $"uid={username},ou=users,dc=hdfcbank,dc=com";
+        //        LdapSearchResults searchResults = ldapConnection.Search(
+        //            "ou=users,dc=hdfcbank,dc=com",
+        //            LdapConnection.SCOPE_SUB,
+        //            $"(uid={username})",
+        //            null,
+        //            false
+        //        );
 
-                _logger.LogInformation("In LDAP function5");
-
-
-                ldapConnection.Bind(userDn, password);
-
-                // If successful, authentication is valid
-                //Console.WriteLine("Authentication successful.");
-                _logger.LogInformation("Authentication successful.");
-                return true;
-
-                ///Check if user entry exists
-                if (searchResults.hasMore())
-                {
-                    // Attempt to bind with user's credentials
-                    ldapConnection.Bind(userDn, password);
-
-                    // If successful, authentication is valid
-                    //Console.WriteLine("Authentication successful.");
-                    _logger.LogInformation("Authentication successful.");
-                    return true;
-
-                }
-                else
-                {
-                    //Console.WriteLine("User not found.");
-                    _logger.LogInformation("User not found.");
-                }
-
-                // Disconnect LDAP connection
-                ldapConnection.Disconnect();
-            }
-            catch (LdapException e)
-            {
-                //Console.WriteLine($"LDAP Exception: {e.Message}");
-                _logger.LogInformation($"LDAP Exception: {e.Message}");
-                return false;
-            }
+        //        _logger.LogInformation("In LDAP function5");
 
 
+        //        ldapConnection.Bind(userDn, password);
 
-        }
+        //        // If successful, authentication is valid
+        //        //Console.WriteLine("Authentication successful.");
+        //        _logger.LogInformation("Authentication successful.");
+        //        return true;
+
+        //        ///Check if user entry exists
+        //        //if (searchResults.hasMore())
+        //        //{
+        //        //    // Attempt to bind with user's credentials
+        //        //    ldapConnection.Bind(userDn, password);
+
+        //        //    // If successful, authentication is valid
+        //        //    //Console.WriteLine("Authentication successful.");
+        //        //    _logger.LogInformation("Authentication successful.");
+        //        //    return true;
+
+        //        //}
+        //        //else
+        //        //{
+        //        //    //Console.WriteLine("User not found.");
+        //        //    _logger.LogInformation("User not found.");
+        //        //}
+
+        //        // Disconnect LDAP connection
+        //        ldapConnection.Disconnect();
+        //    }
+        //    catch (LdapException e)
+        //    {
+        //        //Console.WriteLine($"LDAP Exception: {e.Message}");
+        //        _logger.LogInformation($"LDAP Exception: {e.Message}");
+        //        return false;
+        //    }
+
+
+
+        //}
 
         public bool ValidateADUserNew(string Username, string Password)
         {
@@ -191,44 +191,44 @@ namespace HDFCMSILWebMVC.Controllers
             return false;
         }
 
-        public bool ValidateADUser(string Username, string Password)
-        {
-            _logger.LogInformation("In LDAP function1");
-            //return false;
-            _logger.LogInformation("In LDAP function2");
-            /////Production
-            /////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hbctxdom.com:389/dc=hbctxdom,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
+        //public bool ValidateADUser(string Username, string Password)
+        //{
+        //    _logger.LogInformation("In LDAP function1");
+        //    //return false;
+        //    _logger.LogInformation("In LDAP function2");
+        //    /////Production
+        //    /////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hbctxdom.com:389/dc=hbctxdom,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
 
-            ///////UAT
-            ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://10.226.213.116/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
-            ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hdfcbank.com/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
-            var de = new DirectoryEntry("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
-
-
-
-            _logger.LogInformation("Before connecting");
-
-            _logger.LogInformation("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com" + " " + Username + " " + Password);
+        //    ///////UAT
+        //    ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://10.226.213.116/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
+        //    ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hdfcbank.com/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
+        //    var de = new DirectoryEntry("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
 
 
 
-            try
-            {
-                _logger.LogInformation("Authencating User");
+        //    _logger.LogInformation("Before connecting");
 
-                var ds = new System.DirectoryServices.DirectorySearcher(de);
-                ds.FindOne();
-                _logger.LogInformation("Return True");
-                return true;
-            }
-            catch (Exception ex)
-            {
+        //    _logger.LogInformation("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com" + " " + Username + " " + Password);
 
-                _logger.LogInformation("Error :" + ex.Message.ToString());
-                _logger.LogInformation("Return False");
-                return false;
-            }
-        }
+
+
+        //    try
+        //    {
+        //        _logger.LogInformation("Authencating User");
+
+        //        var ds = new System.DirectoryServices.DirectorySearcher(de);
+        //        ds.FindOne();
+        //        _logger.LogInformation("Return True");
+        //        return true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        _logger.LogInformation("Error :" + ex.Message.ToString());
+        //        _logger.LogInformation("Return False");
+        //        return false;
+        //    }
+        //}
 
         public void LoginLogDB(string pExpDescp, string pError_Id, string Type, string FrmUserID)
         {
@@ -270,7 +270,7 @@ namespace HDFCMSILWebMVC.Controllers
                 }
             }
 
-            catch (Exception ex)
+            catch (Exception )
             {
                 //Interaction.MsgBox("Error :" + ex.Message.ToString(), (MsgBoxStyle)((int)MsgBoxStyle.Information + (int)MsgBoxStyle.OkOnly));
                 //Handle_Error(ex, "ClsBase", Information.Err().Number, "LoginLogDB");

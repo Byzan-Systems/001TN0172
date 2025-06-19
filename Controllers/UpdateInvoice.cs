@@ -133,7 +133,7 @@ namespace HDFCMSILWebMVC.Controllers
                     string strTrdRef;
 
                     var DetailsList = inv.ToList();
-                    Boolean ChkFlag = false;
+                    //Boolean ChkFlag = false;
                     int Unsuccesscnt = 0;
                     int cnt = 0; string msg = "";
 
@@ -174,7 +174,7 @@ namespace HDFCMSILWebMVC.Controllers
                                     Unsuccesscnt += 1;
                                     msg = "Duplicate record Found In Invoice Received Table Invoice -" + dtFilterData.Rows[0]["Invoice_Number"].ToString().Trim();
                                     _logger.LogError("Duplicate record Found In Invoice Received Table Invoice -" + dtFilterData.Rows[0]["Invoice_Number"].ToString().Trim() + " - UploadReceivedInvoiceDataController;UploadDetails");
-                                    ChkFlag = false;
+                                    //ChkFlag = false;
                                     goto Phy_Inv_Not_Rec;
                                 }
                                 else //'3
@@ -229,7 +229,7 @@ namespace HDFCMSILWebMVC.Controllers
                                 msg = "Physical Invoice Data Not Received. Invoice Number : " + dtFilterData.Rows[0]["Invoice_Number"].ToString().Trim();
                                 _logger.LogError("Physical Invoice Data Not Received. Invoice Number : " + dtFilterData.Rows[0]["Invoice_Number"].ToString().Trim() + " - UploadInvoiceController;Update");
 
-                                ChkFlag = false;
+                                //ChkFlag = false;
                                 goto Phy_Inv_Not_Rec;
                             }
                         }

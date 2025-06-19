@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+	<NoWarn>$(NoWarn);0618</NoWarn>
     <RootNamespace>_001TN0172</RootNamespace>
     <StartupObject></StartupObject>
     <AssemblyName>HDFCMSILWebMVC</AssemblyName>
@@ -12,6 +13,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>x64</PlatformTarget>
+	
   </PropertyGroup>
 
   <ItemGroup>

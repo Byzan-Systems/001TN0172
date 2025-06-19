@@ -151,11 +151,12 @@ namespace HDFCMSILWebMVC.Controllers
                         using (MemoryStream stream = new MemoryStream())
                         {
                             wb.SaveAs(stream);
+                            _logger.LogInformation("Data exported successfully" + " - AdditionalMISControlPoint;ExportExcel");
                             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AdditionalMISReport.xlsx");
                         }
                     }
 
-                    _logger.LogInformation("Data exported successfully" + " - AdditionalMISControlPoint;ExportExcel");
+                   
                 }
                 catch (Exception ex)
                 {

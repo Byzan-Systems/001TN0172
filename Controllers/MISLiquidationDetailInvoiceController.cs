@@ -88,11 +88,12 @@ namespace HDFCMSILWebMVC.Controllers
                         using (MemoryStream stream = new MemoryStream())
                         {
                             wb.SaveAs(stream);
+                            _logger.LogInformation("Data exported successfully" + " - MISLiquidationDetailInvoiceController;ExportExcel");
                             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MIS Liquidation-DetailInvoice.xlsx");
                         }
                     }
 
-                    _logger.LogInformation("Data exported successfully" + " - MISLiquidationDetailInvoiceController;ExportExcel");
+                    
                 }
                 catch (Exception ex)
                 {

@@ -222,7 +222,7 @@ namespace HDFCMSILWebMVC.Controllers
                 //    }
                 //}
 
-                return View();
+                //return View();
             }
             
         }
@@ -297,7 +297,7 @@ namespace HDFCMSILWebMVC.Controllers
                     wb.Dispose();
 
                 }
-                return View();
+                //return View();
             }
             
         }
