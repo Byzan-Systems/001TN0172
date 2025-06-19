@@ -41,7 +41,7 @@ jobs:
           semgrep scan --config=p/owasp --lang csharp --output semgrep_report.json || echo "Semgrep scan completed"
 
       - name: Upload Security Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-reports
           path: |
