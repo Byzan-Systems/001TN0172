@@ -1,0 +1,46 @@
+name: "CodeQL_Analysis"
+
+on:
+  push:
+    branches: CodeQL_Analysis
+  pull_request:
+    branches: CodeQL_Analysis
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+
+jobs:
+  analyze:
+    name: Analyze C# with CodeQL
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [csharp]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '5.0.x'  # Targeting .NET 5
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet build --no-restore
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
