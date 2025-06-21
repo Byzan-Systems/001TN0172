@@ -1,10 +1,10 @@
-name: "CodeQL_Analysis"
+name: "CodeQL-Analysis_SAST"
 
 on:
   push:
-    branches: CodeQL_Analysis
+    branches: CodeQL-Analysis_SAST
   pull_request:
-    branches: CodeQL_Analysis
+    branches: CodeQL-Analysis_SAST
   workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 jobs:
