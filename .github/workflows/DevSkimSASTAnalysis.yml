@@ -1,0 +1,31 @@
+# .github/workflows/devskim-analysis.yml
+name: DevSkim SAST Analysis
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  devskim:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Install DevSkim CLI
+      run: |
+        wget https://github.com/microsoft/devskim/releases/download/v0.6.12/devskim-linux-x64.zip
+        unzip devskim-linux-x64.zip -d devskim
+        chmod +x devskim/devskim
+
+    - name: Run DevSkim
+      run: ./devskim/devskim analyze -r -f json -o devskim-report.json .
+
+    - name: Upload SAST Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: DevSkim-SAST
+        path: devskim-report.json
