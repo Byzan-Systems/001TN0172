@@ -306,11 +306,11 @@ namespace HDFCMSILWebMVC.Controllers
                 using (var db = new Entities.DatabaseContext())
                 {
                     //var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Password == LoginViewModel.Password && a.Login_Enable == 1).FirstOrDefault();
-                    var rec = db.user_mst_tempDB.Where(a => a.User_Name == LoginViewModel.User_Name).FirstOrDefault();
+                    var rec = db.user_mst_tempDB.Where(a => a.User_Id == LoginViewModel.User_Name).FirstOrDefault();
 
                     if (rec != null)
                     {
-                        var recIsactive = db.user_mst_tempDB.Where(a => a.User_Name == LoginViewModel.User_Name && a.IsActive == "1").FirstOrDefault();
+                        var recIsactive = db.user_mst_tempDB.Where(a => a.User_Id == LoginViewModel.User_Name && a.IsActive == "1").FirstOrDefault();
                         if (recIsactive != null)
                         {
 
@@ -363,8 +363,8 @@ namespace HDFCMSILWebMVC.Controllers
 
 
                             //// comment validateLDAP if on UAT, otherwise check LDAP
-                            ////////if (ValidateLDAP(LoginViewModel.User_Name, LoginViewModel.Password) == true)
-                            ////////{
+                            //if (ValidateLDAP(LoginViewModel.User_Name, LoginViewModel.Password) == true)
+                            //{
 
                                 // Dormancy Check\
                                 int isdormant = DaysCheck(rec);
@@ -374,43 +374,43 @@ namespace HDFCMSILWebMVC.Controllers
                                 if (isdormant == 0)
                                 {
 
-                                //if (rec.LoginType == "SERVER")
-                                //{
-                                //    ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
+                                    //if (rec.LoginType == "SERVER")
+                                    //{
+                                    //    ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
 
-                                //    return RedirectToAction("HomePage", "Server");
-                                //}
-                                //else if (rec.LoginType == "TRADE OPS")
-                                //{
-                                //    return RedirectToAction("Trade_OPSHomePage", "Login");
-                                //}
-                                //else if (rec.LoginType == "CASH OPS")
-                                //{
-                                //    return RedirectToAction("Cash_OPSHomePage", "Login");
-                                //}
-                                //else if (rec.LoginType == "CASH_Trade OPS")
-                                //{
-                                //    return RedirectToAction("Cash_TradeHomePage", "Login");
-                                //}
-                                //else
-                                //{
-                                LoginLogDB("", "", "LOGIN", UserSession.LoginID.ToString());
-                                ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
+                                    //    return RedirectToAction("HomePage", "Server");
+                                    //}
+                                    //else if (rec.LoginType == "TRADE OPS")
+                                    //{
+                                    //    return RedirectToAction("Trade_OPSHomePage", "Login");
+                                    //}
+                                    //else if (rec.LoginType == "CASH OPS")
+                                    //{
+                                    //    return RedirectToAction("Cash_OPSHomePage", "Login");
+                                    //}
+                                    //else if (rec.LoginType == "CASH_Trade OPS")
+                                    //{
+                                    //    return RedirectToAction("Cash_TradeHomePage", "Login");
+                                    //}
+                                    //else
+                                    //{
+                                    LoginLogDB("", "", "LOGIN", UserSession.LoginID.ToString());
+                                    ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
                                     return RedirectToAction("HomePage", "Login");
                                     //}
                                 }
                                 else
                                 { ViewBag.LoginStatus = -1; }
-                            ////////}
-                            ////////else
-                            ////////{
-                            ////////    _logger.LogInformation("Ldap Fail" + "User" + LoginViewModel.User_Name + "Password" + LoginViewModel.Password + LoginViewModel.User_Name);
-                            ////////}
+                            //}
+                            //else
+                            //{
+                            //    _logger.LogInformation("Ldap Fail" + "User" + LoginViewModel.User_Name + "Password" + LoginViewModel.Password + LoginViewModel.User_Name);
+                            //}
                         }
                         else
                         {
                             ViewBag.LoginStatus = -1;
-                            TempData["alertMessageDormant"] = rec.Remark ;
+                            TempData["alertMessageDormant"] = rec.Remark;
                         }
 
 
@@ -450,7 +450,7 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     DataTable dtDays = new DataTable();
                     //var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Password == LoginViewModel.Password && a.Login_Enable == 1).FirstOrDefault();
-                    var row = db.user_mst_tempDB.Where(a => a.LastLogin != "NULL" && a.EmpType != "NULL" && a.IsActive != "3" && a.IsActive == "1").FirstOrDefault();
+                    var row = db.user_mst_tempDB.Where(a => a.LastLogin != "NULL" && a.EmpType != "NULL" && a.IsActive != "3" && a.IsActive == "1" && a.User_Id == UserSession.LoginID).FirstOrDefault();
                     // _logger.LogInformation("NO OF RECORDS: " + row.);
                     if (row != null)
                     {
@@ -823,30 +823,30 @@ namespace HDFCMSILWebMVC.Controllers
                 //if (HttpContext.Session.GetString("UAMPath") == "") { Console.WriteLine("No process found with the name: " + "MSIL_LOCAL 1.1.exe"); }
                 //else
                 //{
-                    //string UAMPath = HttpContext.Session.GetString("UAMPath");
-                    //string filename = Path.GetFileNameWithoutExtension(UAMPath);
-                    //Process[] processes = Process.GetProcessesByName(filename);
-                    LoginLogDB("", "", "LOGOUT",UserSession.LoginID.ToString());
-                    //if (processes.Length > 0)
-                    //{
-                    //    foreach (var process in processes)
-                    //    {
-                    //        IntPtr hWnd = FindWindow(null, process.MainWindowTitle);
+                //string UAMPath = HttpContext.Session.GetString("UAMPath");
+                //string filename = Path.GetFileNameWithoutExtension(UAMPath);
+                //Process[] processes = Process.GetProcessesByName(filename);
+                LoginLogDB("", "", "LOGOUT", UserSession.LoginID.ToString());
+                //if (processes.Length > 0)
+                //{
+                //    foreach (var process in processes)
+                //    {
+                //        IntPtr hWnd = FindWindow(null, process.MainWindowTitle);
 
-                    //        if (hWnd != IntPtr.Zero)
-                    //        {
-                    //            // Restore and bring the window to the front
-                    //            ShowWindow(hWnd, SW_RESTORE);
-                    //            SetForegroundWindow(hWnd);
-                    //            _logger.LogError("Window brought to the foreground." + " - LoginController;Logout");
-                    //        }
-                    //        else
-                    //        {
-                    //            _logger.LogError("Window handle not found." + " - LoginController;Logout");
-                    //        }
+                //        if (hWnd != IntPtr.Zero)
+                //        {
+                //            // Restore and bring the window to the front
+                //            ShowWindow(hWnd, SW_RESTORE);
+                //            SetForegroundWindow(hWnd);
+                //            _logger.LogError("Window brought to the foreground." + " - LoginController;Logout");
+                //        }
+                //        else
+                //        {
+                //            _logger.LogError("Window handle not found." + " - LoginController;Logout");
+                //        }
 
-                    //    }
-                    //}
+                //    }
+                //}
                 //}
                 HttpContext.Session.Clear();
                 //return View("LoginPage");
