@@ -1,0 +1,69 @@
+# .github/workflows/dotnet-security-checks.yml
+
+name: .NET Security Checks (SAST + SCA + SCR)
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  security-checks:
+    name: Run SAST, SCA, and SCR
+    runs-on: windows-latest
+
+    steps:
+    # Step 1: Checkout
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # Step 2: Setup .NET 5
+    - name: Setup .NET 5 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 5.0.x
+
+    # Step 3: Install SecurityCodeScan (SAST)
+    - name: Add SecurityCodeScan Analyzer
+      run: dotnet add package SecurityCodeScan.VS2019
+
+    # Step 4: Restore & Build with Analyzers
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    - name: Build with SAST Analysis (SecurityCodeScan)
+      run: dotnet build --no-restore -warnaserror
+
+    # Step 5: Install Java for OWASP Dependency-Check (SCA)
+    - name: Install Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    # Step 6: Download and Run OWASP Dependency-Check (SCA)
+    - name: Run OWASP Dependency-Check
+      run: |
+        Invoke-WebRequest -Uri https://github.com/jeremylong/DependencyCheck/releases/download/v8.4.0/dependency-check-8.4.0-release.zip -OutFile dc.zip
+        Expand-Archive dc.zip -DestinationPath dc
+        .\dc\dependency-check\bin\dependency-check.bat --project "MyDotNetApp" --scan . --format HTML --out .
+
+    - name: Upload SCA Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: DependencyCheck-Report
+        path: dependency-check-report.html
+
+    # Step 7: Run DevSkim (SCR - automated pattern-based scan)
+    - name: Install DevSkim CLI
+      run: |
+        Invoke-WebRequest -Uri https://github.com/microsoft/devskim/releases/latest/download/devskim-win-x64.zip -OutFile devskim.zip
+        Expand-Archive devskim.zip -DestinationPath devskim
+        .\devskim\devskim.exe analyze . -r -f sarif -o devskim-results.sarif
+
+    - name: Upload SCR Report (DevSkim)
+      uses: actions/upload-artifact@v4
+      with:
+        name: DevSkim-SCR-Report
+        path: devskim-results.sarif
