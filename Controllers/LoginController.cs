@@ -17,8 +17,7 @@ using System.Security.Principal;
 using System.DirectoryServices.AccountManagement;
 using Novell.Directory.Ldap;
 using System.Data;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
+
 using System.Security.Claims;
 using System.Text;
 using System.Diagnostics;
