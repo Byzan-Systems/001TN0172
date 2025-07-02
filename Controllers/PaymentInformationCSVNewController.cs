@@ -343,7 +343,7 @@ namespace HDFCMSILWebMVC.Controllers
                     progress = 100;
                     _uploadProgress[sessionId] = progress;
                     await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "Upload process completed");
-                WaitFile: progress = 100;
+                WaitFile: progress = 100; 
                 }
 
                 catch (Exception ex)
@@ -419,7 +419,7 @@ namespace HDFCMSILWebMVC.Controllers
 
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
             }
             finally

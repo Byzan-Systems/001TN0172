@@ -158,7 +158,6 @@ namespace HDFCMSILWebMVC.Controllers
                         adapter.Fill(dataTable);
                     }
 
-
                     cmd.Connection.Close();
                     return dataTable;
                 }

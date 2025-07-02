@@ -32,6 +32,7 @@ namespace HDFCMSILWebMVC.Controllers
         [Obsolete]
         public UploadReceivedInvoiceDataController(DataService dataService, IWebHostEnvironment hostingEnvironment, ILogger<UploadReceivedInvoiceDataController> logger, IExcelService excelService, IHubContext<UploadProgressHub> hubContext)
         {
+
             _hostingEnvironment = hostingEnvironment;
             _logger = logger;
             _excelService = excelService;
@@ -112,6 +113,7 @@ namespace HDFCMSILWebMVC.Controllers
                 //{
                 //    dataTable.Columns.Add(headerRow.GetCell(i).ToString());
                 //}
+
                 progress = 20;
                 _uploadProgress[sessionId] = progress;
                 await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");

@@ -1,5 +1,7 @@
+using _001TN0172;
 using HDFCMSILWebMVC.Entities;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
@@ -12,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -55,9 +59,54 @@ namespace HDFCMSILWebMVC
             }); // Register the ExcelService
             services.AddScoped<IExcelService, ExcelService>();
             //services.AddScoped<AccessMenu, PageAccess>();
-            services.AddTransient<DataService>(provider => new DataService(Configuration.GetConnectionString("DefaultConnection")));
+            string[] splitedpass = Configuration.GetConnectionString("DefaultConnection").ToString().Split(";");
+            string exactpass = splitedpass[3].Remove(0, 9);
+            var DecryptedPassword = Decrypted(exactpass);
+            DecryptedPassword = Configuration.GetConnectionString("DefaultConnection").ToString().Replace(exactpass, DecryptedPassword);
+            services.AddTransient<DataService>(provider => new DataService(DecryptedPassword));
             services.AddSignalR();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Login";
+                options.LogoutPath = "/Logout";
+            });
 
+        }
+        protected string Decrypted(string input)
+        {
+            try
+            {
+                string EncryptionKey = "MySuperSecureKeyHDFC_MSIL@123456"; // 32 chars = 256-bit
+                byte[] key = Encoding.UTF8.GetBytes(EncryptionKey);
+
+                if (key.Length != 16 && key.Length != 24 && key.Length != 32)
+                    throw new Exception("Key must be 16, 24, or 32 bytes.");
+
+                byte[] cipherTextBytes = Convert.FromBase64String(input);
+
+                using (Aes aes = Aes.Create())
+                {
+                    aes.Key = key;
+                    aes.IV = new byte[16]; // Must match the IV used in encryption
+                    aes.Mode = CipherMode.CBC;
+                    aes.Padding = PaddingMode.PKCS7;
+
+                    using (MemoryStream ms = new MemoryStream(cipherTextBytes))
+                    using (ICryptoTransform decryptor = aes.CreateDecryptor())
+                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    using (StreamReader sr = new StreamReader(cs))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //"Encrypted Input value is not in proper value. Please enter proper encrypted input."
+                Console.WriteLine("Decryption error: " + ex.Message);
+                return null;
+            }
         }
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
           WebHost.CreateDefaultBuilder(args)
@@ -86,9 +135,10 @@ namespace HDFCMSILWebMVC
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseSession();
+            app.UseMiddleware<SessionValidationMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

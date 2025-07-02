@@ -94,7 +94,7 @@ namespace HDFCMSILWebMVC.Controllers
                             _logger.LogInformation("Data exported successfully" + " - PaymentReportController;ExportExcel");
                             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "GefuReport.xlsx");
                         }
-                     
+                        
                     }
                 }
                 catch (Exception ex)

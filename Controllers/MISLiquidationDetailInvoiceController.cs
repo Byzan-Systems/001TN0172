@@ -91,9 +91,7 @@ namespace HDFCMSILWebMVC.Controllers
                             _logger.LogInformation("Data exported successfully" + " - MISLiquidationDetailInvoiceController;ExportExcel");
                             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MIS Liquidation-DetailInvoice.xlsx");
                         }
-                    }
-
-                    
+                    }                   
                 }
                 catch (Exception ex)
                 {

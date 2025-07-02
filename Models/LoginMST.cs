@@ -89,11 +89,23 @@ namespace HDFCMSILWebMVC.Models
         public int? Login_Enable { get; set; }
     }
 
-    [Table("UAM_LoginLogout")]
-    public class UAM_LoginLogout
+    [Table("MSIL_LoginLogout")]
+    public class MSIL_LoginLogout
     {
         [Key]
-        public string LogID { get; set; } 
+
+        public string LogID { get; set; }
+        public string MSIL_LogoutDatetime { get; set; }
+        public string SessionID { get; set; }
+        public string IsActive { get; set; }
+        public string IPAddress { get; set; }
+    }
+   
+    public class MSIL_LoginLogoutID
+    {
+        [Key]
+
+        public string LogID { get; set; }
     }
     public class BrowserCloseModel
     {
@@ -104,4 +116,5 @@ namespace HDFCMSILWebMVC.Models
         public string MSIL_LogoutDatetime { get; set; }
         public string LogID { get; set; }
 }
+
 }

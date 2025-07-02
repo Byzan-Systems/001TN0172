@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HDFCMSILWebMVC.Models
 {
-    public class ShowPending_Report
+  public class ShowPending_Report
     {
         public bool chkSelectDate { get; set; }
         public DateTime? StartDate { get; set; }
@@ -21,13 +21,13 @@ namespace HDFCMSILWebMVC.Models
     {
         public string InvoiceNo { get; set; }
         public string InvoiceAmount { get; set; }
-        public string? PhysicallyReceiptDate { get; set; }
+        public string PhysicallyReceiptDate { get; set; }
         public string TradeReferenceNo { get; set; }
         public string OrderUpdationStatus { get; set; }
         public string DeliveryOrderNo { get; set; }
         public string Payment_status { get; set; }
         public string PaymentReceiptMode { get; set; } 
-        public string? PaymentReceiptDate { get; set; }
+        public string PaymentReceiptDate { get; set; }
         public string PaymentReferenceNo { get; set; }
         public string DealerCode { get; set; }
         public string DealerName { get; set; }
@@ -115,7 +115,7 @@ namespace HDFCMSILWebMVC.Models
     {
         public string Invoice_Number { get; set; }
         public string Invoice_Amount { get; set; }
-        public string? PhysicallyReceiptDate { get; set; }
+        public string PhysicallyReceiptDate { get; set; }
         public string TradeReferenceNo { get; set; }
         public string OrderUpdationStatus { get; set; }
         public string DeliveryOrderNo { get; set; }

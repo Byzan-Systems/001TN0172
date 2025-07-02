@@ -93,11 +93,10 @@ namespace HDFCMSILWebMVC.Controllers
                         using (MemoryStream stream = new MemoryStream())
                         {
                             wb.SaveAs(stream);
-                            _logger.LogInformation("Data exported successfully" + " - PaymentReportController;ExportExcel");
                             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "PaymentReport.xlsx");
                         }
 
-                        
+                        _logger.LogInformation("Data exported successfully" + " - PaymentReportController;ExportExcel");
                     }
                 }
                 catch (Exception ex)

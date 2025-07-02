@@ -154,9 +154,7 @@ namespace HDFCMSILWebMVC.Controllers
                             _logger.LogInformation("Data exported successfully" + " - AdditionalMISControlPoint;ExportExcel");
                             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "AdditionalMISReport.xlsx");
                         }
-                    }
-
-                   
+                    }                    
                 }
                 catch (Exception ex)
                 {

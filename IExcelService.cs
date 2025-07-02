@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace HDFCMSILWebMVC
 {
@@ -24,10 +26,50 @@ namespace HDFCMSILWebMVC
         private readonly ILogger<ExcelService> _logger;
         public ExcelService(IConfiguration configuration, ILogger<ExcelService> logger)
         {
-            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            _connectionString = configuration.GetConnectionString("DefaultConnection");
 
+            //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+           
+            string[] splitedpass = configuration["connectionStrings:DefaultConnection"].ToString().Split(";");
+            string exactpass = splitedpass[3].Remove(0, 9);
+            var DecryptedPassword = Decrypted(exactpass);
+            DecryptedPassword = configuration["connectionStrings:DefaultConnection"].ToString().Replace(exactpass, DecryptedPassword);
+            _connectionString = DecryptedPassword;
             _logger = logger;
+        }
+        protected string Decrypted(string input)
+        {
+            try
+            {
+                string EncryptionKey = "MySuperSecureKeyHDFC_MSIL@123456"; // 32 chars = 256-bit
+                byte[] key = Encoding.UTF8.GetBytes(EncryptionKey);
+
+                if (key.Length != 16 && key.Length != 24 && key.Length != 32)
+                    throw new Exception("Key must be 16, 24, or 32 bytes.");
+
+                byte[] cipherTextBytes = Convert.FromBase64String(input);
+
+                using (Aes aes = Aes.Create())
+                {
+                    aes.Key = key;
+                    aes.IV = new byte[16]; // Must match the IV used in encryption
+                    aes.Mode = CipherMode.CBC;
+                    aes.Padding = PaddingMode.PKCS7;
+
+                    using (MemoryStream ms = new MemoryStream(cipherTextBytes))
+                    using (ICryptoTransform decryptor = aes.CreateDecryptor())
+                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    using (StreamReader sr = new StreamReader(cs))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //"Encrypted Input value is not in proper value. Please enter proper encrypted input."
+                Console.WriteLine("Decryption error: " + ex.Message);
+                return null;
+            }
         }
         public async Task<DataTable> ReadExcelToDataTableAsync(string filePath)
         {

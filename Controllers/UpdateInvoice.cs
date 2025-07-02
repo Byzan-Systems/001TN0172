@@ -174,7 +174,7 @@ namespace HDFCMSILWebMVC.Controllers
                                     Unsuccesscnt += 1;
                                     msg = "Duplicate record Found In Invoice Received Table Invoice -" + dtFilterData.Rows[0]["Invoice_Number"].ToString().Trim();
                                     _logger.LogError("Duplicate record Found In Invoice Received Table Invoice -" + dtFilterData.Rows[0]["Invoice_Number"].ToString().Trim() + " - UploadReceivedInvoiceDataController;UploadDetails");
-                                    //ChkFlag = false;
+                  //                  ChkFlag = false;
                                     goto Phy_Inv_Not_Rec;
                                 }
                                 else //'3

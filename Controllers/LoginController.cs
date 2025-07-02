@@ -25,6 +25,10 @@ using System.Diagnostics;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Globalization;
+using Microsoft.AspNetCore.Authentication;
+using _001TN0172;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace HDFCMSILWebMVC.Controllers
 {
@@ -32,7 +36,7 @@ namespace HDFCMSILWebMVC.Controllers
     {
         private readonly ILogger _logger;
         private IWebHostEnvironment Environment;
-
+        public string sessionToken = "";
         //private readonly AccessMenu Accmenu;
         public LoginController(ILogger<LoginController> logger, IWebHostEnvironment _environment)
         {
@@ -41,205 +45,7 @@ namespace HDFCMSILWebMVC.Controllers
 
         }
 
-        public bool ValidateLDAP(string Username, string Password)
-        {
-            //return false;
-            _logger.LogInformation("In LDAP function1");
-            /////UAT
-            //string ldapHost = "ldap.hdfcbank.com";
-            //int ldapPort = 389; // Default LDAP port
-            //string username = Username;
-            //string password = Password;
-            /////UAT
-            /////Production
-            string ldapHost = "ldap.hbctxdom.com";
-            int ldapPort = 389; // Default LDAP port
-            string username = Username + "@hbctxdom.com";  ///Production
-            string password = Password;
-            ///Production
-
-            try
-            {
-                _logger.LogInformation("In LDAP function2");
-                // Create an LdapConnection object
-                LdapConnection ldapConnection = new LdapConnection();
-                // Connect to the LDAP server
-                _logger.LogInformation("Before LDAP Connect");
-                ldapConnection.Connect(ldapHost, ldapPort);
-                _logger.LogInformation("After LDAP Connect");
-                // Bind with the provided credentials
-                _logger.LogInformation("Before LDAP Bind");
-                ldapConnection.Bind(username, password);
-                _logger.LogInformation("After LDAP Bind");
-                return true;
-                // If the bind is successful, authentication succeeded
-                //Console.WriteLine("Authentication successful");
-
-            }
-            catch (LdapException e)
-            {
-                // If an exception occurs, authentication failed
-                //Console.WriteLine($"Authentication failed: {e.Message}");
-                _logger.LogInformation(e.Message);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                //Console.WriteLine($"An error occurred: {ex.Message}");
-                _logger.LogInformation(ex.Message);
-                _logger.LogError(ex.Message + " - LoginController;ValidateLDAP");
-                return false;
-            }
-        }
-
-        //public bool ValidateADUserNewConnection(string Username, string Password)
-        //{
-        //    //return false;
-        //    _logger.LogInformation("In LDAP function1");
-        //    try
-        //    {
-        //        // Set up LDAP connection parameters
-        //        //string ldapHost = "LDAP://ldap.hdfcbank.com"; //"ldap.example.com";
-        //        string ldapHost = "ldap.hdfcbank.com"; //"ldap.example.com";
-        //        int ldapPort = 389;
-        //       // string ldapBindDn = "DC = corp, DC = hdfcbank, DC = com"; // "cn=admin,dc=example,dc=com";
-        //        //string ldapBindPassword = "admin_password";
-
-        //        // User credentials for authentication
-        //        string username = Username; //"user";
-        //        string password = Password; //"user_password";
-        //        _logger.LogInformation("In LDAP function2");
-        //        // Create an LDAP connection
-        //        LdapConnection ldapConnection = new LdapConnection();
-        //        _logger.LogInformation("In LDAP function3");
-        //        ldapConnection.Connect(ldapHost, ldapPort);
-        //        _logger.LogInformation("In LDAP function4");
-        //        //ldapConnection.Bind(ldapBindDn, ldapBindPassword);
-        //        //ldapConnection.Bind(ldapBindDn, Password);
-
-        //        //Console.WriteLine("LDAP connection successful.");
-        //        _logger.LogInformation("LDAP connection successful.");
-
-        //        // Search for the user entry to authenticate
-        //        string userDn = $"uid={username},ou=users,dc=hdfcbank,dc=com";
-        //        LdapSearchResults searchResults = ldapConnection.Search(
-        //            "ou=users,dc=hdfcbank,dc=com",
-        //            LdapConnection.SCOPE_SUB,
-        //            $"(uid={username})",
-        //            null,
-        //            false
-        //        );
-
-        //        _logger.LogInformation("In LDAP function5");
-
-
-        //        ldapConnection.Bind(userDn, password);
-
-        //        // If successful, authentication is valid
-        //        //Console.WriteLine("Authentication successful.");
-        //        _logger.LogInformation("Authentication successful.");
-        //        return true;
-
-        //        ///Check if user entry exists
-        //        //if (searchResults.hasMore())
-        //        //{
-        //        //    // Attempt to bind with user's credentials
-        //        //    ldapConnection.Bind(userDn, password);
-
-        //        //    // If successful, authentication is valid
-        //        //    //Console.WriteLine("Authentication successful.");
-        //        //    _logger.LogInformation("Authentication successful.");
-        //        //    return true;
-
-        //        //}
-        //        //else
-        //        //{
-        //        //    //Console.WriteLine("User not found.");
-        //        //    _logger.LogInformation("User not found.");
-        //        //}
-
-        //        // Disconnect LDAP connection
-        //        ldapConnection.Disconnect();
-        //    }
-        //    catch (LdapException e)
-        //    {
-        //        //Console.WriteLine($"LDAP Exception: {e.Message}");
-        //        _logger.LogInformation($"LDAP Exception: {e.Message}");
-        //        return false;
-        //    }
-
-
-
-        //}
-
-        public bool ValidateADUserNew(string Username, string Password)
-        {
-
-            _logger.LogInformation("In LDAP function1");
-            try
-            {
-                using (var context = new PrincipalContext(ContextType.Domain, "LDAP://ldap.hdfcbank.com:389"))
-                {
-                    _logger.LogInformation("In LDAP function2");
-                    var useri = UserPrincipal.FindByIdentity(context, Username);
-                    _logger.LogInformation("In LDAP function3");
-                    if (useri != null)
-                    {
-                        _logger.LogInformation("In LDAP function4");
-                        return true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation("Error :" + ex.Message.ToString());
-                _logger.LogInformation("Return False");
-                return false;
-            }
-
-            return false;
-        }
-
-        //public bool ValidateADUser(string Username, string Password)
-        //{
-        //    _logger.LogInformation("In LDAP function1");
-        //    //return false;
-        //    _logger.LogInformation("In LDAP function2");
-        //    /////Production
-        //    /////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hbctxdom.com:389/dc=hbctxdom,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
-
-        //    ///////UAT
-        //    ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://10.226.213.116/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
-        //    ////var de = new System.DirectoryServices.DirectoryEntry("LDAP://ldap.hdfcbank.com/DC=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
-        //    var de = new DirectoryEntry("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com", Username, Password, System.DirectoryServices.AuthenticationTypes.Secure);
-
-
-
-        //    _logger.LogInformation("Before connecting");
-
-        //    _logger.LogInformation("LDAP://ldap.hdfcbank.com:389/dc=corp,dc=hdfcbank,dc=com" + " " + Username + " " + Password);
-
-
-
-        //    try
-        //    {
-        //        _logger.LogInformation("Authencating User");
-
-        //        var ds = new System.DirectoryServices.DirectorySearcher(de);
-        //        ds.FindOne();
-        //        _logger.LogInformation("Return True");
-        //        return true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        _logger.LogInformation("Error :" + ex.Message.ToString());
-        //        _logger.LogInformation("Return False");
-        //        return false;
-        //    }
-        //}
-
-        public void LoginLogDB(string pExpDescp, string pError_Id, string Type, string FrmUserID)
+        public void LoginLogDB(string pExpDescp, string pError_Id, string Type, string FrmUserID, string SessionID, string IsActive)
         {
             try
             {
@@ -250,7 +56,7 @@ namespace HDFCMSILWebMVC.Controllers
                     // string cmd;
                     using (var db = new Entities.DatabaseContext())
                     {
-                        var strlogId = db.Set<UAM_LoginLogout>().FromSqlRaw("select Convert(varchar,max(Convert(int, logId)))LogID from MSIL_LoginLogout").ToList();
+                        var strlogId = db.Set<MSIL_LoginLogoutID>().FromSqlRaw("select Convert(varchar,max(Convert(int, logId)))LogID from MSIL_LoginLogout").ToList();
 
                         if (strlogId[0].LogID == "" || strlogId[0].LogID == null)
                         {
@@ -261,7 +67,7 @@ namespace HDFCMSILWebMVC.Controllers
                             strId = strlogId[0].LogID;
                         }
                         strId = (int.Parse(strId) + 1).ToString();
-                        db.Database.ExecuteSqlRaw("insert into MSIL_LoginLogout (logId, User_id, Logindate_time) values('" + strId + "','" + FrmUserID.ToString() + "','" + D1 + "') ");
+                        db.Database.ExecuteSqlRaw("insert into MSIL_LoginLogout (logId, User_id, LoginDate_Time,SessionID,IsActive) values('" + strId + "','" + FrmUserID.ToString() + "','" + D1 + "','" + SessionID + "','" + IsActive + "' ) ");
                     }
                 }
                 if (Type == "LOGOUT")
@@ -271,7 +77,7 @@ namespace HDFCMSILWebMVC.Controllers
                     // string cmd;
                     using (var db = new Entities.DatabaseContext())
                     {
-                        var strlogId = db.Set<UAM_LoginLogout>().FromSqlRaw("select (Convert(varchar, max(Convert(int, LogID)))) LogID from MSIL_LoginLogout where User_id='" + FrmUserID.ToString().Trim() + "'").ToList();
+                        var strlogId = db.Set<MSIL_LoginLogoutID>().FromSqlRaw("select (Convert(varchar, max(Convert(int, LogID)))) LogID from MSIL_LoginLogout where User_id='" + FrmUserID.ToString().Trim() + "'").ToList();
 
                         if (strlogId[0].LogID == "")
                         {
@@ -299,6 +105,25 @@ namespace HDFCMSILWebMVC.Controllers
         }
 
         [HttpPost]
+        public IActionResult UpdateLogoutTime()
+        {
+            using (var db = new Entities.DatabaseContext())
+            {
+                var sessionToken = HttpContext.Session.GetString("SessionToken");
+                
+                    var validTokenlist = db.Set<MSIL_LoginLogout>().FromSqlRaw("select MSIL_LogoutDatetime,logID,SessionID,IsActive,IPAddress from MSIL_LoginLogout where User_Id='" + UserSession.LoginID + "' order by CONVERT(int, logID) desc").ToList();
+                    var validToken = validTokenlist[0].SessionID;
+                    if (sessionToken != validToken)
+                    {
+
+                    return RedirectToAction("HomePage", "Login");
+
+                }
+                
+            }
+            return Ok();
+        }
+        [HttpPost]
         public IActionResult LoginPage(user_mst_temp LoginViewModel)
         {
             try
@@ -313,7 +138,8 @@ namespace HDFCMSILWebMVC.Controllers
                         var recIsactive = db.user_mst_tempDB.Where(a => a.User_Id == LoginViewModel.User_Name && a.IsActive == "1").FirstOrDefault();
                         if (recIsactive != null)
                         {
-
+                            sessionToken = Guid.NewGuid().ToString();
+                            HttpContext.Session.SetString("SessionToken", sessionToken);
                             HttpContext.Session.SetString("UserName", LoginViewModel.User_Name);
                             HttpContext.Session.SetString("LoginID", rec.User_Id.ToString());
                             UserSession.LoginID = rec.User_Id.ToString();
@@ -363,50 +189,80 @@ namespace HDFCMSILWebMVC.Controllers
 
 
                             //// comment validateLDAP if on UAT, otherwise check LDAP
-                            //if (ValidateLDAP(LoginViewModel.User_Name, LoginViewModel.Password) == true)
-                            //{
+                            ////////if (ValidateLDAP(LoginViewModel.User_Name, LoginViewModel.Password) == true)
+                            ////////{
 
-                                // Dormancy Check\
-                                int isdormant = DaysCheck(rec);
+                            // Dormancy Check\
+                            int isdormant = DaysCheck(rec);
 
 
-                                _logger.LogInformation("Ldap Successfull" + LoginViewModel.User_Name);
-                                if (isdormant == 0)
+                            _logger.LogInformation("Ldap Successfull" + LoginViewModel.User_Name);
+                            if (isdormant == 0)
+                            {
+
+                                //if (rec.LoginType == "SERVER")
+                                //{
+                                //    ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
+
+                                //    return RedirectToAction("HomePage", "Server");
+                                //}
+                                //else if (rec.LoginType == "TRADE OPS")
+                                //{
+                                //    return RedirectToAction("Trade_OPSHomePage", "Login");
+                                //}
+                                //else if (rec.LoginType == "CASH OPS")
+                                //{
+                                //    return RedirectToAction("Cash_OPSHomePage", "Login");
+                                //}
+                                //else if (rec.LoginType == "CASH_Trade OPS")
+                                //{
+                                //    return RedirectToAction("Cash_TradeHomePage", "Login");
+                                //}
+                                //else
+                                //{
+
+                                var strlogId = db.Set<MSIL_LoginLogout>().FromSqlRaw("select MSIL_LogoutDatetime,logID,SessionID,IsActive,IPAddress from MSIL_LoginLogout where User_Id='" + recIsactive.User_Name.ToString() + "' order by CONVERT(int, logID) desc").ToList();
+                                string curdatestr = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt");
+
+                                if (strlogId[0].MSIL_LogoutDatetime is null || string.IsNullOrWhiteSpace(strlogId[0].MSIL_LogoutDatetime.ToString()))
+                                {
+                                    TempData["alertMessageDormant"] = $"User {recIsactive.User_Name} is already logged in.";
+                                    ViewBag.ShowConfirmLogout = true;
+                                    ViewBag.LoginStatus = -1;
+
+                                }
+                                else
                                 {
 
-                                    //if (rec.LoginType == "SERVER")
-                                    //{
-                                    //    ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
+                                    db.Database.ExecuteSqlRaw("update USER_Mst_Temp set LastLogin='" + curdatestr + "' ,[EmpType]='EXISTING' where User_Id='" + recIsactive.User_Name + "'");
+                                    db.Database.ExecuteSqlRaw("update UserHistory set LastLogin='" + curdatestr + "' where User_Id='" + recIsactive.User_Name + "'");
 
-                                    //    return RedirectToAction("HomePage", "Server");
-                                    //}
-                                    //else if (rec.LoginType == "TRADE OPS")
-                                    //{
-                                    //    return RedirectToAction("Trade_OPSHomePage", "Login");
-                                    //}
-                                    //else if (rec.LoginType == "CASH OPS")
-                                    //{
-                                    //    return RedirectToAction("Cash_OPSHomePage", "Login");
-                                    //}
-                                    //else if (rec.LoginType == "CASH_Trade OPS")
-                                    //{
-                                    //    return RedirectToAction("Cash_TradeHomePage", "Login");
-                                    //}
-                                    //else
-                                    //{
-                                    LoginLogDB("", "", "LOGIN", UserSession.LoginID.ToString());
+                                    LoginLogDB("", "", "LOGIN", UserSession.LoginID.ToString(), sessionToken, "1");
+                                    // 2. Create user claims
+                                    var claims = new List<Claim>
+                                        {
+                                                new Claim(ClaimTypes.Name, UserSession.LoginID),
+                                                new Claim(ClaimTypes.NameIdentifier, UserSession.LoginID),
+                                                new Claim(ClaimTypes.Role, "Admin")
+                                        };
+                                   
+                                    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                                    var principal = new ClaimsPrincipal(identity);
+                                    HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
                                     ViewBag.DownloadInvoice = User.IsInRole("False"); // or any other condition
                                     return RedirectToAction("HomePage", "Login");
                                     //}
                                 }
-                                else
-                                { ViewBag.LoginStatus = -1; }
-                            //}
-                            //else
-                            //{
-                            //    _logger.LogInformation("Ldap Fail" + "User" + LoginViewModel.User_Name + "Password" + LoginViewModel.Password + LoginViewModel.User_Name);
-                            //}
+                            }
+                            else
+                            { ViewBag.LoginStatus = -1; }
+                            ////////}
+                            ////////else
+                            ////////{
+                            ////////    _logger.LogInformation("Ldap Fail" + "User" + LoginViewModel.User_Name + "Password" + LoginViewModel.Password + LoginViewModel.User_Name);
+                            ////////}
                         }
+
                         else
                         {
                             ViewBag.LoginStatus = -1;
@@ -442,8 +298,6 @@ namespace HDFCMSILWebMVC.Controllers
         {
             DataTable dtGetUserDetails = new DataTable();
             int ISDormant = 0;
-            //string strDays;
-
             try
             {
                 using (var db = new Entities.DatabaseContext())
@@ -826,7 +680,7 @@ namespace HDFCMSILWebMVC.Controllers
                 //string UAMPath = HttpContext.Session.GetString("UAMPath");
                 //string filename = Path.GetFileNameWithoutExtension(UAMPath);
                 //Process[] processes = Process.GetProcessesByName(filename);
-                LoginLogDB("", "", "LOGOUT", UserSession.LoginID.ToString());
+                LoginLogDB("", "", "LOGOUT", UserSession.LoginID.ToString(), sessionToken, "0");
                 //if (processes.Length > 0)
                 //{
                 //    foreach (var process in processes)
@@ -1368,4 +1222,5 @@ namespace HDFCMSILWebMVC.Controllers
         //}
 
     }
+
 }

@@ -770,54 +770,7 @@ namespace HDFCMSILWebMVC.Controllers
 
             }
         }
-        //public static DataTable ImportExceltoDatabase(string strFilePath, string connString)
-        //{
-
-        //    OleDbConnection oledbConn = new OleDbConnection(connString);
-        //    DataTable dt = new DataTable();
-        //    try
-        //    {
-        //        if (oledbConn.State == ConnectionState.Closed)
-        //        {
-        //            oledbConn.Open();
-        //        }
-        //        else
-        //        {
-        //            oledbConn.Close();
-        //            oledbConn.Open();
-        //        }
-        //        //_logger.LogInformation("Connection open Successfully" + "   - Methods");
-        //        using (OleDbCommand cmd = new OleDbCommand("SELECT * FROM [Sheet1$]", oledbConn))
-        //        {
-        //            OleDbDataAdapter oleda = new OleDbDataAdapter();
-        //            oleda.SelectCommand = cmd;
-        //            DataSet ds = new DataSet();
-        //            oleda.Fill(ds);
-
-        //            dt = ds.Tables[0];
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        dt.Rows.Add("Error" + ex.Message);
-        //        //_logger.LogError(ex.Message + "   - Methods");
-        //        //return null;
-        //    }
-        //    finally
-        //    {
-        //        oledbConn.Close();
-        //    }
-
-
-        //    return dt;
-        //    //oledbConn.Close();
-        //}
-
-
-
-
+       
 
     }
 }
