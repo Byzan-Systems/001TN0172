@@ -28,7 +28,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowFTPayment()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -38,7 +38,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult UploadPayment(IFormFile upload)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
 

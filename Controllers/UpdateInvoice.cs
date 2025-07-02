@@ -25,7 +25,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult UpdateInvoices()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -35,7 +35,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowInvoices(DownloadinvFrmDeta DInvDa)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 if (DInvDa == null)
@@ -124,7 +124,7 @@ namespace HDFCMSILWebMVC.Controllers
         public ActionResult Update(IList<DownloadFillInvoice> DInvDa, string TradeRefNo, string[] IsSelect)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 XLWorkbook wb = new XLWorkbook();
@@ -174,7 +174,7 @@ namespace HDFCMSILWebMVC.Controllers
                                     Unsuccesscnt += 1;
                                     msg = "Duplicate record Found In Invoice Received Table Invoice -" + dtFilterData.Rows[0]["Invoice_Number"].ToString().Trim();
                                     _logger.LogError("Duplicate record Found In Invoice Received Table Invoice -" + dtFilterData.Rows[0]["Invoice_Number"].ToString().Trim() + " - UploadReceivedInvoiceDataController;UploadDetails");
-                                    //ChkFlag = false;
+                  //                  ChkFlag = false;
                                     goto Phy_Inv_Not_Rec;
                                 }
                                 else //'3

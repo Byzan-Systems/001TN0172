@@ -12,6 +12,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.SignalR;
+using NPOI.SS.UserModel;
+using NPOI.HSSF.UserModel;
+using NPOI.XSSF.UserModel;
+
 namespace HDFCMSILWebMVC.Controllers
 {
     public class UploadReceivedInvoiceDataController : Controller
@@ -28,17 +32,321 @@ namespace HDFCMSILWebMVC.Controllers
         [Obsolete]
         public UploadReceivedInvoiceDataController(DataService dataService, IWebHostEnvironment hostingEnvironment, ILogger<UploadReceivedInvoiceDataController> logger, IExcelService excelService, IHubContext<UploadProgressHub> hubContext)
         {
+
             _hostingEnvironment = hostingEnvironment;
             _logger = logger;
             _excelService = excelService;
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             _hubContext = hubContext;
         }
-
-
         [HttpPost]
         [Obsolete]
         public async Task<IActionResult> UploadDetails(IFormFile txtFile)
+        {
+
+            var sessionId = HttpContext.Session.Id;
+            TempData["alertMessage"] = "";
+            TempData["successMessage"] = "";
+            TempData["alertMessage"] = "";
+
+            var validationErrors = new List<string>();
+            //var processingMessages = new List<string>(); // List to store processing messages
+            if (txtFile == null || txtFile.Length == 0)
+            {
+                TempData["alertMessage"] = "No file selected for upload.";
+                return RedirectToAction("ViewUploadReceivedInvoiceData");
+            }
+
+            string filePath = Path.Combine(_hostingEnvironment.WebRootPath, "Files", txtFile.FileName);
+
+            try
+            {
+                if (System.IO.File.Exists(filePath))
+                {
+                    System.IO.File.Delete(filePath);
+                }
+
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    var file = HttpContext.Request.Form.Files[0];
+                    await file.CopyToAsync(fileStream);
+                    await fileStream.FlushAsync();
+                }
+                // Initial processing progress
+                int progress = 10;
+                _uploadProgress[sessionId] = progress;
+                await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
+
+
+                System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+                //DataTable dataTable = await _excelService.ReadExcelToDataTableAsync(filePath);
+
+                IWorkbook workbook;
+                using (FileStream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    if (Path.GetExtension(filePath).ToLower() == ".xls")
+                    {
+                        workbook = new HSSFWorkbook(fileStream); // for .xls files
+                    }
+                    else if (Path.GetExtension(filePath).ToLower() == ".xlsx")
+                    {
+                        workbook = new XSSFWorkbook(fileStream); // for .xlsx files
+                    }
+                    else
+                    {
+                        throw new Exception("Invalid file extension");
+                    }
+                }
+
+                ISheet sheet = workbook.GetSheetAt(0); // Get the first sheet
+
+                if (sheet == null)
+                {
+                    throw new Exception("No sheets found in the Excel file.");
+                }
+
+                // Loop through the first row and add columns to DataTable
+                IRow headerRow = sheet.GetRow(0);
+                int cellCount = headerRow.LastCellNum;
+
+                //for (int i = 0; i < cellCount; i++)
+                //{
+                //    dataTable.Columns.Add(headerRow.GetCell(i).ToString());
+                //}
+
+                progress = 20;
+                _uploadProgress[sessionId] = progress;
+                await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
+                int fileId = await _excelService.InsertFileDescAsync(txtFile.FileName, "IR", DateTime.Now.ToString("dd/MM/yyyy"), sheet.LastRowNum, "2");
+                _logger.LogError($"File ID " + fileId + " created ");
+
+                // File reading progress
+
+                // File description insertion progress
+                progress = 30;
+                int FailureCount = 0;
+                _uploadProgress[sessionId] = progress;
+                await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
+                // Populate DataTable with data from Excel rows
+                for (int i = (sheet.FirstRowNum + 1); i <= sheet.LastRowNum; i++)
+                {
+                    var formatter = new DataFormatter();
+                    IRow row = sheet.GetRow(i);
+                    string SrNo = GetSafeCellValue(row, 0);
+                    string InvoiceNumber = GetSafeCellValue(row, 1);
+                    string InvoiceAmount = GetSafeCellValue(row, 2);
+                    string Currency = GetSafeCellValue(row, 3);
+                    string VehicleId = GetSafeCellValue(row, 4);
+                    string DueDate = GetSafeCellValue(row, 5);
+                    string DealerName = GetSafeCellValue(row, 6);
+                    string DealerAddress1 = GetSafeCellValue(row, 7);
+                    string DealerCity = GetSafeCellValue(row, 8);
+                    string TransporterName = GetSafeCellValue(row, 9);
+                    string TransportNumber = GetSafeCellValue(row, 10);
+                    string TransportDate = GetSafeCellValue(row, 11);
+                    string DealerCode = GetSafeCellValue(row, 12);
+                    string TransporterCode = GetSafeCellValue(row, 13);
+                    string DealerAddress2 = GetSafeCellValue(row, 14);
+                    string DealerAddress3 = GetSafeCellValue(row, 15);
+                    string DealerAddress4 = GetSafeCellValue(row, 16);
+                    string TradeRefNo = GetSafeCellValue(row, 17);
+                    string PhysicalReceivedDate = GetSafeCellValue(row, 18);
+                    string Remarks = GetSafeCellValue(row, 19);
+
+                    bool isValid = true; 
+                    // Validate TradeRefNo
+                    if (!string.IsNullOrWhiteSpace(TradeRefNo))
+                    {
+                        var tradeRefNo = TradeRefNo.Trim();
+
+                        if (tradeRefNo.Length > 4)
+                        {
+                            if (tradeRefNo.Length != 16)
+                            {
+                                validationErrors.Add($"Trade Reference Number length should be 16 for Invoice {InvoiceNumber}.");
+                                _logger.LogError($"Trade Reference Number length should be sixteen for Invoice {InvoiceNumber}.");
+                                isValid = false;
+                            }
+
+                            if (!tradeRefNo.StartsWith("027BC53", StringComparison.OrdinalIgnoreCase))
+                            {
+                                validationErrors.Add($"Trade Reference Number is not valid for Invoice {InvoiceNumber}.");
+                                _logger.LogError($"Trade Reference Number is not valid for Invoice {InvoiceNumber}.");
+                                isValid = false;
+                            }
+
+                            var query = "Select * from Invoice where Invoice_Number='" + InvoiceNumber.ToString().Trim() + "' and TradeOp_Selected_Invoice_Flag = 1";
+                            DataTable dtInvoice = _dataService.GetDataTable(query);
+
+                            if (dtInvoice.Rows.Count > 0)
+                            {
+                                var query1 = "select * from Invoice_Received where { fn ucase(Invoice_Number)}='" + InvoiceNumber.ToString().Trim() + "'";
+                                DataTable dtInvoiceRec = _dataService.GetDataTable(query1);
+
+                                if (dtInvoiceRec.Rows.Count > 0)
+                                {
+                                    validationErrors.Add($"Duplicate Invoice Number {InvoiceNumber} found in Invoice Receive table- UploadReceivedInvoiceDataController;UploadDetails");
+                                    _logger.LogError($"Duplicate Invoice Number {InvoiceNumber} found in Invoice Receive table- UploadReceivedInvoiceDataController;UploadDetails");
+                                    isValid = false;
+                                }
+                                else
+                                {
+                                    DateTime phy_rec_Date = DateTime.ParseExact(PhysicalReceivedDate, "dd/MM/yyyy", null);
+
+                                    string query2 = @"UPDATE Invoice SET TradeopsFileID = @Search1,F7_MIS = 0,LoginID_TradeOps = @Search2,Invoice_Status = 'PHYSICAL INV REC',IMEX_DEAL_NUMBER = @Search3,StepDate = @Search4,Trade_OPs_Remarks = @Search5 WHERE Invoice_Number = @Search6";
+                                    if (HttpContext.Session.GetString("LoginID") != null)
+                                    { UserSession.LoginID = HttpContext.Session.GetString("LoginID"); }
+                                    var parameters = new[]
+                                {
+                                        new Microsoft.Data.SqlClient.SqlParameter("@Search1", fileId), new Microsoft.Data.SqlClient.SqlParameter("@Search2", UserSession.LoginID.ToString()),new Microsoft.Data.SqlClient.SqlParameter("@Search3", tradeRefNo),new Microsoft.Data.SqlClient.SqlParameter("@Search4", phy_rec_Date.ToString("yyyy-MM-dd").Trim()),new Microsoft.Data.SqlClient.SqlParameter("@Search5", Remarks),new Microsoft.Data.SqlClient.SqlParameter("@Search6", InvoiceNumber)
+                                    };
+                                    int rowsAffected = _dataService.ExecuteUpdateQuery(query2, parameters);
+                                    if (rowsAffected > 0)
+                                    {
+                                        //  validationErrors.Add($"Successfully updated InvoiceFCC_Details for Invoice Number {record.InvoiceNumber} - UploadReceivedInvoiceDataController;UploadDetails");
+                                        _logger.LogInformation($"Successfully updated InvoiceFCC_Details for Invoice Number {InvoiceNumber} - UploadReceivedInvoiceDataController;UploadDetails");
+                                    }
+                                    else
+                                    {
+                                        validationErrors.Add($"Error InvoiceFCC_Details update for Invoice Number {InvoiceNumber} - UploadReceivedInvoiceDataController;UploadDetails");
+                                        _logger.LogError($"Error InvoiceFCC_Details update for Invoice Number {InvoiceNumber} - UploadReceivedInvoiceDataController;UploadDetails");
+                                        isValid = false;
+                                    }
+                                    //if (string.IsNullOrEmpty(dtInvoice.Rows[0]["IMEX_DEAL_NUMBER"].ToString()))
+                                    //{
+                                    //    _logger.LogError($"Value of imex_deal_number not updated for InvoiceNo  {record.InvoiceNumber} - UploadReceivedInvoiceDataController;UploadDetails");
+
+                                    //}
+                                }
+                                //
+                                DataTable dtInvoice1 = _dataService.GetDataTable(query);
+                                if (string.IsNullOrEmpty(dtInvoice1.Rows[0]["IMEX_DEAL_NUMBER"].ToString()))
+                                {
+                                    validationErrors.Add($"Value of imex_deal_number=" + dtInvoice1.Rows[0]["IMEX_DEAL_NUMBER"].ToString() + "and StepDate =" + dtInvoice1.Rows[0]["stepdate"].ToString() + " not updated for InvoiceNo -" + InvoiceNumber + " - UploadReceivedInvoiceDataController;UploadDetails");
+                                    _logger.LogError("Value of imex_deal_number=" + dtInvoice1.Rows[0]["IMEX_DEAL_NUMBER"].ToString() + "and StepDate =" + dtInvoice1.Rows[0]["stepdate"].ToString() + " not updated for InvoiceNo -" + InvoiceNumber + " - UploadReceivedInvoiceDataController;UploadDetails");
+                                    isValid = false;
+                                }
+                            }
+                            else
+                            {
+                                validationErrors.Add($"Physical Invoice Data Not Received. Invoice number not found in Invoice table. Invoice Number: {InvoiceNumber} - UploadReceivedInvoiceDataController; UploadDetails");
+                                _logger.LogError("Physical Invoice Data Not Received. Invoice number not found in Invoice table. Invoice Number : " + InvoiceNumber + " - UploadReceivedInvoiceDataController;UploadDetails");
+
+                                isValid = false;
+                            }
+                        }
+                        else
+                        {
+                            validationErrors.Add($"Trade Reference Number length is more than 4 characters for Invoice {InvoiceNumber}.");
+                            _logger.LogError($"Trade Reference Number length is more than 4 characters for Invoice {InvoiceNumber}.");
+                            isValid = false;
+                        }
+                    }
+                    else
+                    {
+                        validationErrors.Add($"Trade Reference Number is required for Invoice Number {InvoiceNumber}.");
+                        _logger.LogError($"Trade Reference Number is required for Invoice Number {InvoiceNumber}.");
+                        isValid = false;
+
+                    }
+                    //
+                    if (isValid == true)
+                    {
+
+                        string[] detailsCash = new string[25];
+                        detailsCash[0] = "0";   //@Invoice_Rec_ID
+                        detailsCash[1] = SrNo; //Sr_No
+                        detailsCash[2] = InvoiceNumber; //Invoice_Number
+                        detailsCash[3] = InvoiceAmount; //Invoice_Amount
+                        detailsCash[4] = Currency; //Currency
+                        detailsCash[5] = VehicleId;   //Vehical_ID
+                        detailsCash[6] = DueDate;   //DueDate
+                        detailsCash[7] = DealerName;   //Dealer_Name
+                        detailsCash[8] = DealerAddress1;   //Dealer_Address1
+                        detailsCash[9] = DealerCity;   //Dealer_City
+                        detailsCash[10] = TransporterName;   //Transporter_Name
+                        detailsCash[11] = TransportNumber;   //Transport_Number
+                        detailsCash[12] = TransportDate;   //Transport_Date
+                        detailsCash[13] = DealerCode;   //Dealer_Code
+                        detailsCash[14] = TransporterCode;   //Transporter_Code
+                        detailsCash[15] = DealerAddress2;   //Dealer_Address2
+                        detailsCash[16] = DealerAddress3;   //Dealer_Address3
+                        detailsCash[17] = DealerAddress4;   //Dealer_Address4
+                        detailsCash[18] = TradeRefNo;   //Trade_RefNo
+                        detailsCash[19] = PhysicalReceivedDate;   //Physical_Received_Date
+                        detailsCash[20] = Remarks;   //Remarks
+                        detailsCash[21] = UserSession.LoginID;   //LoginID
+                        DataTable dsUpdate = Methods.Insert_InvoiceRecievedDetails("Save", detailsCash, _logger);
+                    }
+                    else
+                    {
+                        FailureCount = FailureCount + 1;
+                    }
+
+                    progress = 40 + (int)(((double)i / sheet.LastRowNum) * 40);
+                    _uploadProgress[sessionId] = progress;
+
+                    // Send progress update to SignalR hub
+                    await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, $" {progress}% ");
+                }
+                // Processing completed
+                progress = 80;
+                _uploadProgress[sessionId] = progress;
+                await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "");
+
+                _logger.LogInformation("FCC File Uploaded Successfully and Total Records :  " + sheet.LastRowNum);// + " and Data Succesfully Converted : " + cnt + " - UploadReceivedInvoiceDataController;UploadDetails");
+                TempData["alertMessage"] = "FCC File Uploaded Successfully and Total Records :  " + sheet.LastRowNum;
+
+                string str = UserSession.LoginID;
+                string query23 = @"UPDATE File_Desc SET FCC_Mail=@Search2 where FileID=@Search1";
+
+                var parameters1 = new[]
+                {
+                     new Microsoft.Data.SqlClient.SqlParameter("@Search2", "0"), new Microsoft.Data.SqlClient.SqlParameter("@Search1", fileId)
+                    };
+                int rowsAffected1 = _dataService.ExecuteUpdateQuery(query23, parameters1);
+                if (rowsAffected1 > 0)
+                    _logger.LogInformation("File_Desc Table updated successfully");
+                else
+                    _logger.LogInformation("There is some issue when updating File_Desc table. Query : " + query23);
+                if (FailureCount > 0)
+                {
+                    _logger.LogInformation("FCC File uploading Failed Due to some Discrepancies : Failure Record : -" + FailureCount);
+                    //  TempData["alertMessage"] = JsonConvert.SerializeObject(validationErrors);
+                    //TempData["alertMessage"] = null;
+                    TempData["alertMessage"] = "FCC File uploading Failed Due to some Discrepancies, Please check audit log: Failure Record : -" + FailureCount;
+
+                }
+                // Final completion progress
+                progress = 100;
+                _uploadProgress[sessionId] = progress;
+                await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "Upload process completed");
+            }
+            catch (Exception ex)
+            {
+                validationErrors.Add($"Error occurred while uploading invoice details.");
+                _logger.LogError(ex, "Error occurred while uploading invoice details.");
+                TempData["alertMessage"] = "An error occurred while processing the file.";
+            }
+            finally
+            {
+                _uploadProgress.Remove(sessionId);
+            }
+            return RedirectToAction("ViewUploadReceivedInvoiceData");
+
+        }
+        public static string GetSafeCellValue(IRow row, int columnIndex)
+        {
+            var cell = row.GetCell(columnIndex);
+            if (cell == null)
+                return string.Empty;
+
+            DataFormatter formatter = new DataFormatter();
+            return formatter.FormatCellValue(cell);
+        }
+        [HttpPost]
+        [Obsolete]
+        public async Task<IActionResult> UploadDetailsOld(IFormFile txtFile)
         {
 
             var sessionId = HttpContext.Session.Id;
@@ -91,7 +399,7 @@ namespace HDFCMSILWebMVC.Controllers
                 int srNo = dataTable.Rows.Count;
                 string fccMail = "2"; // Example value
                 int fileId = await _excelService.InsertFileDescAsync(fileName, fileType, fileDate, srNo, fccMail);
-                _logger.LogError($"File ID "+fileId +" created ");
+                _logger.LogError($"File ID " + fileId + " created ");
                 // File description insertion progress
                 progress = 30;
                 _uploadProgress[sessionId] = progress;
@@ -184,8 +492,8 @@ namespace HDFCMSILWebMVC.Controllers
                                     string query2 = @"UPDATE Invoice SET TradeopsFileID = @Search1,F7_MIS = 0,LoginID_TradeOps = @Search2,Invoice_Status = 'PHYSICAL INV REC',IMEX_DEAL_NUMBER = @Search3,StepDate = @Search4,Trade_OPs_Remarks = @Search5 WHERE Invoice_Number = @Search6";
                                     if (HttpContext.Session.GetString("LoginID") != null)
                                     { UserSession.LoginID = HttpContext.Session.GetString("LoginID"); }
-                                        var parameters = new[]
-                                    {
+                                    var parameters = new[]
+                                {
                                         new Microsoft.Data.SqlClient.SqlParameter("@Search1", fileId), new Microsoft.Data.SqlClient.SqlParameter("@Search2", UserSession.LoginID.ToString()),new Microsoft.Data.SqlClient.SqlParameter("@Search3", tradeRefNo),new Microsoft.Data.SqlClient.SqlParameter("@Search4", phy_rec_Date.ToString("yyyy-MM-dd").Trim()),new Microsoft.Data.SqlClient.SqlParameter("@Search5", record.Remarks),new Microsoft.Data.SqlClient.SqlParameter("@Search6", record.InvoiceNumber)
                                     };
                                     int rowsAffected = _dataService.ExecuteUpdateQuery(query2, parameters);

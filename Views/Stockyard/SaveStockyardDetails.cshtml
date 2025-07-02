@@ -1,0 +1,168 @@
+﻿
+@model HDFCMSILWebMVC.Models.ShowStockyardMaster
+@{
+    ViewBag.Title = "UserMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<div class="content-wrapper">
+    @*<div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">User Master</h1>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Stockyard Master</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            @using (Html.BeginForm("StockyardDetails", "Stockyard", FormMethod.Post))
+            {
+                if (TempData["alertMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissable">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true"> × </button>
+                        @TempData["alertMessage"].ToString()
+                    </div>
+                }
+
+                @*<form>*@
+
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group" hidden="hidden">
+                            <label>ID</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group" hidden="hidden">
+                            @Html.TextBoxFor(m => m.ID, "0", new { @class = "form-control" })
+                            @*<input type="text" class="form-control" placeholder="Enter Your User Name ...">*@
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label> Name</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @*<input type="password" class="form-control" placeholder="Enter Your Password ...">*@
+                            @Html.TextBoxFor(m => m.Name, new { @placeholder = "Enter Name ...", id = "Name", @class = "form-control"  , @maxlength=50 })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Code</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Code, new { @placeholder = "Enter Code ...", id = "Code", @class = "form-control" , @maxlength=10})
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Do Number</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DO_Number, new { @placeholder = "Enter Do Number ...", id = "Do_Number", @class = "form-control" , @maxlength=10 })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label>Email</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Email, new { @placeholder = "Enter Email ...", id = "Email", @class = "form-control" , @maxlength=200 })
+                        </div>
+                    </div>
+                </div>
+                <form method="post" asp-controller="Financer">
+
+                    <div class="row">
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-app bg-success" value="Save" asp-action="SaveStockyardDetails" asp-route-Task="save" onclick=" return validateForm()"><i class="fas fa-save"></i>Save</button>
+                                <button type="submit" class="btn btn-app bg-danger" value="Save" asp-action="ShowStockyard"><i class="fas fa-arrow-alt-circle-left"></i>Back</button>
+                                @*<a class="btn btn-danger" asp-action="Index">Back</a>*@
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                @*</form>*@
+            }
+
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+    <script>
+        function validateForm() {
+            var Name = document.getElementById("Name").value;
+            var Code = document.getElementById("Code").value;
+            var Do_Number = document.getElementById("Do_Number").value;
+            var Email = document.getElementById("Email").value;
+
+
+            if (Name == "" || Name == null) {
+                alert("Please Enter Name.");
+                return false;
+            }
+            if (Code == "" || Code == null) {
+                alert("Please Enter Code.");
+                return false;
+            }
+            if (Do_Number == "" || Do_Number == null) {
+                alert("Please Enter Do Number.");
+                return false;
+            }
+            if (Email == "" || Email == null) {
+                alert("Please Enter Email.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>
+
+

@@ -27,7 +27,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowMISLiquidationDetailInvoice()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -37,7 +37,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowTableMISLiquidationDetailInvoice(ShowMISLiquidationDetailInvoice misliq)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View(GetCustomerList(misliq.StartDate.ToString(), misliq.EndtDate.ToString()));
@@ -74,7 +74,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ExportExcel()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try
@@ -91,9 +91,7 @@ namespace HDFCMSILWebMVC.Controllers
                             _logger.LogInformation("Data exported successfully" + " - MISLiquidationDetailInvoiceController;ExportExcel");
                             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "MIS Liquidation-DetailInvoice.xlsx");
                         }
-                    }
-
-                    
+                    }                   
                 }
                 catch (Exception ex)
                 {

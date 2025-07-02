@@ -24,10 +24,12 @@ namespace HDFCMSILWebMVC.Controllers
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
         public Boolean genrpt = false;
+       
         public PendingReportController(ILogger<PendingReportController> logger, IConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
+           
         }
 
         
@@ -39,19 +41,18 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowPendingReport()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
-            }
-            
+            }            
         }
 
         [HttpPost]
         public IActionResult ShowPendingReport(ShowPending_Report shopend)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 genrpt = false;
@@ -59,11 +60,8 @@ namespace HDFCMSILWebMVC.Controllers
                 var stream1 = new MemoryStream();
                 string OutFileName = String.Empty;
                 string FileLastPart = String.Empty;
-
-
                 try
                 {
-
                     String strTempFolder = String.Empty;
                     if (shopend.ReportType == null || shopend.ReportType == "" || shopend.ReportType == "0")
                     {
@@ -91,7 +89,6 @@ namespace HDFCMSILWebMVC.Controllers
                                 OutFileName = "INVOICE_LEVEL_DATA." + FileLastPart + ".Csv";
                                 using (var sw = new StreamWriter(stream: stream1, encoding: new UTF8Encoding(true)))
                                 {
-
                                     sw.WriteLine("Invoice No;Invoice Amount;Physically Receipt Date;Trade Reference No;Order Updation Status;Delivery Order No;Payment Status;Payment Receipt Mode;Payment Receipt Date;Payment Reference No;Dealer Code;Dealer Name;Location");
 
                                     foreach (var rec in Inv)

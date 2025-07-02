@@ -20,7 +20,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowPhysicalReceived()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -30,7 +30,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Update()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try
@@ -48,6 +48,33 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     _logger.LogError(ex.ToString() + " - PhysicalReceivedController;Update");
                 }
+                return RedirectToAction("ShowPhysicalReceived", "PhysicalReceived");
+            }
+        }
+        public IActionResult StopPhysicalRecieved()
+        {
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("Logout", "Login"); }
+            else
+            {
+                try
+                {
+                    using (var db = new Entities.DatabaseContext())
+                    {
+                        db.Database.ExecuteSqlRaw("update Phy_Reports set PhyFlag=0");
+                        db.SaveChanges();
+                        var message = "Physical Invoice Stop Successfully.";
+                        TempData["alertMessage"] = message;
+                    }
+
+                    _logger.LogInformation("Executed successfully" + " - PhysicalReceivedController;StopPhysicalRecieved");
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString() + " - PhysicalReceivedController;StopPhysicalRecieved");
+                }
+
                 return RedirectToAction("ShowPhysicalReceived", "PhysicalReceived");
             }
         }

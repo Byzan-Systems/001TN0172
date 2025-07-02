@@ -36,7 +36,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowCancelationInvoiceAndDO()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -49,7 +49,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Show(ShowCancelationInvoiceAndDO DInvDa)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 //  DataTable dt = new DataTable();
@@ -162,7 +162,10 @@ namespace HDFCMSILWebMVC.Controllers
 
         public IActionResult RecordsDeleteCancelDOandRetainInvoices(string[] IsSelect)
         {
-            
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("Logout", "Login"); }
+            else
+            {
                 try
                 {
                     var DetailsList = inv.ToList();
@@ -216,16 +219,16 @@ namespace HDFCMSILWebMVC.Controllers
 
                                 var stuffToRemove = inv.SingleOrDefault(s => s.DO_number == row["DO_Number"].ToString());
 
-                                if (stuffToRemove !=null )
-                                {                                
+                                if (stuffToRemove != null)
+                                {
                                     if (stuffToRemove.DO_number != "")
                                     {
                                         inv.Remove(stuffToRemove);
                                     }
                                     TempData["alertMessage"] = "Deleted record has been sent for authorization";
                                     _logger.LogInformation("Record has been Deleted successfully");
-                                }                               
-                               
+                                }
+
                             }
                         }
 
@@ -235,15 +238,18 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     _logger.LogError(ex.ToString() + " - RecordsDeleteCancelDOandRetainInvoices");
                 }
-            
-
-            return View("ShowCancellationInvDORetain",inv);
+                return View("ShowCancellationInvDORetain", inv);
+            }
         }
 
 
         public IActionResult RecordDeleteShowCancelInvoicesonly(string[] IsSelect)
         {
-            
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("Logout", "Login"); }
+            else
+            {
+
                 try
                 {
                     var DetailsList = inv1.ToList();
@@ -296,7 +302,7 @@ namespace HDFCMSILWebMVC.Controllers
                                 }
 
 
-                               
+
                             }
                         }
                     }
@@ -307,13 +313,17 @@ namespace HDFCMSILWebMVC.Controllers
                     _logger.LogError(ex.ToString() + " - RecordDeleteShowCancelInvoicesonly");
                 }
 
-            
-            return View("ShowCancelInvoicesonly",inv1);
+
+                return View("ShowCancelInvoicesonly", inv1);
+            }
         }
 
         public IActionResult RecordDeleteShowCancelOrdernumberandInvoices(string[] IsSelect)
         {
-            
+            if (HttpContext.Session.GetString("LoginID") == null)
+            { return RedirectToAction("Logout", "Login"); }
+            else
+            {
                 try
                 {
                     var DetailsList = inv2.ToList();
@@ -344,7 +354,7 @@ namespace HDFCMSILWebMVC.Controllers
                             }
                             else
                             {
-                               var ordinv = db.Set<Order_Invoice_Order_DesForCanfrm>().FromSqlRaw("SELECT Order_Inv_Number,DO_Number FROM Order_Invoice INNER JOIN Order_Desc ON Order_Invoice.Order_ID = Order_Desc.Order_ID WHERE (Order_Invoice.Order_Inv_Status = 'Found') and order_desc.DO_Number='" + row.ItemArray[3].ToString() + "'").ToList();
+                                var ordinv = db.Set<Order_Invoice_Order_DesForCanfrm>().FromSqlRaw("SELECT Order_Inv_Number,DO_Number FROM Order_Invoice INNER JOIN Order_Desc ON Order_Invoice.Order_ID = Order_Desc.Order_ID WHERE (Order_Invoice.Order_Inv_Status = 'Found') and order_desc.DO_Number='" + row.ItemArray[3].ToString() + "'").ToList();
                                 if (ordinv.Count > 0) /////Correction 19-12-2023
                                 {
 
@@ -379,7 +389,7 @@ namespace HDFCMSILWebMVC.Controllers
                                     db.Database.ExecuteSqlRaw("Update invoice_cancel_desc set Cancelled_Flag=1 where DO_Number='" + row.ItemArray[3].ToString() + "'");
                                     db.SaveChanges();
 
-                                  
+
 
                                     var stuffToRemove = inv2.SingleOrDefault(s => s.Invoice_Number == row["Invoice_Number"].ToString());
 
@@ -406,10 +416,8 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     _logger.LogError(ex.ToString() + " - RecordDeleteShowCancelOrdernumberandInvoices");
                 }
-
-            
-
-            return View("ShowCancelOrdernumberandInvoices",inv2);
+                return View("ShowCancelOrdernumberandInvoices", inv2);
+            }
         }
     }
 

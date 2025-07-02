@@ -45,7 +45,7 @@ namespace HDFCMSILWebMVC.Models
         [Display(Name = "Dealer Address4")]
         public string Dealer_Address4 { get; set; }
         [Display(Name = "IMEX Number")]
-        public string? IMEX_DEAL_NUMBER { get; set; }
+        public string IMEX_DEAL_NUMBER { get; set; }
         [Display(Name = "Invoice Date")]
         public string TradeOp_Selected_Invoice_Date { get; set; }
         [Display(Name = "Trade OPs Remark")]

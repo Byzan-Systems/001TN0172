@@ -19,7 +19,33 @@ namespace HDFCMSILWebMVC.Models
         public int? Login_Enable { get; set; }
 
     }
- 
+    [Table("user_mst_temp")]
+    public class user_mst_temp
+    {
+        public string User_Id { get; set; }
+        public string User_Name { get; set; }
+        public string Password { get; set; }
+        public int? Role { get; set; }
+        public string IsActive { get; set; }
+        public string Maker_Checker { get; set; }
+        public string Status { get; set; }
+        public string Reason { get; set; }
+        public string LastLogin { get; set; }
+        public int? Attempts { get; set; }
+        public string LogoutTime { get; set; }
+        public string DepartmentCode { get; set; }
+        public string DepartmentName { get; set; }
+        public string BranchCode { get; set; }
+        public string BranchName { get; set; }
+        public string UserType { get; set; }
+        public string RoleName { get; set; }
+        public string EmpType { get; set; }
+        public string Remark { get; set; }
+        public DateTime? MSIL_LogoutTime { get; set; }
+       
+
+        
+    }
 
     public class RegisterNew
     {
@@ -63,16 +89,32 @@ namespace HDFCMSILWebMVC.Models
         public int? Login_Enable { get; set; }
     }
 
-    [Table("UAM_LoginLogout")]
-    public class UAM_LoginLogout
+    [Table("MSIL_LoginLogout")]
+    public class MSIL_LoginLogout
     {
         [Key]
+
         public string LogID { get; set; }
-        public string User_id { get; set; }
-        public string LoginDate_Time { get; set; }
-        public string LogoutDate_Time { get; set; }
-
-
+        public string MSIL_LogoutDatetime { get; set; }
+        public string SessionID { get; set; }
+        public string IsActive { get; set; }
+        public string IPAddress { get; set; }
     }
+   
+    public class MSIL_LoginLogoutID
+    {
+        [Key]
+
+        public string LogID { get; set; }
+    }
+    public class BrowserCloseModel
+    {
+        public string isclick { get; set; }
+    }
+    public class UAM_LoginLogoutExist
+    {
+        public string MSIL_LogoutDatetime { get; set; }
+        public string LogID { get; set; }
+}
 
 }

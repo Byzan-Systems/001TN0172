@@ -35,7 +35,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -45,7 +45,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult TallyBookingFCC()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -55,7 +55,7 @@ namespace HDFCMSILWebMVC.Controllers
         public ActionResult TallyBookingFCC_Show(TallyBookingFCC Fcc)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try
@@ -91,7 +91,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ExportExcel()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 try

@@ -34,7 +34,7 @@ namespace HDFCMSILWebMVC.Controllers
                 //clserr.WriteLogToTxtFile("Insert values in Payment Upload table", "CashOps_Payments", strFileName);
                 //clserr.WriteLogToTxtFile("VA_account =" + Details[8].Substring(0, 22) + " and UTR Number =" + Details[11], "CashOps_Payments", strFileName);
                 DataTable dtCash = Methods.Insert_PaymentUploadDetails("Save", Details, logger);
-                if (dtCash == null)
+                if (dtCash != null)
                 {
                     if (Details[2].ToUpper() == "C")
                     {
@@ -444,6 +444,47 @@ namespace HDFCMSILWebMVC.Controllers
                 return null;
             }
         }
+        public static string EncryptDecryptData(string Task, string PlainText, string @InputEncryptedData, ILogger logger)
+        {
+            try
+            {
+                DataTable dataTable = new DataTable();
+                //using var cmd = db.LoginMSTs.FromSqlRaw($"SP_FTPayment");
+                using (var db = new Entities.DatabaseContext())
+                {
+
+                    DbConnection connection = db.Database.GetDbConnection();
+                    using var cmd = db.Database.GetDbConnection().CreateCommand();
+                    DbProviderFactory dbFactory = DbProviderFactories.GetFactory(connection);
+                    cmd.CommandText = "EncryptDecryptData";
+
+                    //common
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    if (cmd.Connection.State != ConnectionState.Open) cmd.Connection.Open();
+                    cmd.Parameters.Add(new SqlParameter("@Task", SqlDbType.VarChar) { Value = Task });
+                    cmd.Parameters.Add(new SqlParameter("@PlainText", SqlDbType.VarChar) { Value = PlainText });
+                    cmd.Parameters.Add(new SqlParameter("@InputEncryptedData", SqlDbType.VarChar) { Value = InputEncryptedData });
+                    //cmd.ExecuteReader();  
+                    var result = cmd.ExecuteScalar();
+                    cmd.Connection.Close();
+                    return result.ToString();
+                    //using (DbDataAdapter adapter = dbFactory.CreateDataAdapter())
+                    //{
+                    //    adapter.SelectCommand = cmd;
+                    //    adapter.Fill(dataTable);
+                    //}
+
+                    
+                    //return dataTable;
+                }
+            }
+            catch (Exception EX)
+            {
+                //log enhance by chaitrali 3/7/2024
+                logger.LogError(EX.Message + " For Task: " + Task + "" + " and AccountNo: " + PlainText+" or " +InputEncryptedData + " ; EncryptDecryptData"); return null;
+            }
+        }
+
         public static DataTable getDetails(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7, ILogger logger)
         {
             try
@@ -729,54 +770,7 @@ namespace HDFCMSILWebMVC.Controllers
 
             }
         }
-        //public static DataTable ImportExceltoDatabase(string strFilePath, string connString)
-        //{
-
-        //    OleDbConnection oledbConn = new OleDbConnection(connString);
-        //    DataTable dt = new DataTable();
-        //    try
-        //    {
-        //        if (oledbConn.State == ConnectionState.Closed)
-        //        {
-        //            oledbConn.Open();
-        //        }
-        //        else
-        //        {
-        //            oledbConn.Close();
-        //            oledbConn.Open();
-        //        }
-        //        //_logger.LogInformation("Connection open Successfully" + "   - Methods");
-        //        using (OleDbCommand cmd = new OleDbCommand("SELECT * FROM [Sheet1$]", oledbConn))
-        //        {
-        //            OleDbDataAdapter oleda = new OleDbDataAdapter();
-        //            oleda.SelectCommand = cmd;
-        //            DataSet ds = new DataSet();
-        //            oleda.Fill(ds);
-
-        //            dt = ds.Tables[0];
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //        dt.Rows.Add("Error" + ex.Message);
-        //        //_logger.LogError(ex.Message + "   - Methods");
-        //        //return null;
-        //    }
-        //    finally
-        //    {
-        //        oledbConn.Close();
-        //    }
-
-
-        //    return dt;
-        //    //oledbConn.Close();
-        //}
-
-
-
-
+       
 
     }
 }

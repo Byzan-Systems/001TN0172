@@ -37,7 +37,7 @@ namespace HDFCMSILWebMVC.Controllers
         {
 
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 ViewBag.Count = 0;
@@ -51,7 +51,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult UploadPayment(IFormFile upload, int Count, [FromServices] IWebHostEnvironment hostingEnvironment)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                // string connString;
@@ -390,8 +390,6 @@ namespace HDFCMSILWebMVC.Controllers
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Rectify");
             }
         }
-
-
         public Boolean RejectPaymentFile(DataTable dt)
         {
             try

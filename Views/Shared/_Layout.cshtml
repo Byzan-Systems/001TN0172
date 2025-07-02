@@ -5,28 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - HDFC MSIL Application </title>
-    <!-- Google Font: Source Sans Pro -->
+
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    @* <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">*@
-    <!-- Ionicons -->
+
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-    <!-- Tempusdominus Bootstrap 4 -->
-    @*  <link rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">*@
-    <!-- iCheck -->
-    @*  <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">*@
-    <!-- JQVMap -->
-    @* <link rel="stylesheet" href="plugins/jqvmap/jqvmap.min.css">*@
-    <!-- Theme style -->
-    @* <link rel="stylesheet" href="dist/css/adminlte.min.css">*@
-    <!-- overlayScrollbars -->
-    @*<link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">*@
-    <!-- Daterange picker -->
-    @*<link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">*@
-    <!-- summernote -->
-    @* <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">*@
+ 
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed" onclick="clicked=true;">
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -84,10 +69,16 @@
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
+                                @*<li class="nav-item">
+                                        <a href="@Url.Action("Index", "Login")" class="nav-link">
+                                            <i class="fas fa-user-plus nav-icon"></i>
+                                            <p>User Master</p>
+                                        </a>
+                                    </li>*@
                                 <li class="nav-item">
-                                    <a href="@Url.Action("Index", "Login")" class="nav-link">
-                                        <i class="fas fa-user-plus nav-icon"></i>
-                                        <p>User Master</p>
+                                    <a href="@Url.Action("ShowPhysicalReceived", "PhysicalReceived")" class="nav-link">
+                                        <i class="fas fa-file nav-icon"></i>
+                                        <p>Physical Received</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -96,6 +87,12 @@
                                         <p>Financer Master</p>
                                     </a>
                                 </li>
+                                @*<li class="nav-item">
+                                        <a href="@Url.Action( "ShowStockyard","Stockyard")" class="nav-link">
+                                            <i class="fas fa-user-plus nav-icon"></i>
+                                            <p>Stockyard Master</p>
+                                        </a>
+                                    </li>*@
                                 <li class="nav-item">
                                     <a href="@Url.Action("ShowAccountDetails", "AccountDetails")" class="nav-link">
                                         <i class="fas fa-audio-description nav-icon"></i>
@@ -114,12 +111,7 @@
                                         <p>EOD Process</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="@Url.Action("ShowPhysicalReceived", "PhysicalReceived")" class="nav-link">
-                                        <i class="fas fa-file nav-icon"></i>
-                                        <p>Physical Received</p>
-                                    </a>
-                                </li>
+
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -307,6 +299,18 @@
         <!-- /.control-sidebar -->
     </div>
 
-    @RenderSection("Scripts", required: false)
+
+    @*@RenderSection("Scripts", required: false)
+    <script>
+        window.addEventListener("beforeunload", function () {
+            navigator.sendBeacon("/Login/UpdateLogoutTime");
+        });
+    </script>*@
+
+    @*<script>
+        setInterval(() => {
+            fetch('/session/ping', { method: 'POST' });
+        }, 30000); // every 30 seconds
+    </script>*@
 </body>
 </html>

@@ -20,17 +20,17 @@
             var ele = document.getElementsByName('IsSelect');
             var count = 0;
             for (var i = 0; i < ele.length; i++) {
-                if (ele[i].disabled  == false) {
+                if (ele[i].disabled == false) {
                     if (ele[i].type == 'checkbox') {
                         ele[i].checked = true;
                         count = count + 1;
                     }
                 }
-            }            
+            }
             if (count == 0) {
                 alert("No Data found to Select.");
                 return false;
-            }            
+            }
             countCheckboxes();
         }
         function deSelect() {
@@ -116,16 +116,16 @@
                 <div class="row">
                     @*<div class="col-sm-2">
 
-        </div>
-        <div class="col-sm-2">
+                        </div>
+                        <div class="col-sm-2">
 
-        </div>
-        <div class="col-sm-2">
+                        </div>
+                        <div class="col-sm-2">
 
-        </div>
-        <div class="col-sm-2">
+                        </div>
+                        <div class="col-sm-2">
 
-        </div>*@
+                        </div>*@
                     <div class="col-sm-2">
                         <label id="count" class="control-label">Selected Count : 0</label>
                     </div>
@@ -140,7 +140,7 @@
 
                     </div>
                     @*<div class="col-sm-2">
-        </div>*@
+                        </div>*@
                     <div class="col-sm-4">
                         <a class="btn btn-primary" onclick='selects()'>Select All</a>
                         <a class="btn btn-primary" onclick='deSelect()'>De-Select All</a>
@@ -233,20 +233,20 @@
                                     @* Below is for if imex no is blank then only this is visible*@
                                     @*@if (item.IMEX_DEAL_NUMBER == null || item.IMEX_DEAL_NUMBER.Length == 0)*@
                                     <!--{-->
-                                        @*@Html.CheckBoxFor(modelItem => item.IsSelect)*@
-                                        <!--<input data-val="true" data-val-required="The isActive field is required." id="IsSelect" name="IsSelect" type="checkbox" value="@item.Invoice_Number" onclick="countCheckboxes()" />
+                                    @*@Html.CheckBoxFor(modelItem => item.IsSelect)*@
+                                    <!--<input data-val="true" data-val-required="The isActive field is required." id="IsSelect" name="IsSelect" type="checkbox" value="@item.Invoice_Number" onclick="countCheckboxes()" />
                                         <input name="IsSelect" type="hidden" value="false" />
                                     }-->
                                     @*else
-                                    {
-                                        <input data-val="true" data-val-required="The isActive field is required." id="IsSelect" name="IsSelect" type="checkbox" disabled="disabled" value="@item.Invoice_Number" onclick="countCheckboxes()" />
-                                    }*@ 
+                                        {
+                                            <input data-val="true" data-val-required="The isActive field is required." id="IsSelect" name="IsSelect" type="checkbox" disabled="disabled" value="@item.Invoice_Number" onclick="countCheckboxes()" />
+                                        }*@
 
 
 
                                     <input data-val="true" data-val-required="The isActive field is required." id="IsSelect" name="IsSelect" type="checkbox" value="@item.Invoice_Number" onclick="countCheckboxes()" />
                                     @*<input type="checkbox" id="checkboxPrimary1" class="checkboxAlistados" style="width: 25px; height: 25px" value="@item.IsSelect">
-        <label for="checkboxPrimary1"> </label>*@
+                                        <label for="checkboxPrimary1"> </label>*@
 
 
 
@@ -348,7 +348,9 @@
 <!-- jQuery -->
 <script src="../../plugins/jquery/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
-<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+@*<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>*@
 <!-- AdminLTE App -->
 <script src="../../dist/js/adminlte.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="~/js/jquery.min.js"></script>
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>*@

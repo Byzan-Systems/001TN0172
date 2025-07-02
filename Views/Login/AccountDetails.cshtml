@@ -15,38 +15,7 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
 </head>
-@*<script type="text/javascript">
-    $(document).ready(function () {
-        $("#ProductList").change(function () {
-            $.ajax({
-                url: '@Url.Action("FillModel", "Login")',
-                type: 'POST',
-                dataType: 'json',
-                data: { clientID: $("#ProductList").val() },
-                contentType: 'application/json; charset=utf-8',
-                success: function (data) {
-                    if (data.success) {
-                        // fill the product code
-                        $("#DR_Account_No").val(data.ProductCode);
-                    }
-                    else {
-                        // show a message in a alert or div
-                        alert('This Product ID is not valid. Try again!');
-                    }
-                }
-            });
-        });
-    });
 
-
-</script>
-<script>
-    function callChangefunc(val) {
-        window.location.href = "/Login/FillModel?Value=" + val;
-    }
-</script>*@
-
- @*window.location.href = "/Login/FillModel?Payment_Type=" + val;*@
 <div class="content-wrapper">
 
     <div class="card card-warning">

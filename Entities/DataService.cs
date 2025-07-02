@@ -32,7 +32,7 @@ namespace HDFCMSILWebMVC.Entities
                     dataAdapter.Fill(dataTable);
                 }
             }
-            catch (Exception)
+            catch (Exception )
             {
 
             }

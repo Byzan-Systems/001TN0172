@@ -33,7 +33,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowAuthorisation()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 return View();
@@ -43,7 +43,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult ShowTableAuthorisation(ShowAuthoriz shAuth)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
 
@@ -97,7 +97,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult DeleteCancel_DORetain_Invoices(IList<AuthorizInvDORetainInv> DInvDa, string[] IsSelect)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 XLWorkbook wb = new XLWorkbook();
@@ -163,42 +163,6 @@ namespace HDFCMSILWebMVC.Controllers
                         return View("ShowTableAuthorisation", AuthorizDORetainList);
                     }
 
-                    //DataTable DT = dtFilterData.Copy();
-                    //DataTable dtIncremented = new DataTable();
-                    //DataColumn dc = new DataColumn("Sr.No");
-                    //dc.AutoIncrement = true;
-                    //dc.AutoIncrementSeed = 1;
-                    //dc.AutoIncrementStep = 1;
-                    //dc.DataType = typeof(Int32);
-                    //dtIncremented.Columns.Add(dc);
-
-                    //dtIncremented.BeginLoadData();
-
-                    //DataTableReader dtReader = new DataTableReader(DT);
-                    //dtIncremented.Load(dtReader);
-
-                    //dtIncremented.EndLoadData();
-                    //dtIncremented.Columns.RemoveAt(1);
-                    //dtIncremented.Columns["DO_number"].ColumnName = "DO Number";
-                    //dtIncremented.Columns["Do_Date"].ColumnName = "DO Date";
-                    //dtIncremented.Columns["Dealer_Code"].ColumnName = "Dealer Code";
-                    //dtIncremented.Columns["Dealer_Destination_Code"].ColumnName = "Dealer Destination Code";
-                    //dtIncremented.Columns["Dealer_Outlet_Code"].ColumnName = "Dealer Outlet Code";
-                    //dtIncremented.Columns["Order_Amount"].ColumnName = "Order Amount";
-                    //dtIncremented.Columns["DONumber"].ColumnName = "DO Number";
-
-                    //dtIncremented.TableName = "Sheet1";
-                    //using (wb)
-                    //{
-                    //    wb.Worksheets.Add(dtIncremented);
-                    //    using (MemoryStream stream = new MemoryStream())
-                    //    {
-                    //        wb.SaveAs(stream);
-
-                    //        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Authorize.xlsx");
-                    //    }
-
-                    //}
                 }
                 catch (Exception ex)
                 { _logger.LogInformation(ex.Message); return View(); }
@@ -207,21 +171,6 @@ namespace HDFCMSILWebMVC.Controllers
                     wb.Dispose();
 
                 }
-
-
-                //var DetailsList = AuthorizDORetainList.ToList();
-                //DataTable Details = DetailsList.ToDataTable();
-                //Details.TableName = "Sheet1";
-                //using (XLWorkbook wb = new XLWorkbook())
-                //{
-                //    wb.Worksheets.Add(Details);
-                //    using (MemoryStream stream = new MemoryStream())
-                //    {
-                //        wb.SaveAs(stream);
-                //        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Authorize.xlsx");
-                //    }
-                //}
-
                 //return View();
             }
             
@@ -229,7 +178,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult DeleteCancel_InvoicesOnly(IList<AuthorizInvDORetainInv> DInvDa, string[] IsSelect)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 XLWorkbook wb = new XLWorkbook();
@@ -297,14 +246,13 @@ namespace HDFCMSILWebMVC.Controllers
                     wb.Dispose();
 
                 }
-                //return View();
             }
             
         }
         public IActionResult DeleteCancel_OrderNumber_Invoices(string[] IsSelect)
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
 

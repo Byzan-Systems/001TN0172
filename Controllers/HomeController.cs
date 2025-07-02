@@ -22,7 +22,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Index()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 _logger.LogInformation("The main page has been accessed");
@@ -33,7 +33,7 @@ namespace HDFCMSILWebMVC.Controllers
         public IActionResult Privacy()
         {
             if (HttpContext.Session.GetString("LoginID") == null)
-            { return RedirectToAction("LoginPage", "Login"); }
+            { return RedirectToAction("Logout", "Login"); }
             else
             {
                 _logger.LogInformation("The privacy page has been accessed");
@@ -46,5 +46,7 @@ namespace HDFCMSILWebMVC.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+       
+       
     }
 }

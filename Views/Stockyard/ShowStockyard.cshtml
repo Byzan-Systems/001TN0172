@@ -1,0 +1,167 @@
+﻿@model IEnumerable<HDFCMSILWebMVC.Models.ShowStockyardMaster>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    Pager pager = new Pager();
+
+    int pageNo = 0;
+
+    if (ViewBag.Pager != null)
+    {
+        pager = ViewBag.Pager;
+        pageNo = pager.CurrentPage;
+    }
+}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../../plugins/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="../../plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="../../dist/css/adminlte.min.css">
+</head>
+<div class="content-wrapper">
+
+
+    <!-- general form elements disabled -->
+    <div class="card card-warning">
+        <div class="card-header">
+            <h1 class="card-title">Stockyard Master</h1>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <h1>Stockyard List</h1>
+
+            <p style="text-align:right;margin-right:20px;">
+                <a class="btn btn-primary" asp-action="CreateStockyardDetails">Create New</a>
+            </p>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.ID)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Name)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Code)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.DO_Number)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Email)
+                            </th>
+                            <th></th>
+                            <th>Edit Action</th>
+                            <th>Details Action</th>
+                            @*<th>Delete Action</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ID)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Code)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DO_Number)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td></td>
+                                <td class="text-center">
+                                    <a asp-action="UpdateStockyardDetails" class="btn btn-primary" asp-route-ID="@item.ID">Edit</a>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="StockyardDisplay" class="btn btn-info" asp-route-ID="@item.ID">Details</a>
+                                </td>
+                                @*<td class="text-center">
+                            <a asp-action="Delete" class="btn btn-danger" asp-route-LoginID="@item.ID">Delete</a>
+                        </td>*@
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <br>
+                <br>
+
+                <div class="container">
+
+
+
+
+                    @if (pager.TotalPages > 0)
+                    {
+                        <ul class="pagination justify-content-end">
+
+                            @if (pager.CurrentPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("ShowStockyard", new { pg = 1 })"> First </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("ShowStockyard", new { pg = @pager.CurrentPage -1 })"> Previous </a>
+                                </li>
+                            }
+
+                            @for (var pge = pager.StartPage; pge <= pager.EndPage; pge++)
+                            {
+                                <li class="page-item @(pge == pager.CurrentPage? "active" : "")">
+                                    @*<a class="page-link" asp-controller="ListOfEmployee" asp-action="ListofEmployee" asp-route-pg="@pge"> @pge </a>*@
+
+                                    <a class="page-link" href="@Url.Action("ShowStockyard", new { pg = @pge })">@pge</a>
+                                </li>
+                            }
+
+
+
+                            @if (pager.CurrentPage < pager.TotalPages)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("ShowStockyard", new { pg = @pager.CurrentPage + 1 })"> Next </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("ShowStockyard", new { pg = @pager.TotalPages })"> Last </a>
+                                </li>
+                            }
+                        </ul>
+
+                    }
+
+
+
+                </div>
+
+
+            </div>
+        
+
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+</div>
+<!-- jQuery -->
+<script src="../../plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="../../plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="../../dist/js/adminlte.min.js"></script>

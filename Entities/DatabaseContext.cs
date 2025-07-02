@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HDFCMSILWebMVC.Entities
@@ -16,7 +18,46 @@ namespace HDFCMSILWebMVC.Entities
         {
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
             var configuration = builder.Build();
-            optionsBuilder.UseSqlServer(configuration["connectionStrings:DefaultConnection"]);
+            string[] splitedpass = configuration["connectionStrings:DefaultConnection"].ToString().Split(";");
+            string exactpass = splitedpass[3].Remove(0, 9);           
+           var DecryptedPassword= Decrypted(exactpass);
+            DecryptedPassword = configuration["connectionStrings:DefaultConnection"].ToString().Replace(exactpass, DecryptedPassword);
+            optionsBuilder.UseSqlServer(DecryptedPassword);
+        }
+        protected string Decrypted(string input)
+        {
+            try
+            {
+                string EncryptionKey = "MySuperSecureKeyHDFC_MSIL@123456"; // 32 chars = 256-bit
+                byte[] key = Encoding.UTF8.GetBytes(EncryptionKey);
+
+                if (key.Length != 16 && key.Length != 24 && key.Length != 32)
+                    throw new Exception("Key must be 16, 24, or 32 bytes.");
+
+                byte[] cipherTextBytes = Convert.FromBase64String(input);
+
+                using (Aes aes = Aes.Create())
+                {
+                    aes.Key = key;
+                    aes.IV = new byte[16]; // Must match the IV used in encryption
+                    aes.Mode = CipherMode.CBC;
+                    aes.Padding = PaddingMode.PKCS7;
+
+                    using (MemoryStream ms = new MemoryStream(cipherTextBytes))
+                    using (ICryptoTransform decryptor = aes.CreateDecryptor())
+                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+                    using (StreamReader sr = new StreamReader(cs))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //"Encrypted Input value is not in proper value. Please enter proper encrypted input."
+                Console.WriteLine("Decryption error: " + ex.Message);
+                return null;
+            }
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,6 +67,10 @@ namespace HDFCMSILWebMVC.Entities
             modelBuilder.Entity<ShowFinancerMaster>().HasNoKey();
             modelBuilder.Entity<FinancerMaster>().HasNoKey();
             modelBuilder.Entity<FinancerModel>().HasNoKey();
+            modelBuilder.Entity<StockyardModel>().HasNoKey();
+            modelBuilder.Entity<ShowStockyardMaster>().HasNoKey();
+            modelBuilder.Entity<StockyardMaster>().HasNoKey();
+
             modelBuilder.Entity<DetailsUserMaster>().HasNoKey();
             modelBuilder.Entity<showAddMISControlPoint>().HasNoKey();
             modelBuilder.Entity<DownloadFillInvoice>().HasNoKey();
@@ -63,7 +108,7 @@ namespace HDFCMSILWebMVC.Entities
             modelBuilder.Entity<PendingRet_DOAndInvoiceCancellationReport>().HasNoKey();
             modelBuilder.Entity<PendingRet_InvoiceCancellationReport>().HasNoKey();
             modelBuilder.Entity<Gefu>().HasNoKey();
-     
+
 
             modelBuilder.Entity<Order_Des>().HasNoKey();
 
@@ -81,67 +126,51 @@ namespace HDFCMSILWebMVC.Entities
             modelBuilder.Entity<OrderDetails>().HasNoKey();
             modelBuilder.Entity<CashOPSDetails>().HasNoKey();
             modelBuilder.Entity<PaymentDetails>().HasNoKey();
+            modelBuilder.Entity<MSIL_LoginLogout>().HasNoKey();
+            modelBuilder.Entity<MSIL_LoginLogoutID>().HasNoKey();
+            modelBuilder.Entity<UAM_LoginLogoutExist>().HasNoKey();
+            modelBuilder.Entity<user_mst_temp>().HasNoKey();
         }
         public DbSet<LoginMST> LoginMSTs { get; set; }
-
+        public DbSet<user_mst_temp> user_mst_tempDB { get; set; }
         public DbSet<FinancerModel> FinancerMST { get; set; }
+        public DbSet<StockyardModel> StockyardMST { get; set; }
         public DbSet<RegisterNew> RegisterNews { get; set; }
         public DbSet<UserMaster> UserMasters { get; set; }
         public DbSet<ShowUserMaster> ShowUserMasters { get; set; }
         public DbSet<DownloadFillInvoice> DownloadFillInvoices { get; set; }
         public DbSet<DetailsUserMaster> DetailsUserMasters { get; set; }
         public DbSet<showAddMISControlPoint> showAddMISControlPoints { get; set; }
-
         public DbSet<AddMISControlPoint_INVDate> AddMISControlPoint_INVDates { get; set; }
         public DbSet<AddMISControlPoint_PHyInvRec> AddMISControlPoint_PHyInvRecs { get; set; }
         public DbSet<AddMISControlPoint_Order_Rec> AddMISControlPoint_Order_Recs { get; set; }
         public DbSet<AddMISControlPoint_Payment_Recev> AddMISControlPoint_Payment_Recevs { get; set; }
-
         public DbSet<AccountDetails> Account_Details { get; set; }
-
         public DbSet<MISLiquidation> MISLiquidations { get; set; }
-
         public DbSet<ShowMISLiquidation> ShowMISLiquidations { get; set; }
-
         public DbSet<ShowMISLiquidationDetailInvoice> ShowMISLiquidationDetailInvoices { get; set; }
-
         public DbSet<ShowPaymentReportSelect> ShowPaymentReports { get; set; }
-
         public DbSet<ShowPending_Report> ShowPending_Reports { get; set; }
-
         public DbSet<ControlDOLiquidation> ControlDOLiquidations { get; set; }
         public DbSet<DBAccountDetails> DBAccountDetailss { get; set; }
-
         public DbSet<TallyBookingFCC> TallyBookingFCCs { get; set; }
-
         public DbSet<TallyBookingFCCData> TallyBookingFCCDatas { get; set; }
-
         public DbSet<ShowTradeRefNo> ShowTradeRefNo { get; set; }
         public DbSet<TradeRefNo> TradeRefNos { get; set; }
-
         public DbSet<MISLiquidationDetailInvoice> MISLiquidationDetailInvoices { get; set; }
-
         public DbSet<AuthorizInvDORetainInv> AuthorizInvDORetainInvs { get; set; }
-
         public DbSet<AuthorizoderNoInv> AuthorizoderNoInvs { get; set; }
-
         public DbSet<AuthorizInvoicesonly> AuthorizInvoicesonlys { get; set; }
-
         public DbSet<ShowCashOps_Upload> ShowCashOps_Uploads { get; set; }
-
         public DbSet<PendingRet_InvoiceLevel> pendingRet_InvoiceLevels { get; set; }
         public DbSet<PendingRet_PendingOrder> PendingRet_PendingOrders { get; set; }
         public DbSet<PendingRet_PendingPayment> PendingRet_PendingPayments { get; set; }
         public DbSet<PendingRet_FinancerName> PendingRet_FinancerNames { get; set; }
         public DbSet<PendingRet_NONFinancerName> PendingRet_NONFinancerNames { get; set; }
         public DbSet<PendingRet_BothFinancerName> PendingRet_BothFinancerNames { get; set; }
-
         public DbSet<PendingRet_DO_CancellationAndRetainInvoiceReport> PendingRet_DO_CancellationAndRetainInvoiceReports { get; set; }
-
         public DbSet<PendingRet_DOAndInvoiceCancellationReport> PendingRet_DOAndInvoiceCancellationReports { get; set; }
-
         public DbSet<PendingRet_InvoiceCancellationReport> PendingRet_InvoiceCancellationReports { get; set; }
-
         public DbSet<Gefu> Gefus { get; set; }
 
         public DbSet<Order_Des> Order_Dess { get; set; }
@@ -162,6 +191,23 @@ namespace HDFCMSILWebMVC.Entities
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<CashOPSDetails> CashOPSDetails { get; set; }
         public DbSet<PaymentDetails> PaymentDetails { get; set; }
-
+        public DbSet<MSIL_LoginLogout> MSIL_LoginLogout { get; set; }
+        public DbSet<MSIL_LoginLogoutID> MSIL_LoginLogoutID { get; set; }
     }
+    //    public class DatabaseContextUAM : DbContext
+    //    {
+    //        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //        {
+    //            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json");
+    //            var configuration = builder.Build();
+    //            optionsBuilder.UseSqlServer(configuration["ConnectionStringsUAM:DefaultConnection"]);
+    //        }
+    //        protected override void OnModelCreating(ModelBuilder modelBuilder)
+    //        {      
+    //            modelBuilder.Entity<UAM_LoginLogout>().HasNoKey();
+    //            modelBuilder.Entity<UAM_LoginLogoutExist>().HasNoKey();
+    //        }
+    //         public DbSet<UAM_LoginLogout> UAM_LoginLogout { get; set; }
+
+    //    }
 }
