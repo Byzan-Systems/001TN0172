@@ -71,6 +71,7 @@
     <PackageReference Include="Novell.Directory.Ldap" Version="2.2.1" />
     <PackageReference Include="NPOI" Version="2.6.0" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="2.1.10" />
     <PackageReference Include="Spire.XLS" Version="13.9.1" />
     <PackageReference Include="System.Data.OleDb" Version="6.0.0" />
     <PackageReference Include="System.DirectoryServices" Version="8.0.0" />
