@@ -55,18 +55,21 @@ namespace HDFCMSILWebMVC.Controllers
                     // string cmd;
                     using (var db = new Entities.DatabaseContext())
                     {
-                        var strlogId = db.Set<MSIL_LoginLogoutID>().FromSqlRaw("select Convert(varchar,max(Convert(int, logId)))LogID from MSIL_LoginLogout").ToList();
+                        //var strlogId = db.Set<MSIL_LoginLogoutID>().FromSqlRaw("select Convert(varchar,max(Convert(int, logId)))LogID from MSIL_LoginLogout").ToList();
 
-                        if (strlogId[0].LogID == "" || strlogId[0].LogID == null)
-                        {
-                            strId = 0.ToString();
-                        }
-                        else
-                        {
-                            strId = strlogId[0].LogID;
-                        }
-                        strId = (int.Parse(strId) + 1).ToString();
-                        db.Database.ExecuteSqlRaw("insert into MSIL_LoginLogout (logId, User_id, LoginDate_Time,SessionID,IsActive) values('" + strId + "','" + FrmUserID.ToString() + "','" + D1 + "','" + SessionID + "','" + IsActive + "' ) ");
+                        //if (strlogId[0].LogID == "" || strlogId[0].LogID == null)
+                        //{
+                        //    strId = 0.ToString();
+                        //}
+                        //else
+                        //{
+                        //    strId = strlogId[0].LogID;
+                        //}
+                        //strId = (int.Parse(strId) + 1).ToString();
+                        DataTable DTFile = Methods.InsertDetailsAudit("Insert_MSIL_LoginLogout",FrmUserID.ToString(),D1,SessionID ,IsActive, "", "", "", _logger);
+
+
+                      //  db.Database.ExecuteSqlRaw("insert into MSIL_LoginLogout (logId, User_id, LoginDate_Time,SessionID,IsActive) values('" + strId + "','" + FrmUserID.ToString() + "','" + D1 + "','" + SessionID + "','" + IsActive + "' ) ");
                     }
                 }
                 if (Type == "LOGOUT")
@@ -76,21 +79,28 @@ namespace HDFCMSILWebMVC.Controllers
                     // string cmd;
                     using (var db = new Entities.DatabaseContext())
                     {
-                        var strlogId = db.Set<MSIL_LoginLogoutID>().FromSqlRaw("select (Convert(varchar, max(Convert(int, LogID)))) LogID from MSIL_LoginLogout where User_id='" + FrmUserID.ToString().Trim() + "'").ToList();
-
-                        if (strlogId[0].LogID == "")
+                        DataTable dt = Methods.getDetailsAudit("Get_LoginDB", FrmUserID.ToString().Trim(), "", "", "", "", "", "", _logger);
+                        if (dt.Rows.Count == 0)
                         {
                             strId = 0.ToString();
                         }
                         else
                         {
-                            strId = strlogId[0].LogID;
+                            strId = dt.Rows[0][0].ToString();
                         }
-                        db.Database.ExecuteSqlRaw("update USER_Mst_Temp set MSIL_LogoutTime='" + D1 + "'  where User_id='" + FrmUserID.ToString().Trim() + "' ");
-                        db.Database.ExecuteSqlRaw("update UserHistory set MSIL_LogoutTime='" + D1 + "'  where User_id='" + FrmUserID.ToString().Trim() + "'");
+                        //var strlogId = db.Set<MSIL_LoginLogoutID>().FromSqlRaw("select (Convert(varchar, max(Convert(int, LogID)))) LogID from MSIL_LoginLogout where User_id='" + FrmUserID.ToString().Trim() + "'").ToList();
 
-                        db.Database.ExecuteSqlRaw("update MSIL_LoginLogout set MSIL_LogoutDatetime='" + D1 + "'  where User_id='" + FrmUserID.ToString().Trim() + "' and LogID='" + strId + "'");
-                    }
+                        //if (strlogId[0].LogID == "")
+                        //{
+                        //    strId = 0.ToString();
+                        //}
+                        //else
+                        //{
+                        //    strId = strlogId[0].LogID;
+                        //}
+                        DataTable dt_Up = Methods.UpdateDetailsAudit("Update_Logout", D1, FrmUserID.ToString().Trim(), strId, "", "", "","",_logger);
+
+                }
                 }
             }
 
@@ -184,7 +194,7 @@ namespace HDFCMSILWebMVC.Controllers
                             HttpContext.Session.SetString("Password", configuration.GetSection("EmailSetting:Password").Value);
                             HttpContext.Session.SetString("SysEmail_FromID", configuration.GetSection("SystemSetting:Pwd").Value);
                             HttpContext.Session.SetString("PWD", configuration.GetSection("SystemSetting:Pwd").Value);
-                            _logger.LogInformation("The MSIL application login : User Name - " + LoginViewModel.User_Name);
+                            _logger.LogInformation("The MSIL application login: User Name - {UserName}", LoginViewModel.User_Name);
 
 
                             //// comment validateLDAP if on UAT, otherwise check LDAP
@@ -193,9 +203,7 @@ namespace HDFCMSILWebMVC.Controllers
 
                             // Dormancy Check\
                             int isdormant = DaysCheck(rec);
-
-
-                            _logger.LogInformation("Ldap Successfull" + LoginViewModel.User_Name);
+                            _logger.LogInformation("LDAP login successful for user {UserName}", LoginViewModel.User_Name);
                             if (isdormant == 0)
                             {
 

@@ -485,6 +485,49 @@ namespace HDFCMSILWebMVC.Controllers
             }
         }
 
+        public static DataTable getDetailsAudit(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7, ILogger logger)
+        {
+            try
+            {
+                DataTable dataTable = new DataTable();
+                //using var cmd = db.LoginMSTs.FromSqlRaw($"SP_FTPayment");
+                using (var db = new Entities.DatabaseContext())
+                {
+
+                    DbConnection connection = db.Database.GetDbConnection();
+                    using var cmd = db.Database.GetDbConnection().CreateCommand();
+                    DbProviderFactory dbFactory = DbProviderFactories.GetFactory(connection);
+                    cmd.CommandText = "SP_GetDetails_Audit";
+
+                    //common
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    if (cmd.Connection.State != ConnectionState.Open) cmd.Connection.Open();
+                    cmd.Parameters.Add(new SqlParameter("@Task", SqlDbType.VarChar) { Value = Task });
+                    cmd.Parameters.Add(new SqlParameter("@Search1", SqlDbType.VarChar) { Value = Search1 });
+                    cmd.Parameters.Add(new SqlParameter("@Search2", SqlDbType.VarChar) { Value = Search2 });
+                    cmd.Parameters.Add(new SqlParameter("@Search3", SqlDbType.VarChar) { Value = Search3 });
+                    cmd.Parameters.Add(new SqlParameter("@Search4", SqlDbType.VarChar) { Value = Search4 });
+                    cmd.Parameters.Add(new SqlParameter("@Search5", SqlDbType.VarChar) { Value = Search5 });
+                    cmd.Parameters.Add(new SqlParameter("@Search6", SqlDbType.VarChar) { Value = Search6 });
+                    cmd.Parameters.Add(new SqlParameter("@Search7", SqlDbType.VarChar) { Value = Search7 });
+                    //cmd.ExecuteReader();  
+                    using (DbDataAdapter adapter = dbFactory.CreateDataAdapter())
+                    {
+                        adapter.SelectCommand = cmd;
+                        adapter.Fill(dataTable);
+                    }
+
+                    cmd.Connection.Close();
+                    return dataTable;
+                }
+            }
+            catch (Exception EX)
+            {
+                //log enhance by chaitrali 3/7/2025
+                logger.LogError(EX.Message , "getDetailsAudit"); return null;
+            }
+        }
+
         public static DataTable getDetails(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7, ILogger logger)
         {
             try
@@ -570,7 +613,51 @@ namespace HDFCMSILWebMVC.Controllers
                 return null;
             }
         }
-        public static DataTable UpdateDetails(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7,ILogger logger)
+
+        public static DataTable InsertDetailsAudit(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7, ILogger logger)
+        {
+            try
+            {
+                DataTable dataTable = new DataTable();
+                //using var cmd = db.LoginMSTs.FromSqlRaw($"SP_FTPayment");
+                using (var db = new Entities.DatabaseContext())
+                {
+
+                    DbConnection connection = db.Database.GetDbConnection();
+                    using var cmd = db.Database.GetDbConnection().CreateCommand();
+                    DbProviderFactory dbFactory = DbProviderFactories.GetFactory(connection);
+                    cmd.CommandText = "SP_InsertDetails_Audit";
+
+                    //common
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    if (cmd.Connection.State != ConnectionState.Open) cmd.Connection.Open();
+                    cmd.Parameters.Add(new SqlParameter("@Task", SqlDbType.VarChar) { Value = Task });
+                    cmd.Parameters.Add(new SqlParameter("@Search1", SqlDbType.VarChar) { Value = Search1 });
+                    cmd.Parameters.Add(new SqlParameter("@Search2", SqlDbType.VarChar) { Value = Search2 });
+                    cmd.Parameters.Add(new SqlParameter("@Search3", SqlDbType.VarChar) { Value = Search3 });
+                    cmd.Parameters.Add(new SqlParameter("@Search4", SqlDbType.VarChar) { Value = Search4 });
+                    cmd.Parameters.Add(new SqlParameter("@Search5", SqlDbType.VarChar) { Value = Search5 });
+                    cmd.Parameters.Add(new SqlParameter("@Search6", SqlDbType.VarChar) { Value = Search6 });
+                    cmd.Parameters.Add(new SqlParameter("@Search7", SqlDbType.VarChar) { Value = Search7 });
+                    //cmd.ExecuteReader();  
+                    using (DbDataAdapter adapter = dbFactory.CreateDataAdapter())
+                    {
+                        adapter.SelectCommand = cmd;
+                        adapter.Fill(dataTable);
+                    }
+
+                    cmd.Connection.Close();
+                    return dataTable;
+                }
+            }
+            catch (Exception EX)
+            {
+                //log enhance by chaitrali 3/7/2024
+                logger.LogError(EX.Message + " For Task: " + Task + "" + " and FileName: " + Search1 + " ; InsertDetails");
+                return null;
+            }
+        }
+        public static DataTable UpdateDetails(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7, ILogger logger)
         {
             try
             {
@@ -582,6 +669,47 @@ namespace HDFCMSILWebMVC.Controllers
                     using var cmd = db.Database.GetDbConnection().CreateCommand();
                     DbProviderFactory dbFactory = DbProviderFactories.GetFactory(connection);
                     cmd.CommandText = "SP_UpdateDetails";
+
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    if (cmd.Connection.State != ConnectionState.Open) cmd.Connection.Open();
+                    cmd.Parameters.Add(new SqlParameter("@Task", SqlDbType.VarChar) { Value = Task });
+                    cmd.Parameters.Add(new SqlParameter("@Search1", SqlDbType.VarChar) { Value = Search1 });
+                    cmd.Parameters.Add(new SqlParameter("@Search2", SqlDbType.VarChar) { Value = Search2 });
+                    cmd.Parameters.Add(new SqlParameter("@Search3", SqlDbType.VarChar) { Value = Search3 });
+                    cmd.Parameters.Add(new SqlParameter("@Search4", SqlDbType.VarChar) { Value = Search4 });
+                    cmd.Parameters.Add(new SqlParameter("@Search5", SqlDbType.VarChar) { Value = Search5 });
+                    cmd.Parameters.Add(new SqlParameter("@Search6", SqlDbType.VarChar) { Value = Search6 });
+                    cmd.Parameters.Add(new SqlParameter("@Search7", SqlDbType.VarChar) { Value = Search7 });
+                    using (DbDataAdapter adapter = dbFactory.CreateDataAdapter())
+                    {
+                        adapter.SelectCommand = cmd;
+                        adapter.Fill(dataTable);
+                    }
+
+
+                    cmd.Connection.Close();
+                    return dataTable;
+                }
+            }
+            catch (Exception EX)
+            { //log enhance by chaitrali 3/7/2024
+                logger.LogError(EX.Message + " For Task: " + Task + "" + " and FileName or Cashops ID: " + Search1 + " ; UpdateDetails");
+                return null;
+            }
+        }
+
+        public static DataTable UpdateDetailsAudit(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7,ILogger logger)
+        {
+            try
+            {
+                DataTable dataTable = new DataTable();
+                using (var db = new Entities.DatabaseContext())
+                {
+
+                    DbConnection connection = db.Database.GetDbConnection();
+                    using var cmd = db.Database.GetDbConnection().CreateCommand();
+                    DbProviderFactory dbFactory = DbProviderFactories.GetFactory(connection);
+                    cmd.CommandText = "SP_UpdateDetailsAudit";
 
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (cmd.Connection.State != ConnectionState.Open) cmd.Connection.Open();

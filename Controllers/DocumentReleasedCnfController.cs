@@ -576,6 +576,11 @@ namespace HDFCMSILWebMVC.Controllers
             var filepath = AppDomain.CurrentDomain.BaseDirectory + "\\Document_Release" + "\\" + appPhysicalPath;
 
             var doc1 = new Document();
+            if (filepath.Contains("..") || filepath.Contains("/") || filepath.Contains("\\"))
+            {
+                HttpContext.Response.StatusCode = 400;               
+                return;
+            }
             var streamOBJ = new System.IO.FileStream(filepath, System.IO.FileMode.CreateNew);
             PdfWriter.GetInstance(doc1, streamOBJ);
             doc1.Open();
