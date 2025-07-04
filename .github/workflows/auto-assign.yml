@@ -1,0 +1,24 @@
+# .github/workflows/auto-assign-vuln.yml
+name: Auto‑assign Vulnerability Issues
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  auto-assign:
+    runs-on: windows-latest  # ✅ Use Windows runner
+
+    permissions:
+      issues: write  # Needed to assign issues
+
+    steps:
+      - name: Auto‑assign issue
+        uses: pozil/auto-assign-issue@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          assignees: BZN-CHAITRALI-KHALATE
+          label-to-assign: security
+          # Optional:
+          # numOfAssignee: 1
+          # allowSelfAssign: false
