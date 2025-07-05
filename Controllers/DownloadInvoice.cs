@@ -13,6 +13,8 @@ using System.Data;
 using MoreLinq;
 using System.Text;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Text.RegularExpressions;
+using System.Data.SqlClient;
 
 namespace HDFCMSILWebMVC.Controllers
 {
@@ -101,6 +103,7 @@ namespace HDFCMSILWebMVC.Controllers
                             _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = '" + Fromdate + "', @FromInvoiceDate = '" + Todate + "', @ReportType = '', @Flag = 2  - DownloadInvoice;Show");
 
                             inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='',@Flag=2").ToList();
+                              //inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = @ToDate, @FromInvoiceDate = @FromDate, @ReportType = '', @Flag = 2",new SqlParameter("@ToDate", Fromdate),new SqlParameter("@FromDate", Todate)).ToList();
                         }
                         //else if (DInvDa.ChkReporttype == true && DInvDa.ChkDate == true)
                         else if (DInvDa.ChkDate == true)
@@ -110,13 +113,13 @@ namespace HDFCMSILWebMVC.Controllers
                             if (Fromdate == null || Todate == null)
                             {
                                 TempData["alertMessage"] = "Please Select Valid Date";
-
                                 _logger.LogError("Please Select Valid Date");   //log enhance by chaitrali 4/7/2024
                                 return PartialView("Index");
                             }
                             if (DInvDa.RerportType == "With Trade Ref.No")
                             { //log enhance by chaitrali 4/7/2024
-                                _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=3 +  - DownloadInvoice;Show");
+                                //_logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=3 +  - DownloadInvoice;Show");
+                                _logger.LogError("DownloadInvoice failed. FromDate: {FromDate}, ToDate: {ToDate}, ReportType: {ReportType}", Sanitize(Fromdate), Sanitize(Todate), Sanitize(DInvDa.RerportType));
 
                                 inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=3").ToList();
                                 if (inv.Count == 0)
@@ -129,7 +132,8 @@ namespace HDFCMSILWebMVC.Controllers
                             else if (DInvDa.RerportType == "Without Trade Ref.No")
                             {
                                 //log enhance by chaitrali 4/7/2024
-                                _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=3 +  - DownloadInvoice;Show");
+                                _logger.LogError( "DownloadInvoice failed. FromDate: {FromDate}, ToDate: {ToDate}, ReportType: {ReportType}", Sanitize(Fromdate), Sanitize(Todate), Sanitize(DInvDa.RerportType));
+                                //_logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=3 +  - DownloadInvoice;Show");
 
                                 inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=3").ToList();
                                 if (inv.Count == 0)
@@ -147,7 +151,10 @@ namespace HDFCMSILWebMVC.Controllers
                             if (DInvDa.RerportType == "With Trade Ref.No")
                             {
                                 //log enhance by chaitrali 4/7/2024
-                                _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5 +  - DownloadInvoice;Show");
+
+                                string query = $"EXEC uspDownloadInvoice @Invoice_Number='', @ToInvoiceDate='', @FromInvoiceDate='', @ReportType='{Sanitize(DInvDa.RerportType)}', @Flag=5";
+                                _logger.LogError("Error executing query: {Query}", query);
+                                // _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5 +  - DownloadInvoice;Show");
                                 inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5").ToList();
                                 if (inv.Count == 0)
                                 {
@@ -159,8 +166,10 @@ namespace HDFCMSILWebMVC.Controllers
                             }
                             else if (DInvDa.RerportType == "Without Trade Ref.No")
                             {
+                                string query = $"EXEC uspDownloadInvoice @Invoice_Number='', @ToInvoiceDate='', @FromInvoiceDate='', @ReportType='{Sanitize(DInvDa.RerportType)}', @Flag=5";
+                                _logger.LogError("Error executing query: {Query}", query);
                                 //log enhance by chaitrali 4/7/2024
-                                _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5 +  - DownloadInvoice;Show");
+                               // _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5 +  - DownloadInvoice;Show");
                                 inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5").ToList();
                                 if (inv.Count == 0)
                                 {
@@ -190,6 +199,12 @@ namespace HDFCMSILWebMVC.Controllers
             }
 
         }
+        private string Sanitize(string input)
+        {
+            // Remove control characters to prevent log injection
+            return Regex.Replace(input ?? "", @"[^\u0020-\u007E]", "");
+        }
+
         public ActionResult GenExcel(IList<DownloadFillInvoice> DInvDa, string[] IsSelect)
         {
             //if (HttpContext.Session.GetString("LoginID") == null)

@@ -45,7 +45,8 @@ namespace HDFCMSILWebMVC.Controllers
                     {
 
                         TempData["alertMessage"] = "Please Select at least one Record to update.";
-                        return RedirectToAction("Show");
+                        
+                        return View("Show", tsradeRefNo.ToList());
                     }
                     for (int i = 0; i < IsSelect.Length; i++)
                     {
@@ -57,7 +58,14 @@ namespace HDFCMSILWebMVC.Controllers
                             DataRow[] dtFilter = Details.Select("[InvoiceNo]='" + InvoiceNumber + "'");
                             DataTable dtFilterData = dtFilter.CopyToDataTable();
 
-                            db.Database.ExecuteSqlRaw("update Invoice set IMEX_DEAL_NUMBER='" + TradeRefNo.Idname.ToString() + "'  where Invoice_Status='PHYSICAL INV REC' and  IMEX_DEAL_NUMBER='" + dtFilterData.Rows[0]["TradeRefNum"].ToString().Trim() + "' and Invoice_ID='" + dtFilterData.Rows[0]["InvoiceID"].ToString().Trim() + "' and  Invoice_Number='" + dtFilterData.Rows[0]["InvoiceNo"].ToString().Trim() + "'");
+                            var tradeRefNum = dtFilterData.Rows[0]["TradeRefNum"].ToString().Trim();
+                            var invoiceId = dtFilterData.Rows[0]["InvoiceID"].ToString().Trim();
+                            var invoiceNo = dtFilterData.Rows[0]["InvoiceNo"].ToString().Trim();
+                            var newDealNumber = TradeRefNo.Idname.ToString();
+
+                            db.Database.ExecuteSqlInterpolated($@" UPDATE Invoice SET IMEX_DEAL_NUMBER = {newDealNumber} WHERE Invoice_Status = 'PHYSICAL INV REC' AND IMEX_DEAL_NUMBER = {tradeRefNum} AND Invoice_ID = {invoiceId}  AND Invoice_Number = {invoiceNo}");
+
+                            //db.Database.ExecuteSqlRaw("update Invoice set IMEX_DEAL_NUMBER='" + TradeRefNo.Idname.ToString() + "'  where Invoice_Status='PHYSICAL INV REC' and  IMEX_DEAL_NUMBER='" + dtFilterData.Rows[0]["TradeRefNum"].ToString().Trim() + "' and Invoice_ID='" + dtFilterData.Rows[0]["InvoiceID"].ToString().Trim() + "' and  Invoice_Number='" + dtFilterData.Rows[0]["InvoiceNo"].ToString().Trim() + "'");
                             db.SaveChanges();
                         }
                     }
@@ -101,8 +109,9 @@ namespace HDFCMSILWebMVC.Controllers
             try
             {
                 using (var db = new Entities.DatabaseContext())
-                {
-                    tsradeRefNo = db.Set<TradeRefNo>().FromSqlRaw("EXEC uspChangeTradeRefNo @TradeRefNo ='" + traderefno.ToString() + "',@Flag=1  ").ToList();
+                {                   
+                    tsradeRefNo = db.Set<TradeRefNo>().FromSqlInterpolated($"EXEC uspChangeTradeRefNo @TradeRefNo={traderefno}, @Flag={1}").ToList();
+                    //tsradeRefNo = db.Set<TradeRefNo>().FromSqlRaw("EXEC uspChangeTradeRefNo @TradeRefNo ='" + traderefno.ToString() + "',@Flag=1  ").ToList();
                 }
 
                 _logger.LogInformation("Executed successfully" + " - ChangeTradeRefNoController; GetTradeRefNoList");

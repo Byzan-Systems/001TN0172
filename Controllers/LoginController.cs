@@ -51,7 +51,7 @@ namespace HDFCMSILWebMVC.Controllers
                 if (Type == "LOGIN")
                 {
                     string D1 = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt");
-                    string strId;
+                    //string strId;
                     // string cmd;
                     using (var db = new Entities.DatabaseContext())
                     {
@@ -203,6 +203,8 @@ namespace HDFCMSILWebMVC.Controllers
 
                             // Dormancy Check\
                             int isdormant = DaysCheck(rec);
+                            _logger.LogInformation("LDAP login successful for user {UserName}", MaskUsername(LoginViewModel.User_Name));
+
                             _logger.LogInformation("LDAP login successful for user {UserName}", LoginViewModel.User_Name);
                             if (isdormant == 0)
                             {
@@ -301,6 +303,12 @@ namespace HDFCMSILWebMVC.Controllers
             }
             return View(LoginViewModel);
         }
+        private string MaskUsername(string username)
+        {
+            if (string.IsNullOrEmpty(username)) return "UnknownUser";
+            return username.Length <= 5 ? "**" : username.Substring(0, 5) + new string('*', username.Length - 5);
+        }
+
         public int DaysCheck(user_mst_temp user_Mst_TempS)
         {
             DataTable dtGetUserDetails = new DataTable();

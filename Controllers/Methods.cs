@@ -283,7 +283,11 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception ex)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; Fill_CashOpsDetails_Manual");
+              
+                string accountno= detailsCash[4].ToString().Length <= 4 ? "****" : new string('*', detailsCash[4].ToString().Length - 4) + detailsCash[4].ToString()[^4..];
+                logger.LogError(ex, "Fill_CashOpsDetails_Manual failed for VirtualAccount ending in {VirtualAccountMasked} and UTR Present: {UTRPresent}", accountno, !string.IsNullOrWhiteSpace(detailsCash[5]));
+
+               // logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; Fill_CashOpsDetails_Manual");
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Fill_CashOpsDetails");
             }
         }
@@ -342,10 +346,15 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; Insert_CashOpsDetails");
+                string maskeddata = "";
+                if (string.IsNullOrWhiteSpace(detailsCash[4].ToString())) maskeddata = "Unknown";
+                maskeddata = detailsCash[4].ToString().Length <= 5 ? "****" : new string('*', detailsCash[4].ToString().Length - 5) + detailsCash[4].ToString()[^5..];
+                logger.LogError(EX, "Insert_CashOpsDetails failed for Virtual Account ending in {MaskedAccount} and UTR Present: {UtrPresent}", maskeddata, !string.IsNullOrWhiteSpace(detailsCash[5]));
+                //  logger.LogError(EX.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; Insert_CashOpsDetails");
                 return null;
             }
         }
+
         public static DataTable Insert_PaymentUploadDetails(string Task, string[] details, ILogger logger)
         {
             try
@@ -480,11 +489,14 @@ namespace HDFCMSILWebMVC.Controllers
             }
             catch (Exception EX)
             {
+                if (string.IsNullOrEmpty(PlainText)) return "N/A";
+                string abc= PlainText.Length <= 4 ? "****" : new string('*', PlainText.Length - 4) + PlainText[^4..];
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Task: " + Task + "" + " and AccountNo: " + PlainText+" or " +InputEncryptedData + " ; EncryptDecryptData"); return null;
+                logger.LogError(EX, "EncryptDecryptData failed. Task: {Task}, AccountNo: {MaskedAccountNo}, EncryptedInputPresent: {HasEncryptedInput}",Task, abc, !string.IsNullOrWhiteSpace(InputEncryptedData));
+                return null;
             }
         }
-
+     
         public static DataTable getDetailsAudit(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7, ILogger logger)
         {
             try
@@ -609,7 +621,7 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Task: " + Task + "" + " and FileName: " + Search1 + " ; InsertDetails");
+                logger.LogError(EX.Message, "InsertDetails failed. Task: {Task}, FileName: {FileName}", Task, Search1);
                 return null;
             }
         }

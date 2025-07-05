@@ -11,6 +11,7 @@ using ClosedXML.Excel;
 using System.IO;
 using System.Data;
 using MoreLinq;
+using System.Data.SqlClient;
 
 namespace HDFCMSILWebMVC.Controllers
 {
@@ -82,7 +83,8 @@ namespace HDFCMSILWebMVC.Controllers
                             var Todate = DInvDa.DateTo;
 
 
-                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='',@Flag=2").ToList();
+                            //inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='',@Flag=2").ToList();
+                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = @ToDate, @FromInvoiceDate = @FromDate, @ReportType = '', @Flag = 2",new SqlParameter("@ToDate", Fromdate),new SqlParameter("@FromDate", Todate)).ToList();
 
 
                         }
