@@ -1,0 +1,2 @@
+"Product","Remitter Name","Remitter A/ C No","Remitter Bank Name","UTR No","Amount","IFSC Code","VirtualAccountNumber","RejectedReason"
+"FUND TRANS","Transitory Suspense","/02400930001386","HDFC BANK LTD","020524346846","7990413.6800","HDFC0000240","MARSL2990012124112621F","DO length is less or greater than 23"
