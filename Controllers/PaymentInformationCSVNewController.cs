@@ -202,8 +202,8 @@ namespace HDFCMSILWebMVC.Controllers
                                     DataTable dt_UTR = Methods.getDetails("GetUniqueUTR", UTR_No, "", "", "", "", "", "", _logger);
                                     if (dt_Orderstatus.Rows.Count > 0)
                                     {
-                                        Filtervalidate = Filtervalidate + "Duplicate DO Number.";
-                                        _logger.LogError("Duplicate DO Number " + DealerVirAccNo.Substring(0, 22).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                                                                                                                                                                                                     //break;   
+                                        Filtervalidate = Filtervalidate + "Order Number under processing.";
+                                        _logger.LogError("Order Number under processing " + DealerVirAccNo.Substring(0, 22).ToString() + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh                                                                                                                                                                                                     //break;   
                                     }
                                     else if (dt_UTR.Rows.Count > 0)
                                     {
@@ -291,8 +291,8 @@ namespace HDFCMSILWebMVC.Controllers
                                     }
                                     else
                                     {
-                                        TempData["alertMessage"] = "Session get expired. Please login again and reupload. File Name :" + HttpContext.Request.Form.Files[0].FileName; ////Enhance by yogesh
-                                        _logger.LogInformation("Session get expired. Please login again and reupload. File Name :" + HttpContext.Request.Form.Files[0].FileName + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
+                                        TempData["alertMessage"] = "Session get expired. Please login again and re-upload. File Name :" + HttpContext.Request.Form.Files[0].FileName; ////Enhance by yogesh
+                                        _logger.LogInformation("Session get expired. Please login again and re-upload. File Name :" + HttpContext.Request.Form.Files[0].FileName + "" + " - PaymentInformationController;UploadPayment");  ////Enhance by yogesh
                                         return RedirectToAction("ShowPaymentInformation");
                                     }
                                     //clserr.WriteLogToTxtFile("End -Cashops_Payment Function", "Upload_Click", strFileName);
@@ -343,7 +343,7 @@ namespace HDFCMSILWebMVC.Controllers
                     progress = 100;
                     _uploadProgress[sessionId] = progress;
                     await _hubContext.Clients.Group(sessionId).SendAsync("ReceiveProgressUpdate", progress, "Upload process completed");
-                WaitFile: progress = 100; 
+                WaitFile: progress = 100;
                 }
 
                 catch (Exception ex)
