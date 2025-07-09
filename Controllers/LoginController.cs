@@ -204,8 +204,7 @@ namespace HDFCMSILWebMVC.Controllers
                             // Dormancy Check\
                             int isdormant = DaysCheck(rec);
                             _logger.LogInformation("LDAP login successful for user {UserName}", MaskUsername(LoginViewModel.User_Name));
-
-                            _logger.LogInformation("LDAP login successful for user {UserName}", LoginViewModel.User_Name);
+                            _logger.LogInformation("LDAP login successful for user {UserName}", LoginViewModel.User_Name.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", ""));
                             if (isdormant == 0)
                             {
 
