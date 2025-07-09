@@ -202,7 +202,9 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception ex)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; CashOps_Payments_Manual");
+                string sanitizedVirtualAccount = detailsCash[4].Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                string sanitizedUTRNo = detailsCash[5].Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                logger.LogError(ex.Message + " For Virtual Account No: " + sanitizedVirtualAccount + "" + " and UTR No: " + sanitizedUTRNo + " ; CashOps_Payments_Manual");
             }
         }
         public static void Fill_CashOpsDetails_Manual(string NEFT_RTGS_BT_ID, string[] Details, string[] detailsCash, ILogger logger)
@@ -408,7 +410,9 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Virtual Account No: " + details[8].Substring(0, 22) + "" + " and UTR No: " + details[11] + " ; Insert_PaymentUploadDetails");
+                string sanitizedVirtualAccount = details[8].Substring(0, 22).Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                string sanitizedUTRNo = details[11].Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                logger.LogError(EX.Message + " For Virtual Account No: " + sanitizedVirtualAccount + "" + " and UTR No: " + sanitizedUTRNo + " ; Insert_PaymentUploadDetails");
                 return null;
             }
         }
