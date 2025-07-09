@@ -41,7 +41,7 @@ namespace HDFCMSILWebMVC.Controllers
         }
         [HttpPost]
         [Obsolete]
-        public async Task<IActionResult> UploadDetails(IFormFile txtFile)
+        public async Task<IActionResult> UploadDetailsUpdated(IFormFile txtFile)
         {
 
             var sessionId = HttpContext.Session.Id;
@@ -346,7 +346,7 @@ namespace HDFCMSILWebMVC.Controllers
         }
         [HttpPost]
         [Obsolete]
-        public async Task<IActionResult> UploadDetailsOld(IFormFile txtFile)
+        public async Task<IActionResult> UploadDetails(IFormFile txtFile)
         {
 
             var sessionId = HttpContext.Session.Id;

@@ -53,7 +53,9 @@ namespace HDFCMSILWebMVC.Controllers
                     }
                     else
                     {
-                        DataSet DS = Methods.getDetails_Web("Get_DoLiquidationDataAsPer", model.DoNumberNew.ToString(), "", "", "", "", "", "", _logger);
+                        string sanitizedDoNumberNew = model.DoNumberNew?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                        DataSet DS = Methods.getDetails_Web("Get_DoLiquidationDataAsPer", sanitizedDoNumberNew, "", "", "", "", "", "", _logger);
+                        //DataSet DS = Methods.getDetails_Web("Get_DoLiquidationDataAsPer", model.DoNumberNew.ToString(), "", "", "", "", "", "", _logger);
                         if (DS.Tables[0].Rows.Count > 0)
                         {
                             if (DS.Tables[0].Rows[0]["order_status"].ToString().Trim().ToUpper() == "Payment Received".Trim().ToUpper())
@@ -131,10 +133,10 @@ namespace HDFCMSILWebMVC.Controllers
                     Details[5] = Data.ElementAt(0).Type; //Product
                     Details[6] = ""; //Party_Code
                     Details[7] = ""; //Party_Name
-                    Details[8] = model.DoNumber; //VA_account
+                    Details[8] = model.DoNumber?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", ""); //model.DoNumber; //VA_account
                     Details[9] = ""; //Locations
                     Details[10] = ""; //RemittingBank
-                    Details[11] = model.PaymentRefno; //UTR_No
+                    Details[11] = model.PaymentRefno?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "");//model.PaymentRefno; //UTR_No
                     Details[12] = ""; //IFSC_code
                     Details[13] = ""; //Dealer_Name
                     Details[14] = ""; //Dealer_Account_No

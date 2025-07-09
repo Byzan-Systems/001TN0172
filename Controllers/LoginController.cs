@@ -140,7 +140,7 @@ namespace HDFCMSILWebMVC.Controllers
                 using (var db = new Entities.DatabaseContext())
                 {
                     //var rec = db.LoginMSTs.Where(a => a.LoginName == LoginViewModel.LoginName && a.Password == LoginViewModel.Password && a.Login_Enable == 1).FirstOrDefault();
-                    var rec = db.user_mst_tempDB.Where(a => a.User_Id == LoginViewModel.User_Name).FirstOrDefault();
+                    var rec = db.user_mst_tempDB.Where(a => a.User_Id == LoginViewModel.User_Name && a.Password== LoginViewModel.Password).FirstOrDefault();
 
                     if (rec != null)
                     {
@@ -194,7 +194,7 @@ namespace HDFCMSILWebMVC.Controllers
                             HttpContext.Session.SetString("Password", configuration.GetSection("EmailSetting:Password").Value);
                             HttpContext.Session.SetString("SysEmail_FromID", configuration.GetSection("SystemSetting:Pwd").Value);
                             HttpContext.Session.SetString("PWD", configuration.GetSection("SystemSetting:Pwd").Value);
-                            _logger.LogInformation("The MSIL application login: User Name - {UserName}", LoginViewModel.User_Name);
+                            _logger.LogInformation("The MSIL application login: User Name - {UserName}", MaskUsername(LoginViewModel.User_Name));
 
 
                             //// comment validateLDAP if on UAT, otherwise check LDAP
@@ -205,7 +205,7 @@ namespace HDFCMSILWebMVC.Controllers
                             int isdormant = DaysCheck(rec);
                             _logger.LogInformation("LDAP login successful for user {UserName}", MaskUsername(LoginViewModel.User_Name));
 
-                            _logger.LogInformation("LDAP login successful for user {UserName}", LoginViewModel.User_Name);
+                           // _logger.LogInformation("LDAP login successful for user {UserName}", LoginViewModel.User_Name);
                             if (isdormant == 0)
                             {
 
@@ -306,6 +306,7 @@ namespace HDFCMSILWebMVC.Controllers
         private string MaskUsername(string username)
         {
             if (string.IsNullOrEmpty(username)) return "UnknownUser";
+            username = username.Replace("\r", "").Replace("\n", "").Replace("\t", "");
             return username.Length <= 5 ? "**" : username.Substring(0, 5) + new string('*', username.Length - 5);
         }
 

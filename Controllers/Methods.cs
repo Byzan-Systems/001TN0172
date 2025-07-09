@@ -201,8 +201,11 @@ namespace HDFCMSILWebMVC.Controllers
             }
             catch (Exception ex)
             {
-                //log enhance by chaitrali 3/7/2024
-                logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; CashOps_Payments_Manual");
+                //log changed by chaitrali 9/7/2025
+                string sanitizedAccountNo = detailsCash[4]?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "");
+                string sanitizedUTRNo = detailsCash[5]?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "");
+                logger.LogError(ex.Message + " For Virtual Account No: " + sanitizedAccountNo + " and UTR No: " + sanitizedUTRNo + " ; CashOps_Payments_Manual");
+                //logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; CashOps_Payments_Manual");
             }
         }
         public static void Fill_CashOpsDetails_Manual(string NEFT_RTGS_BT_ID, string[] Details, string[] detailsCash, ILogger logger)
@@ -285,7 +288,10 @@ namespace HDFCMSILWebMVC.Controllers
                 //log enhance by chaitrali 3/7/2024
               
                 string accountno= detailsCash[4].ToString().Length <= 4 ? "****" : new string('*', detailsCash[4].ToString().Length - 4) + detailsCash[4].ToString()[^4..];
-                logger.LogError(ex, "Fill_CashOpsDetails_Manual failed for VirtualAccount ending in {VirtualAccountMasked} and UTR Present: {UTRPresent}", accountno, !string.IsNullOrWhiteSpace(detailsCash[5]));
+                string sanitizedUTR = detailsCash[5].Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                logger.LogError(ex, "Fill_CashOpsDetails_Manual failed for VirtualAccount ending in {VirtualAccountMasked} and UTR Present: {UTRPresent}", accountno, !string.IsNullOrWhiteSpace(sanitizedUTR));
+
+                //logger.LogError(ex, "Fill_CashOpsDetails_Manual failed for VirtualAccount ending in {VirtualAccountMasked} and UTR Present: {UTRPresent}", accountno, !string.IsNullOrWhiteSpace(detailsCash[5]));
 
                // logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; Fill_CashOpsDetails_Manual");
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Fill_CashOpsDetails");
@@ -347,9 +353,11 @@ namespace HDFCMSILWebMVC.Controllers
             {
                 //log enhance by chaitrali 3/7/2024
                 string maskeddata = "";
-                if (string.IsNullOrWhiteSpace(detailsCash[4].ToString())) maskeddata = "Unknown";
-                maskeddata = detailsCash[4].ToString().Length <= 5 ? "****" : new string('*', detailsCash[4].ToString().Length - 5) + detailsCash[4].ToString()[^5..];
-                logger.LogError(EX, "Insert_CashOpsDetails failed for Virtual Account ending in {MaskedAccount} and UTR Present: {UtrPresent}", maskeddata, !string.IsNullOrWhiteSpace(detailsCash[5]));
+                //if (string.IsNullOrWhiteSpace(detailsCash[4].ToString())) maskeddata = "Unknown";
+                //maskeddata = detailsCash[4].ToString().Length <= 5 ? "****" : new string('*', detailsCash[4].ToString().Length - 5) + detailsCash[4].ToString()[^5..];
+                //logger.LogError(EX, "Insert_CashOpsDetails failed for Virtual Account ending in {MaskedAccount} and UTR Present: {UtrPresent}", maskeddata, !string.IsNullOrWhiteSpace(detailsCash[5]));
+                //maskeddata = detailsCash[4].ToString().Length <= 5 ? "****" : new string('*', detailsCash[4].ToString().Length - 5) + detailsCash[4].ToString()[^5..];
+                logger.LogError(EX, "Insert_CashOpsDetails failed for Virtual Account ending in {MaskedAccount} and UTR Present: {UtrPresent}", !string.IsNullOrWhiteSpace(detailsCash[4]), !string.IsNullOrWhiteSpace(detailsCash[5]));
                 //  logger.LogError(EX.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; Insert_CashOpsDetails");
                 return null;
             }
@@ -449,7 +457,10 @@ namespace HDFCMSILWebMVC.Controllers
             }
             catch (Exception EX)
             { //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Task: " + Task + "" + " and invoiceNo or Do Number or OrderID: " + Search1 + " ; getDetails_Web");
+                string sanitizedTask = Task?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                string sanitizedSearch1 = Search1?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                logger.LogError(EX.Message + " For Task: " + sanitizedTask + "" + " and invoiceNo or Do Number or OrderID: " + sanitizedSearch1 + " ; getDetails_Web");
+                //logger.LogError(EX.Message + " For Task: " + Task + "" + " and invoiceNo or Do Number or OrderID: " + Search1 + " ; getDetails_Web");
                 return null;
             }
         }
@@ -489,10 +500,9 @@ namespace HDFCMSILWebMVC.Controllers
             }
             catch (Exception EX)
             {
-                if (string.IsNullOrEmpty(PlainText)) return "N/A";
-                string abc= PlainText.Length <= 4 ? "****" : new string('*', PlainText.Length - 4) + PlainText[^4..];
+                
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX, "EncryptDecryptData failed. Task: {Task}, AccountNo: {MaskedAccountNo}, EncryptedInputPresent: {HasEncryptedInput}",Task, abc, !string.IsNullOrWhiteSpace(InputEncryptedData));
+                logger.LogError(EX, "EncryptDecryptData failed. Task: {Task}, AccountNo: {MaskedAccountNo}, EncryptedInputPresent: {HasEncryptedInput}",Task, !string.IsNullOrWhiteSpace(PlainText), !string.IsNullOrWhiteSpace(InputEncryptedData));
                 return null;
             }
         }
@@ -665,7 +675,11 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Task: " + Task + "" + " and FileName: " + Search1 + " ; InsertDetails");
+                //logger.LogError(EX, "Exception occurred while processing Task: {Task} and FileName: {FileName}; InsertDetails", Task, Search1);
+                string sanitizedTask = Task?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                string sanitizedSearch1 = Search1?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                logger.LogError(EX, "InsertDetails failed. Task: {Task}, FileName: {FileName}", sanitizedTask, sanitizedSearch1);
+                //logger.LogError(EX.Message + " For Task: " + Task + "" + " and FileName: " + Search1 + " ; InsertDetails");
                 return null;
             }
         }
