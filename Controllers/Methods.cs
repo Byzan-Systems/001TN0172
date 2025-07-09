@@ -490,9 +490,10 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 if (string.IsNullOrEmpty(PlainText)) return "N/A";
-                string abc= PlainText.Length <= 4 ? "****" : new string('*', PlainText.Length - 4) + PlainText[^4..];
+                string sanitizedPlainText = PlainText.Replace("\n", "").Replace("\r", "");
+                string abc = sanitizedPlainText.Length <= 4 ? "****" : new string('*', sanitizedPlainText.Length - 4) + sanitizedPlainText[^4..];
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX, "EncryptDecryptData failed. Task: {Task}, AccountNo: {MaskedAccountNo}, EncryptedInputPresent: {HasEncryptedInput}",Task, abc, !string.IsNullOrWhiteSpace(InputEncryptedData));
+                logger.LogError(EX, "EncryptDecryptData failed. Task: {Task}, AccountNo: {MaskedAccountNo}, EncryptedInputPresent: {HasEncryptedInput}", Task, abc, !string.IsNullOrWhiteSpace(InputEncryptedData));
                 return null;
             }
         }
