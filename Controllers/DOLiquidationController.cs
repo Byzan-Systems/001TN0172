@@ -53,7 +53,8 @@ namespace HDFCMSILWebMVC.Controllers
                     }
                     else
                     {
-                        DataSet DS = Methods.getDetails_Web("Get_DoLiquidationDataAsPer", model.DoNumberNew.ToString(), "", "", "", "", "", "", _logger);
+                        string sanitizedDoNumberNew = model.DoNumberNew?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                        DataSet DS = Methods.getDetails_Web("Get_DoLiquidationDataAsPer", sanitizedDoNumberNew, "", "", "", "", "", "", _logger);
                         if (DS.Tables[0].Rows.Count > 0)
                         {
                             if (DS.Tables[0].Rows[0]["order_status"].ToString().Trim().ToUpper() == "Payment Received".Trim().ToUpper())
