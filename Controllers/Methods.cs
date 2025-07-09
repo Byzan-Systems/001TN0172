@@ -665,7 +665,9 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Task: " + Task + "" + " and FileName: " + Search1 + " ; InsertDetails");
+                string sanitizedTask = Task?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                string sanitizedSearch1 = Search1?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                logger.LogError(EX, "InsertDetails failed. Task: {Task}, FileName: {FileName}", sanitizedTask, sanitizedSearch1);
                 return null;
             }
         }
