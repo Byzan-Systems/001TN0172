@@ -306,6 +306,8 @@ namespace HDFCMSILWebMVC.Controllers
         private string MaskUsername(string username)
         {
             if (string.IsNullOrEmpty(username)) return "UnknownUser";
+            // Sanitize input by removing newline characters and other potentially harmful characters
+            username = username.Replace("\r", "").Replace("\n", "").Replace("\t", "");
             return username.Length <= 5 ? "**" : username.Substring(0, 5) + new string('*', username.Length - 5);
         }
 
