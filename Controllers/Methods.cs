@@ -202,7 +202,9 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception ex)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; CashOps_Payments_Manual");
+                string sanitizedAccountNo = detailsCash[4]?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "");
+                string sanitizedUTRNo = detailsCash[5]?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "");
+                logger.LogError(ex.Message + " For Virtual Account No: " + sanitizedAccountNo + " and UTR No: " + sanitizedUTRNo + " ; CashOps_Payments_Manual");
             }
         }
         public static void Fill_CashOpsDetails_Manual(string NEFT_RTGS_BT_ID, string[] Details, string[] detailsCash, ILogger logger)

@@ -131,10 +131,10 @@ namespace HDFCMSILWebMVC.Controllers
                     Details[5] = Data.ElementAt(0).Type; //Product
                     Details[6] = ""; //Party_Code
                     Details[7] = ""; //Party_Name
-                    Details[8] = model.DoNumber; //VA_account
+                    Details[8] = model.DoNumber?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", ""); //VA_account
                     Details[9] = ""; //Locations
                     Details[10] = ""; //RemittingBank
-                    Details[11] = model.PaymentRefno; //UTR_No
+                    Details[11] = model.PaymentRefno?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", ""); //UTR_No
                     Details[12] = ""; //IFSC_code
                     Details[13] = ""; //Dealer_Name
                     Details[14] = ""; //Dealer_Account_No
