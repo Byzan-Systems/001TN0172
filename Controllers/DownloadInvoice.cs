@@ -155,7 +155,8 @@ namespace HDFCMSILWebMVC.Controllers
                                 string query = $"EXEC uspDownloadInvoice @Invoice_Number='', @ToInvoiceDate='', @FromInvoiceDate='', @ReportType='{Sanitize(DInvDa.RerportType)}', @Flag=5";
                                 _logger.LogError("Error executing query: {Query}", query);
                                 // _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5 +  - DownloadInvoice;Show");
-                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5").ToList();
+                                var reportTypeParam = new SqlParameter("@ReportType", DInvDa.RerportType);
+                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = '', @FromInvoiceDate = '', @ReportType = @ReportType, @Flag = 5", reportTypeParam).ToList();
                                 if (inv.Count == 0)
                                 {
                                     TempData["alertMessage"] = "No Record Found";
@@ -170,7 +171,8 @@ namespace HDFCMSILWebMVC.Controllers
                                 _logger.LogError("Error executing query: {Query}", query);
                                 //log enhance by chaitrali 4/7/2024
                                // _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5 +  - DownloadInvoice;Show");
-                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5").ToList();
+                                var reportTypeParam = new SqlParameter("@ReportType", DInvDa.RerportType);
+                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = '', @FromInvoiceDate = '', @ReportType = @ReportType, @Flag = 5", reportTypeParam).ToList();
                                 if (inv.Count == 0)
                                 {
                                     TempData["alertMessage"] = "No Record Found";
