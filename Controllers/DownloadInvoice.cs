@@ -100,7 +100,9 @@ namespace HDFCMSILWebMVC.Controllers
                                 return PartialView("Index");
                             }
                             //log enhance by chaitrali 4/7/2024
-                            _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = '" + Fromdate + "', @FromInvoiceDate = '" + Todate + "', @ReportType = '', @Flag = 2  - DownloadInvoice;Show");
+                            var sanitizedFromdate = Fromdate?.Replace("\n", "").Replace("\r", "");
+                            var sanitizedTodate = Todate?.Replace("\n", "").Replace("\r", "");
+                            _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = '" + sanitizedFromdate + "', @FromInvoiceDate = '" + sanitizedTodate + "', @ReportType = '', @Flag = 2  - DownloadInvoice;Show");
 
                             inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='',@Flag=2").ToList();
                               //inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = @ToDate, @FromInvoiceDate = @FromDate, @ReportType = '', @Flag = 2",new SqlParameter("@ToDate", Fromdate),new SqlParameter("@FromDate", Todate)).ToList();
