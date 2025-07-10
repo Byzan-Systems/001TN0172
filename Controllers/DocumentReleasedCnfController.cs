@@ -103,7 +103,7 @@ namespace HDFCMSILWebMVC.Controllers
                             return View("ViewGenerateDRC");
                         }
 
-                        var inv = db.Set<DocumentReleasedCnfNew>().FromSqlRaw("EXEC SP_DRCGenerate  @Search1 ='" + DS.DRCUTRNo + "',@Search2='" + DS.DRCVirtualAcc + "',@Flag=1").ToList();
+                        var inv = db.Set<DocumentReleasedCnfNew>().FromSqlInterpolated($"EXEC SP_DRCGenerate @Search1={DS.DRCUTRNo}, @Search2={DS.DRCVirtualAcc}, @Flag=1").ToList();
 
                         if (inv.Count > 0)
                         {
