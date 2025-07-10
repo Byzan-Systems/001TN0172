@@ -412,7 +412,8 @@ namespace HDFCMSILWebMVC.Controllers
                             if (CmbMISRpt.ToString().ToUpper() == "DO Cancellation And Retain Invoice Report".ToString().ToUpper())
                             {
                                 List<PendingRet_DO_CancellationAndRetainInvoiceReport> Inv;
-                                Inv = db.Set<PendingRet_DO_CancellationAndRetainInvoiceReport>().FromSqlRaw("EXEC uspFrm_PendingReport @To_date='" + todate + "',@From_date='" + fromdate + "',@MISReport='" + CmbMISRpt.ToString().ToUpper() + "',@Flag=5 ").ToList();
+                                Inv = db.Set<PendingRet_DO_CancellationAndRetainInvoiceReport>().FromSqlInterpolated($"EXEC uspFrm_PendingReport @To_date={todate}, @From_date={fromdate}, @MISReport={CmbMISRpt.ToUpper()}, @Flag=5").ToList();
+                                //Inv = db.Set<PendingRet_DO_CancellationAndRetainInvoiceReport>().FromSqlRaw("EXEC uspFrm_PendingReport @To_date='" + todate + "',@From_date='" + fromdate + "',@MISReport='" + CmbMISRpt.ToString().ToUpper() + "',@Flag=5 ").ToList();
                                 if (Inv.Count > 0)
                                 {
                                     //  dataGridView1.DataSource = Inv;

@@ -75,7 +75,9 @@ namespace HDFCMSILWebMVC.Controllers
 
                                 var Fromdate = DInvDa.DateFrom;
                                 var Todate = DInvDa.DateTo;
-                                inv = db.Set<cancellationInvDORetainInv>().FromSqlRaw("EXEC uspcancellationInvoiceDO @ToOrder_date ='" + Todate + "',@FromOrder_date='" + Fromdate + "',@Flag=1").ToList();
+                                inv = db.Set<cancellationInvDORetainInv>().FromSqlRaw("EXEC uspcancellationInvoiceDO @ToOrder_date = {0}, @FromOrder_date = {1}, @Flag = {2}", Todate, Fromdate, 1).ToList();
+
+                                //inv = db.Set<cancellationInvDORetainInv>().FromSqlRaw("EXEC uspcancellationInvoiceDO @ToOrder_date ='" + Todate + "',@FromOrder_date='" + Fromdate + "',@Flag=1").ToList();
 
                                 return View("ShowCancellationInvDORetain", inv);
                                 //ListtoDataTable lsttodt = new ListtoDataTable();
