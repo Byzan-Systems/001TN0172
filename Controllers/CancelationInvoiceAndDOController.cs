@@ -91,7 +91,7 @@ namespace HDFCMSILWebMVC.Controllers
                                 var Todate = DInvDa.DateTo; //DateTime.ParseExact(DInvDa.DateFrom.ToString().Substring(0, 10), "dd/MM/yyyy", CultureInfo.InvariantCulture).ToString("yyyy-MM-dd");
 
 
-                                inv1 = db.Set<cancellationInvoicesonly>().FromSqlRaw("EXEC uspcancellationInvoiceDO  @FromOrder_date ='" + Fromdate + "',@ToOrder_date ='" + Todate + "',@Flag=3").ToList();
+                                inv1 = db.Set<cancellationInvoicesonly>().FromSqlInterpolated($"EXEC uspcancellationInvoiceDO @FromOrder_date={Fromdate}, @ToOrder_date={Todate}, @Flag=3").ToList();
 
 
                                 return View("ShowCancelInvoicesonly", inv1);
