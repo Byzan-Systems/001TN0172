@@ -416,7 +416,12 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Virtual Account No: " + details[8].Substring(0, 22) + "" + " and UTR No: " + details[11] + " ; Insert_PaymentUploadDetails");
+                string virtualAccount = details.Length > 8 && details[8].Length >= 22 ? details[8].Substring(0, 22) : "N/A";
+                string utrNumber = details.Length > 11 ? details[11] : "N/A";
+
+                logger.LogError(EX, "Exception in Insert_PaymentUploadDetails. Virtual Account No: {VirtualAccount}, UTR No: {UTR}", virtualAccount, utrNumber);
+
+                //logger.LogError(EX.Message + " For Virtual Account No: " + details[8].Substring(0, 22) + "" + " and UTR No: " + details[11] + " ; Insert_PaymentUploadDetails");
                 return null;
             }
         }

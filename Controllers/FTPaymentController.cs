@@ -163,7 +163,9 @@ namespace HDFCMSILWebMVC.Controllers
                 DataTable dt = Methods.getDetails("Get_CashOpsDetails", Details[0], Details[1], "", "", "", "", "",_logger);
                 if (dt.Rows.Count > 0)
                 {
-                    _logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", strFileName);
+                    string sanitizedFileName = strFileName.Replace("\n", "").Replace("\r", "");
+                    _logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", sanitizedFileName);
+                    //_logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", strFileName);
                     return;
                 }
 

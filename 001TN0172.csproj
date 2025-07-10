@@ -91,6 +91,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
     <PackageReference Include="System.ServiceModel.NetTcp" Version="4.4.4" />
     <PackageReference Include="System.ServiceModel.Http" Version="4.4.4" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.34.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="itextsharp">

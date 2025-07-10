@@ -51,7 +51,8 @@ namespace HDFCMSILWebMVC.Controllers
 
                         if (DInvDa.ChkInvoiceNo == true)
                         {
-                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number ='" + DInvDa.Invoice_Number + "',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='',@Flag=1").ToList();
+                            inv = db.Set<DownloadFillInvoice>().FromSqlInterpolated($"EXEC uspDownloadInvoice @Invoice_Number={DInvDa.Invoice_Number}, @ToInvoiceDate='', @FromInvoiceDate='', @ReportType='', @Flag=1").ToList();
+                            //inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number ='" + DInvDa.Invoice_Number + "',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='',@Flag=1").ToList();
 
                         }
                         else if (DInvDa.ChkDate == true && DInvDa.ChkReporttype == true)
@@ -60,20 +61,36 @@ namespace HDFCMSILWebMVC.Controllers
                             var Todate = DInvDa.DateTo;
                             if (DInvDa.RerportType == "Select All")
                             {
-                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=6").ToList();
+                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = @ToDate, @FromInvoiceDate = @FromDate, @ReportType = @ReportType, @Flag = 6",
+                                    new SqlParameter("@ToDate", Fromdate),
+                                    new SqlParameter("@FromDate", Todate),
+                                    new SqlParameter("@ReportType", DInvDa.RerportType)
+                                ).ToList();
+                                //inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=6").ToList();
 
 
                             }
                             else if (DInvDa.RerportType == "With Trade Ref.No")
                             {
-
-                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=6").ToList();
+                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = @ToInvoiceDate, @FromInvoiceDate = @FromInvoiceDate, @ReportType = @ReportType, @Flag = @Flag",
+                                    new SqlParameter("@ToInvoiceDate", Fromdate ?? (object)DBNull.Value),
+                                    new SqlParameter("@FromInvoiceDate", Todate ?? (object)DBNull.Value),
+                                    new SqlParameter("@ReportType", DInvDa.RerportType ?? (object)DBNull.Value),
+                                    new SqlParameter("@Flag", 6)
+                                ).ToList();
+                                //inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=6").ToList();
 
 
                             }
                             else if (DInvDa.RerportType == "Without Trade Ref.No")
                             {
-                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=6").ToList();
+                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = @ToInvoiceDate, @FromInvoiceDate = @FromInvoiceDate, @ReportType = @ReportType, @Flag = @Flag",
+                                    new SqlParameter("@ToInvoiceDate", Fromdate ?? (object)DBNull.Value),
+                                    new SqlParameter("@FromInvoiceDate", Todate ?? (object)DBNull.Value),
+                                    new SqlParameter("@ReportType", DInvDa.RerportType ?? (object)DBNull.Value),
+                                    new SqlParameter("@Flag", 6)
+                                ).ToList();
+                                //inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='" + DInvDa.RerportType + "',@Flag=6").ToList();
 
                             }
                         }

@@ -459,7 +459,7 @@ namespace HDFCMSILWebMVC.Controllers
                         {
                             if (tradeRefNo.Length != 16)
                             {
-                                validationErrors.Add($"Trade Reference Number length should be 16 for Invoice {record.InvoiceNumber}.");
+                                 validationErrors.Add($"Trade Reference Number length should be 16 for Invoice {record.InvoiceNumber}.");
                                 _logger.LogError($"Trade Reference Number length should be sixteen for Invoice {record.InvoiceNumber}.");
                                 isValid = false;
                             }
@@ -471,12 +471,12 @@ namespace HDFCMSILWebMVC.Controllers
                                 isValid = false;
                             }
 
-                            var query = "Select * from Invoice where Invoice_Number='" + record.InvoiceNumber.ToString().Trim() + "' and TradeOp_Selected_Invoice_Flag = 1";
+                            var query = "Select IMEX_DEAL_NUMBER,stepdate from Invoice where Invoice_Number='" + record.InvoiceNumber.ToString().Trim() + "' and TradeOp_Selected_Invoice_Flag = 1";
                             DataTable dtInvoice = _dataService.GetDataTable(query);
 
                             if (dtInvoice.Rows.Count > 0)
                             {
-                                var query1 = "select * from Invoice_Received where { fn ucase(Invoice_Number)}='" + record.InvoiceNumber.ToString().Trim() + "'";
+                                var query1 = "select Invoice_Number from Invoice_Received where { fn ucase(Invoice_Number)}='" + record.InvoiceNumber.ToString().Trim() + "'";
                                 DataTable dtInvoiceRec = _dataService.GetDataTable(query1);
 
                                 if (dtInvoiceRec.Rows.Count > 0)
