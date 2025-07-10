@@ -120,7 +120,14 @@ namespace HDFCMSILWebMVC.Controllers
 
                         if (DInvDa.ChkInvoiceNo == true)
                         {
-                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number ='" + DInvDa.Invoice_Number + "',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='',@Flag=1").ToList();
+                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw(
+                                "EXEC uspDownloadInvoice @Invoice_Number, @ToInvoiceDate, @FromInvoiceDate, @ReportType, @Flag",
+                                new SqlParameter("@Invoice_Number", DInvDa.Invoice_Number ?? (object)DBNull.Value),
+                                new SqlParameter("@ToInvoiceDate", DBNull.Value),
+                                new SqlParameter("@FromInvoiceDate", DBNull.Value),
+                                new SqlParameter("@ReportType", DBNull.Value),
+                                new SqlParameter("@Flag", 1)
+                            ).ToList();
 
                         }
                         else if (DInvDa.ChkDate == true)
@@ -129,7 +136,14 @@ namespace HDFCMSILWebMVC.Controllers
                             var Todate = DInvDa.DateTo;
 
 
-                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='" + Fromdate + "',@FromInvoiceDate='" + Todate + "',@ReportType='',@Flag=2").ToList();
+                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw(
+                                "EXEC uspDownloadInvoice @Invoice_Number, @ToInvoiceDate, @FromInvoiceDate, @ReportType, @Flag",
+                                new SqlParameter("@Invoice_Number", DBNull.Value),
+                                new SqlParameter("@ToInvoiceDate", Fromdate ?? (object)DBNull.Value),
+                                new SqlParameter("@FromInvoiceDate", Todate ?? (object)DBNull.Value),
+                                new SqlParameter("@ReportType", DBNull.Value),
+                                new SqlParameter("@Flag", 2)
+                            ).ToList();
 
 
                         }
@@ -138,7 +152,14 @@ namespace HDFCMSILWebMVC.Controllers
                             if (DInvDa.RerportType == "With Trade Ref.No")
                             {
 
-                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=3").ToList();
+                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw(
+                                    "EXEC uspDownloadInvoice @Invoice_Number, @ToInvoiceDate, @FromInvoiceDate, @ReportType, @Flag",
+                                    new SqlParameter("@Invoice_Number", DBNull.Value),
+                                    new SqlParameter("@ToInvoiceDate", DBNull.Value),
+                                    new SqlParameter("@FromInvoiceDate", DBNull.Value),
+                                    new SqlParameter("@ReportType", DInvDa.RerportType ?? (object)DBNull.Value),
+                                    new SqlParameter("@Flag", 3)
+                                ).ToList();
 
 
                             }
@@ -155,7 +176,14 @@ namespace HDFCMSILWebMVC.Controllers
                         }
                         else
                         {
-                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='',@Flag=4").ToList();
+                            inv = db.Set<DownloadFillInvoice>().FromSqlRaw(
+                                "EXEC uspDownloadInvoice @Invoice_Number, @ToInvoiceDate, @FromInvoiceDate, @ReportType, @Flag",
+                                new SqlParameter("@Invoice_Number", DBNull.Value),
+                                new SqlParameter("@ToInvoiceDate", DBNull.Value),
+                                new SqlParameter("@FromInvoiceDate", DBNull.Value),
+                                new SqlParameter("@ReportType", DBNull.Value),
+                                new SqlParameter("@Flag", 4)
+                            ).ToList();
                         }
                     }
 
