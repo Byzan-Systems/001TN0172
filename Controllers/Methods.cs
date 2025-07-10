@@ -287,8 +287,9 @@ namespace HDFCMSILWebMVC.Controllers
             {
                 //log enhance by chaitrali 3/7/2024
               
-                string accountno= detailsCash[4].ToString().Length <= 4 ? "****" : new string('*', detailsCash[4].ToString().Length - 4) + detailsCash[4].ToString()[^4..];
-                string sanitizedUTR = detailsCash[5].Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                string sanitizedAccountNo = detailsCash[4]?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "");
+                string accountno = sanitizedAccountNo.Length <= 4 ? "****" : new string('*', sanitizedAccountNo.Length - 4) + sanitizedAccountNo[^4..];
+                string sanitizedUTR = detailsCash[5]?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "");
                 logger.LogError(ex, "Fill_CashOpsDetails_Manual failed for VirtualAccount ending in {VirtualAccountMasked} and UTR Present: {UTRPresent}", accountno, !string.IsNullOrWhiteSpace(sanitizedUTR));
 
                 //logger.LogError(ex, "Fill_CashOpsDetails_Manual failed for VirtualAccount ending in {VirtualAccountMasked} and UTR Present: {UTRPresent}", accountno, !string.IsNullOrWhiteSpace(detailsCash[5]));
