@@ -598,7 +598,8 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX, "Error occurred in getDetails. Task: {Task}, Identifier: {Search1}", Task, Search1);
+                string sanitizedSearch1 = Search1?.Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "");
+                logger.LogError(EX, "Error occurred in getDetails. Task: {Task}, Identifier: {Search1}", Task, sanitizedSearch1);
 
                 //logger.LogError(EX.Message + " For Task: " + Task + "" + " and invoiceNo or Do Number or OrderID: " + Search1 + " ; getDetails");
                 return null;
