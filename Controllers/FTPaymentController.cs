@@ -215,9 +215,11 @@ namespace HDFCMSILWebMVC.Controllers
             }
             catch (Exception ex)
             {
-                // Mask sensitive fields
-                string maskedAccount = detailsCash[4]?.Length >= 4 ? "****" + detailsCash[4][^4..] : "****";
-                string maskedUTR = detailsCash[5]?.Length >= 4 ? "****" + detailsCash[5][^4..] : "****";
+                // Mask sensitive fields and sanitize input
+                string sanitizedAccount = detailsCash[4]?.Replace("\n", "").Replace("\r", "");
+                string sanitizedUTR = detailsCash[5]?.Replace("\n", "").Replace("\r", "");
+                string maskedAccount = sanitizedAccount?.Length >= 4 ? "****" + sanitizedAccount[^4..] : "****";
+                string maskedUTR = sanitizedUTR?.Length >= 4 ? "****" + sanitizedUTR[^4..] : "****";
 
                 // Use structured logging and exception object
                 _logger.LogError(ex, "Exception in Fill_CashOpsDetails (FTPaymentController). Virtual Account: {VirtualAccountMasked}, UTR: {UTRMasked}",  maskedAccount, maskedUTR);
