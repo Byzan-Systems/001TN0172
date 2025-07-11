@@ -178,7 +178,7 @@ namespace HDFCMSILWebMVC.Controllers
                                 // _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5 +  - DownloadInvoice;Show");
                                 var reportTypeParam = new SqlParameter("@ReportType", DInvDa.RerportType ?? (object)DBNull.Value);
                                 inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = '', @FromInvoiceDate = '', @ReportType = @ReportType, @Flag = 5", reportTypeParam).ToList();
-                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=5").ToList();
+                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '', @ToInvoiceDate = '', @FromInvoiceDate = '', @ReportType = @ReportType, @Flag = 5", reportTypeParam).ToList();
                                 if (inv.Count == 0)
                                 {
                                     TempData["alertMessage"] = "No Record Found";
