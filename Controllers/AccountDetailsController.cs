@@ -123,7 +123,9 @@ namespace HDFCMSILWebMVC.Controllers
                     {
                         string encryptedBase64 = Methods.EncryptDecryptData("Encrypt", model.CR_Account_No, "", _logger);
                         string encryptedBase64DR = Methods.EncryptDecryptData("Encrypt", model.DR_Account_No, "", _logger);
-                        db.Database.ExecuteSqlRaw("Update Account_Details set CR_Account_No='" + encryptedBase64 + "',DR_Account_No='" + encryptedBase64DR + "' where Payment_Type ='" + model.Payment_Type + "' ");
+                        db.Database.ExecuteSqlInterpolated($@"UPDATE Account_Details SET CR_Account_No = {encryptedBase64}, DR_Account_No = {encryptedBase64DR}  WHERE Payment_Type = {model.Payment_Type}");
+
+                        //db.Database.ExecuteSqlRaw("Update Account_Details set CR_Account_No='" + encryptedBase64 + "',DR_Account_No='" + encryptedBase64DR + "' where Payment_Type ='" + model.Payment_Type + "' ");
                         //  var ss = db.Set<DBAccountDetails>().FromSqlRaw().ToList();
 
                         TempData["alertMessage"] = "Account number update successfullly.";

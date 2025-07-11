@@ -166,7 +166,15 @@ namespace HDFCMSILWebMVC.Controllers
                             }
                             else if (DInvDa.RerportType == "Without Trade Ref.No")
                             {
-                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=3").ToList();
+                                inv = db.Set<DownloadFillInvoice>().FromSqlRaw(
+                                   "EXEC uspDownloadInvoice @Invoice_Number, @ToInvoiceDate, @FromInvoiceDate, @ReportType, @Flag",
+                                   new SqlParameter("@Invoice_Number", DBNull.Value),
+                                   new SqlParameter("@ToInvoiceDate", DBNull.Value),
+                                   new SqlParameter("@FromInvoiceDate", DBNull.Value),
+                                   new SqlParameter("@ReportType", DInvDa.RerportType ?? (object)DBNull.Value),
+                                   new SqlParameter("@Flag", 3)
+                               ).ToList();
+                               // inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number = '',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='" + DInvDa.RerportType + "',@Flag=3").ToList();
 
 
                             }

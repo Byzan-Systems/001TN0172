@@ -420,8 +420,9 @@ namespace HDFCMSILWebMVC.Controllers
                 //log enhance by chaitrali 3/7/2024
                 string virtualAccount = details.Length > 8 && details[8].Length >= 22 ? details[8].Substring(0, 22) : "N/A";
                 string utrNumber = details.Length > 11 ? details[11] : "N/A";
-
-                logger.LogError(EX, "Exception in Insert_PaymentUploadDetails. Virtual Account No: {VirtualAccount}, UTR No: {UTR}", virtualAccount, utrNumber);
+                string maskedVirtualAccount = string.IsNullOrWhiteSpace(virtualAccount) || virtualAccount.Length <= 4? "****": new string('*', virtualAccount.Length - 4) + virtualAccount[^4..];
+                string maskedUTR = string.IsNullOrWhiteSpace(utrNumber) || utrNumber.Length <= 4 ? "****": new string('*', utrNumber.Length - 4) + utrNumber[^4..];
+                logger.LogError(EX, "Exception in Insert_PaymentUploadDetails. Virtual Account No: {VirtualAccount}, UTR No: {UTR}", maskedVirtualAccount, maskedUTR);
 
                 //logger.LogError(EX.Message + " For Virtual Account No: " + details[8].Substring(0, 22) + "" + " and UTR No: " + details[11] + " ; Insert_PaymentUploadDetails");
                 return null;
@@ -596,7 +597,10 @@ namespace HDFCMSILWebMVC.Controllers
             catch (Exception EX)
             {
                 //log enhance by chaitrali 3/7/2024
-                logger.LogError(EX.Message + " For Task: " + Task + "" + " and invoiceNo or Do Number or OrderID: " + Search1 + " ; getDetails"); return null;
+                logger.LogError(EX, "Error occurred in getDetails. Task: {Task}, Identifier: {Search1}", Task, Search1);
+
+                //logger.LogError(EX.Message + " For Task: " + Task + "" + " and invoiceNo or Do Number or OrderID: " + Search1 + " ; getDetails");
+                return null;
             }
         }
         public static DataTable InsertDetails(string Task, string Search1, string Search2, string Search3, string Search4, string Search5, string Search6, string Search7, ILogger logger)

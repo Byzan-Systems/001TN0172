@@ -155,6 +155,13 @@ namespace HDFCMSILWebMVC.Controllers
                 _logger.LogError(ex.Message);
             }
         }
+        public static string MaskSensitive(string input, int visibleSuffix = 4)
+        {
+            if (string.IsNullOrWhiteSpace(input) || input.Length <= visibleSuffix)
+                return new string('*', input?.Length ?? 0);
+
+            return new string('*', input.Length - visibleSuffix) + input[^visibleSuffix..];
+        }
         public void CashOps_Payments(string[] Details, string[] detailsCash, string strFileName)
         {
             try
@@ -164,7 +171,10 @@ namespace HDFCMSILWebMVC.Controllers
                 if (dt.Rows.Count > 0)
                 {
                     string sanitizedFileName = strFileName.Replace("\n", "").Replace("\r", "");
-                    _logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", sanitizedFileName);
+                    string utrMasked = MaskSensitive(Details[11]);  // Show only last 4 if needed
+                    string amount = Details[3];
+                    _logger.LogError("Duplicate UTR detected. UTR: {UTR}, Amount: {Amount}, File: {FileName}",utrMasked, amount, sanitizedFileName);
+                    //_logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", sanitizedFileName);
                     //_logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", strFileName);
                     return;
                 }

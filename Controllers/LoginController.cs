@@ -309,7 +309,6 @@ namespace HDFCMSILWebMVC.Controllers
             username = username.Replace("\r", "").Replace("\n", "").Replace("\t", "");
             return username.Length <= 5 ? "**" : username.Substring(0, 5) + new string('*', username.Length - 5);
         }
-
         public int DaysCheck(user_mst_temp user_Mst_TempS)
         {
             DataTable dtGetUserDetails = new DataTable();
@@ -672,7 +671,11 @@ namespace HDFCMSILWebMVC.Controllers
         }
         public IActionResult LoginPage()
         {
-            return View();
+            try
+            {
+                return View();
+            }
+            catch(Exception ex) { _logger.LogError(ex.Message + " - LoginController;Login()"); return null; }
         }
         [DllImport("user32.dll")]
         public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);

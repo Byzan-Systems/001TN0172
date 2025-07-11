@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,34 +16,45 @@ namespace _001TN0172
     {
         private readonly RequestDelegate _next;
         private readonly IMemoryCache _cache;
-
-        public SessionValidationMiddleware(RequestDelegate next, IMemoryCache cache)
+        private readonly ILogger _logger;
+        public SessionValidationMiddleware(ILogger<SessionValidationMiddleware> logger, RequestDelegate next, IMemoryCache cache)
         {
+            _logger = logger;
             _next = next;
             _cache = cache;
         }
 
         public async Task Invoke(HttpContext context)
         {
-            if (context.User.Identity.IsAuthenticated)
+            try
             {
-                var username = context.User.Identity.Name;
-                var sessionToken = context.Session.GetString("SessionToken");
-                using (var db = new HDFCMSILWebMVC.Entities.DatabaseContext())
+                if (context.User.Identity.IsAuthenticated)
                 {
-                    var validTokenlist = db.Set<MSIL_LoginLogout>().FromSqlRaw("select MSIL_LogoutDatetime,logID,SessionID,IsActive,IPAddress from MSIL_LoginLogout where User_Id='" + UserSession.LoginID + "' order by CONVERT(int, logID) desc").ToList();
-                    var validToken = validTokenlist[0].SessionID;
-                    if (sessionToken != validToken)
+                    var username = context.User.Identity.Name;
+                    var sessionToken = context.Session.GetString("SessionToken");
+                    using (var db = new HDFCMSILWebMVC.Entities.DatabaseContext())
                     {
-                        // Session is invalid
-                        await context.SignOutAsync();
-                        context.Response.Redirect("/Login");
-                        return;
+                        var validTokenlist = db.Set<MSIL_LoginLogout>().FromSqlRaw("select MSIL_LogoutDatetime,logID,SessionID,IsActive,IPAddress from MSIL_LoginLogout where User_Id='" + UserSession.LoginID + "' order by CONVERT(int, logID) desc").ToList();
+                        var validToken = validTokenlist[0].SessionID;
+                        if (sessionToken != validToken)
+                        {
+                            // Session is invalid
+                            await context.SignOutAsync();
+                            context.Response.Redirect("/Login");
+                            return;
+                        }
                     }
                 }
-            }
 
-            await _next(context);
+                await _next(context);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message + " - SessionValidationMiddleware;Invoke");
+                Console.WriteLine(ex); // Or use logger
+                throw; // Or handle gracefully}
+                //return;
+            }
         }
     }
 

@@ -33,9 +33,10 @@ namespace HDFCMSILWebMVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSession();
             services.AddControllersWithViews();
             services.AddMvc().AddSessionStateTempDataProvider();
-            services.AddSession();
+            
             services.Configure<FormOptions>(x =>
             {
                 x.BufferBody = false;
@@ -49,6 +50,8 @@ namespace HDFCMSILWebMVC
             });
             services.AddSession(optons=>
                 { optons.IdleTimeout = TimeSpan.FromMinutes(30);
+                    optons.Cookie.HttpOnly = true;
+                    optons.Cookie.IsEssential = true;
                 }
             );
 
