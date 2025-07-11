@@ -52,7 +52,8 @@ namespace HDFCMSILWebMVC.Controllers
                 }
                 try
                 {
-                    _logger.LogError("Filter values - ChkDate: {ChkDate}; ChkInvoiceNo: {ChkInvoiceNo}; ChkReportType: {ChkReportType}; DateFrom: {DateFrom}; DateTo: {DateTo}; Invoice_Number: {InvoiceNumber}; ReportType: {ReportType}", DInvDa.ChkDate, DInvDa.ChkInvoiceNo, DInvDa.ChkReporttype, DInvDa.DateFrom, DInvDa.DateTo, DInvDa.Invoice_Number, DInvDa.RerportType);
+                    var sanitizedInvoiceNumber = DInvDa.Invoice_Number?.Replace("\n", "").Replace("\r", "");
+                    _logger.LogError("Filter values - ChkDate: {ChkDate}; ChkInvoiceNo: {ChkInvoiceNo}; ChkReportType: {ChkReportType}; DateFrom: {DateFrom}; DateTo: {DateTo}; Invoice_Number: {InvoiceNumber}; ReportType: {ReportType}", DInvDa.ChkDate, DInvDa.ChkInvoiceNo, DInvDa.ChkReporttype, DInvDa.DateFrom, DInvDa.DateTo, sanitizedInvoiceNumber, DInvDa.RerportType);
 
                     //_logger.LogError("values of filters ChkDate:" + DInvDa.ChkDate + "; ChkInvoiceNo: " + DInvDa.ChkInvoiceNo + " DateFrom: " + DInvDa.ChkReporttype + ";" + DInvDa.DateFrom + " ; Invoice_Number: " + DInvDa.DateTo + "" + DInvDa.Invoice_Number + " ; RerportType:" + DInvDa.RerportType);
                     using (var db = new Entities.DatabaseContext())
