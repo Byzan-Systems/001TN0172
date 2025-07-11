@@ -68,18 +68,18 @@ namespace HDFCMSILWebMVC.Controllers
                 using (var db = new Entities.DatabaseContext())
                 {
                     // Define SQL commands with parameter placeholders
-                    var invoiceQuery = "EXEC SP_GetDetails_Web @Task = 'Get_DoDetailsAsInvoice', @Search1 = '"+do_number+"', @Search2 = '', @Search3 = '', @Search4 =  '', @Search5 =  '', @Search6 =  '', @Search7 =  ''";
-                    var paymentQuery = "EXEC SP_GetDetails_Web @Task = 'Get_DoDetailsAsPayment', @Search1 = '" + do_number + "', @Search2 =  '', @Search3 =  '', @Search4 =  '', @Search5 =  '', @Search6 =  '', @Search7 =  ''";
+                    var invoiceQuery = $@"EXEC SP_GetDetails_Web @Task = {"Get_DoDetailsAsInvoice"}, @Search1 = {do_number ?? ""}, @Search2 = {""}, @Search3 = {""}, @Search4 = {""}, @Search5 = {""}, @Search6 = {""}, @Search7 = {""}";
+                    var paymentQuery = $@"EXEC SP_GetDetails_Web @Task = {"Get_DoDetailsAsPayment"}, @Search1 = {do_number ?? ""}, @Search2 = {""}, @Search3 = {""}, @Search4 = {""}, @Search5 = {""}, @Search6 = {""}, @Search7 = {""}";
 
-                    viewModel.Invoicelist = db.Set<InvoiceDetails>().FromSqlRaw(invoiceQuery).ToList();
-                    var orderQuery = "EXEC SP_GetDetails_Web @Task = 'Get_DoDetailsAsOrder', @Search1 = '" + do_number + "', @Search2 =  '', @Search3 =  '', @Search4 =  '', @Search5 =  '', @Search6 =  '', @Search7 =  ''";
+                    viewModel.Invoicelist = db.Set<InvoiceDetails>().FromSqlInterpolated(invoiceQuery).ToList();
+                    var orderQuery = $@"EXEC SP_GetDetails_Web @Task = {"Get_DoDetailsAsOrder"}, @Search1 = {do_number ?? ""}, @Search2 = {""}, @Search3 = {""}, @Search4 = {""}, @Search5 = {""}, @Search6 = {""}, @Search7 = {""}";
 
-                    viewModel.orderlist = db.Set<OrderDetails>().FromSqlRaw(orderQuery).ToList();
-                    var cashOpsQuery = "EXEC SP_GetDetails_Web @Task = 'Get_DoDetailsAsCashOps', @Search1 = '" + do_number + "', @Search2 =  '', @Search3 =  '', @Search4 =  '', @Search5 =  '', @Search6 =  '', @Search7 =  ''";
+                    viewModel.orderlist = db.Set<OrderDetails>().FromSqlInterpolated(orderQuery).ToList();
+                    var cashOpsQuery = $@"EXEC SP_GetDetails_Web @Task = {"Get_DoDetailsAsCashOps"}, @Search1 = {do_number ?? ""}, @Search2 = {""}, @Search3 = {""}, @Search4 = {""}, @Search5 = {""}, @Search6 = {""}, @Search7 = {""}";
  //viewModel.CashopsList = db.Set<CashOPSDetails>().FromSqlRaw(cashOpsQuery).ToList();
                     viewModel.CashopsList = db.Set<CashOPSDetails>().FromSqlInterpolated($@"EXEC SP_GetDetails_Web  @Task = {"Get_DoDetailsAsCashOps"},  @Search1 = {do_number ?? ""},  @Search2 = {""},   @Search3 = {""},  @Search4 = {""},   @Search5 = {""},   @Search6 = {""},   @Search7 = {""}").ToList();
                    
-                    viewModel.PaymentList = db.Set<PaymentDetails>().FromSqlRaw(paymentQuery).ToList();
+                    viewModel.PaymentList = db.Set<PaymentDetails>().FromSqlInterpolated(paymentQuery).ToList();
 
                 }
             }
