@@ -205,7 +205,9 @@ namespace HDFCMSILWebMVC.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; FTPaymentController;Fill_CashOpsDetails");
+                string sanitizedVirtualAccountNo = detailsCash[4].Replace("\n", "").Replace("\r", "");
+                string sanitizedUTRNo = detailsCash[5].Replace("\n", "").Replace("\r", "");
+                _logger.LogError(ex.Message + " For Virtual Account No: " + sanitizedVirtualAccountNo + " and UTR No: " + sanitizedUTRNo + " ; FTPaymentController;Fill_CashOpsDetails");
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Fill_CashOpsDetails");
             }
         }
