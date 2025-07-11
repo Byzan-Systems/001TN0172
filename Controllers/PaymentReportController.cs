@@ -61,7 +61,8 @@ namespace HDFCMSILWebMVC.Controllers
                         }
                         else if (showpay.Status == true)
                         {
-                            ShowCashOps_UploadList = db.Set<ShowCashOps_Upload>().FromSqlRaw("EXEC uspShowCashOps_Upload @ToCash_Ops_Date='',@FromCash_Ops_Date='',@Payment_Status='" + showpay.ReportType + "',@Flag=2").ToList();
+                            ShowCashOps_UploadList = db.Set<ShowCashOps_Upload>().FromSqlInterpolated($"EXEC uspShowCashOps_Upload @ToCash_Ops_Date='',@FromCash_Ops_Date='',@Payment_Status={showpay.ReportType},@Flag=2").ToList();
+                            //ShowCashOps_UploadList = db.Set<ShowCashOps_Upload>().FromSqlRaw("EXEC uspShowCashOps_Upload @ToCash_Ops_Date='',@FromCash_Ops_Date='',@Payment_Status='" + showpay.ReportType + "',@Flag=2").ToList();
                             ListtoDataTable lsttodt = new ListtoDataTable();
                             dt = lsttodt.ToDataTable(ShowCashOps_UploadList);
                         }

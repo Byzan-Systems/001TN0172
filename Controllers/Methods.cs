@@ -289,7 +289,8 @@ namespace HDFCMSILWebMVC.Controllers
               
                 string accountno= detailsCash[4].ToString().Length <= 4 ? "****" : new string('*', detailsCash[4].ToString().Length - 4) + detailsCash[4].ToString()[^4..];
                 string sanitizedUTR = detailsCash[5].Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
-                logger.LogError("Exception occurred: {Message}. VirtualAccount ending: {VirtualAccountMasked}, UTR Present: {UTRPresent}", ex.Message, accountno,!string.IsNullOrWhiteSpace(sanitizedUTR));
+                var maskedAccount = accountno?.Length > 4 ? "****" + accountno.Substring(accountno.Length - 4): accountno;
+                logger.LogError("Exception occurred: {Message}. VirtualAccount ending: {VirtualAccountMasked}, UTR Present: {UTRPresent}", ex.Message, maskedAccount, !string.IsNullOrWhiteSpace(sanitizedUTR));
 
                 //logger.LogError(ex, "Fill_CashOpsDetails_Manual failed for VirtualAccount ending in {VirtualAccountMasked} and UTR Present: {UTRPresent}", accountno, !string.IsNullOrWhiteSpace(sanitizedUTR));
 

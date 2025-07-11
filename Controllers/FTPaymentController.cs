@@ -215,7 +215,14 @@ namespace HDFCMSILWebMVC.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; FTPaymentController;Fill_CashOpsDetails");
+                // Mask sensitive fields
+                string maskedAccount = detailsCash[4]?.Length >= 4 ? "****" + detailsCash[4][^4..] : "****";
+                string maskedUTR = detailsCash[5]?.Length >= 4 ? "****" + detailsCash[5][^4..] : "****";
+
+                // Use structured logging and exception object
+                _logger.LogError(ex, "Exception in Fill_CashOpsDetails (FTPaymentController). Virtual Account: {VirtualAccountMasked}, UTR: {UTRMasked}",  maskedAccount, maskedUTR);
+
+                //_logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; FTPaymentController;Fill_CashOpsDetails");
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Fill_CashOpsDetails");
             }
         }
