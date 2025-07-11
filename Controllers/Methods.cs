@@ -419,7 +419,7 @@ namespace HDFCMSILWebMVC.Controllers
             {
                 //log enhance by chaitrali 3/7/2024
                 string virtualAccount = details.Length > 8 && details[8].Length >= 22 ? details[8].Substring(0, 22) : "N/A";
-                string utrNumber = details.Length > 11 ? details[11] : "N/A";
+                string utrNumber = details.Length > 11 ? details[11].Replace(Environment.NewLine, "").Replace("\r", "").Replace("\n", "") : "N/A";
 
                 logger.LogError(EX, "Exception in Insert_PaymentUploadDetails. Virtual Account No: {VirtualAccount}, UTR No: {UTR}", virtualAccount, utrNumber);
 
