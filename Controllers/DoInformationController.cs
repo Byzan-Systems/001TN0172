@@ -72,9 +72,9 @@ namespace HDFCMSILWebMVC.Controllers
                     var paymentQuery = "EXEC SP_GetDetails_Web @Task = 'Get_DoDetailsAsPayment', @Search1 = '" + do_number + "', @Search2 =  '', @Search3 =  '', @Search4 =  '', @Search5 =  '', @Search6 =  '', @Search7 =  ''";
 
                     viewModel.Invoicelist = db.Set<InvoiceDetails>().FromSqlRaw(invoiceQuery).ToList();
-                    var orderQuery = "EXEC SP_GetDetails_Web @Task = 'Get_DoDetailsAsOrder', @Search1 = '" + do_number + "', @Search2 =  '', @Search3 =  '', @Search4 =  '', @Search5 =  '', @Search6 =  '', @Search7 =  ''";
+                    var orderQuery = $@"EXEC SP_GetDetails_Web @Task = {"Get_DoDetailsAsOrder"}, @Search1 = {do_number ?? ""}, @Search2 = {""}, @Search3 = {""}, @Search4 = {""}, @Search5 = {""}, @Search6 = {""}, @Search7 = {""}";
 
-                    viewModel.orderlist = db.Set<OrderDetails>().FromSqlRaw(orderQuery).ToList();
+                    viewModel.orderlist = db.Set<OrderDetails>().FromSqlInterpolated(orderQuery).ToList();
                     var cashOpsQuery = "EXEC SP_GetDetails_Web @Task = 'Get_DoDetailsAsCashOps', @Search1 = '" + do_number + "', @Search2 =  '', @Search3 =  '', @Search4 =  '', @Search5 =  '', @Search6 =  '', @Search7 =  ''";
  //viewModel.CashopsList = db.Set<CashOPSDetails>().FromSqlRaw(cashOpsQuery).ToList();
                     viewModel.CashopsList = db.Set<CashOPSDetails>().FromSqlInterpolated($@"EXEC SP_GetDetails_Web  @Task = {"Get_DoDetailsAsCashOps"},  @Search1 = {do_number ?? ""},  @Search2 = {""},   @Search3 = {""},  @Search4 = {""},   @Search5 = {""},   @Search6 = {""},   @Search7 = {""}").ToList();
