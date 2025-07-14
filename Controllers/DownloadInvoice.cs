@@ -54,6 +54,8 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     var sanitizedInvoiceNumber = DInvDa.Invoice_Number?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
                     string ReportType = DInvDa.RerportType.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                    string DateFrom = DInvDa.DateFrom.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                    string DateTo = DInvDa.DateTo.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
                     _logger.LogError("Filter values - ChkDate: {ChkDate}; ChkInvoiceNo: {ChkInvoiceNo}; ChkReportType: {ChkReportType}; DateFrom: {DateFrom}; DateTo: {DateTo}; Invoice_Number: {InvoiceNumber}; ReportType: {ReportType}", DInvDa.ChkDate, DInvDa.ChkInvoiceNo, DInvDa.ChkReporttype, DInvDa.DateFrom, DInvDa.DateTo, sanitizedInvoiceNumber, ReportType);
 
                     //_logger.LogError("values of filters ChkDate:" + DInvDa.ChkDate + "; ChkInvoiceNo: " + DInvDa.ChkInvoiceNo + " DateFrom: " + DInvDa.ChkReporttype + ";" + DInvDa.DateFrom + " ; Invoice_Number: " + DInvDa.DateTo + "" + DInvDa.Invoice_Number + " ; RerportType:" + DInvDa.RerportType);
