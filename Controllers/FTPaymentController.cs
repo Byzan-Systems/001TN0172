@@ -171,7 +171,7 @@ namespace HDFCMSILWebMVC.Controllers
                 if (dt.Rows.Count > 0)
                 {
                     string sanitizedFileName = strFileName.Replace("\n", "").Replace("\r", "");
-                    string utrMasked =( MaskSensitive(Details[11])).Replace("\n", "").Replace("\r", ""); ;  // Show only last 4 if needed
+                    string utrMasked =( MaskSensitive(Details[11])).Replace("\n", "").Replace("\r", "");   // Show only last 4 if needed
                     string amount = (Details[3]).Replace("\n", "").Replace("\r", ""); ;
                     _logger.LogError("Duplicate UTR detected. UTR: {UTR}, Amount: {Amount}, File: {FileName}",utrMasked, amount, sanitizedFileName);
                     //_logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", sanitizedFileName);
@@ -187,10 +187,21 @@ namespace HDFCMSILWebMVC.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; FTPaymentController;CashOps_Payments");
+                string maskedAccount =( MaskAccount(detailsCash[4])).Replace("\n", "").Replace("\r", ""); // e.g., ****6789
+                string maskedUTR = (MaskUtr(detailsCash[5])).Replace("\n", "").Replace("\r", "");         // e.g., ****1234
+
+                _logger.LogError($"Exception: {ex.Message} For Virtual Account No: {maskedAccount}, UTR No: {maskedUTR}; FTPaymentController;CashOps_Payments");
+                //_logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; FTPaymentController;CashOps_Payments");
                 //_logger.LogError(ex.Message);
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "CashOps_Payments");
             }
+        }
+        public static string MaskAccount(string accountNumber)
+        {
+            if (string.IsNullOrWhiteSpace(accountNumber) || accountNumber.Length < 4)
+                return "****";
+
+            return new string('*', accountNumber.Length - 4) + accountNumber[^4..];
         }
         public  void Fill_CashOpsDetails(string NEFT_RTGS_BT_ID, string[] Details, string[] detailsCash)
         {

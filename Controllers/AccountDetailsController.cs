@@ -68,7 +68,8 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     using (var db = new Entities.DatabaseContext())
                     {
-                        var ss = db.Set<DBAccountDetails>().FromSqlRaw("Select * from Account_Details where Payment_Type ='" + model.Payment_Type + "' ").ToList();
+                        var ss = db.Set<DBAccountDetails>().FromSqlInterpolated($"Select * from Account_Details where Payment_Type = {model.Payment_Type}").ToList();
+                        //var ss = db.Set<DBAccountDetails>().FromSqlRaw("Select * from Account_Details where Payment_Type ='" + model.Payment_Type + "' ").ToList();
                         _logger.LogInformation("data read from database." + " - AccountDetailsController; ShowAccountDetails");
                         if (ss.Count > 0)
                         {
