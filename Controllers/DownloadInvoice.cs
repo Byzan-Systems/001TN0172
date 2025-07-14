@@ -52,7 +52,9 @@ namespace HDFCMSILWebMVC.Controllers
                 }
                 try
                 {
-                    _logger.LogError("Filter values - ChkDate: {ChkDate}; ChkInvoiceNo: {ChkInvoiceNo}; ChkReportType: {ChkReportType}; DateFrom: {DateFrom}; DateTo: {DateTo}; Invoice_Number: {InvoiceNumber}; ReportType: {ReportType}", DInvDa.ChkDate, DInvDa.ChkInvoiceNo, DInvDa.ChkReporttype, DInvDa.DateFrom, DInvDa.DateTo, DInvDa.Invoice_Number, DInvDa.RerportType);
+                    var sanitizedInvoiceNumber = DInvDa.Invoice_Number?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                    string ReportType = DInvDa.RerportType.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                    _logger.LogError("Filter values - ChkDate: {ChkDate}; ChkInvoiceNo: {ChkInvoiceNo}; ChkReportType: {ChkReportType}; DateFrom: {DateFrom}; DateTo: {DateTo}; Invoice_Number: {InvoiceNumber}; ReportType: {ReportType}", DInvDa.ChkDate, DInvDa.ChkInvoiceNo, DInvDa.ChkReporttype, DInvDa.DateFrom, DInvDa.DateTo, sanitizedInvoiceNumber, ReportType);
 
                     //_logger.LogError("values of filters ChkDate:" + DInvDa.ChkDate + "; ChkInvoiceNo: " + DInvDa.ChkInvoiceNo + " DateFrom: " + DInvDa.ChkReporttype + ";" + DInvDa.DateFrom + " ; Invoice_Number: " + DInvDa.DateTo + "" + DInvDa.Invoice_Number + " ; RerportType:" + DInvDa.RerportType);
                     using (var db = new Entities.DatabaseContext())
@@ -76,9 +78,10 @@ namespace HDFCMSILWebMVC.Controllers
                                 return PartialView("Index");
                             }
                             //log enhance by chaitrali 4/7/2024
-                            _logger.LogError("Executing uspDownloadInvoice with Invoice_Number: {InvoiceNumber}, Flag: 1", DInvDa.Invoice_Number);
+                           
+                            _logger.LogError("Executing uspDownloadInvoice with sanitized Invoice_Number: {SanitizedInvoiceNumber}, Flag: 1", sanitizedInvoiceNumber);
 
-                           // _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number ='" + DInvDa.Invoice_Number + "',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='',@Flag=1 - DownloadInvoice;Show");
+                            // _logger.LogError("EXEC uspDownloadInvoice @Invoice_Number ='" + DInvDa.Invoice_Number + "',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='',@Flag=1 - DownloadInvoice;Show");
                             inv = db.Set<DownloadFillInvoice>().FromSqlInterpolated($@"EXEC uspDownloadInvoice @Invoice_Number = {DInvDa.Invoice_Number},  @ToInvoiceDate = '',  @FromInvoiceDate = '', @ReportType = '', @Flag = 1").ToList();
 
                             //inv = db.Set<DownloadFillInvoice>().FromSqlRaw("EXEC uspDownloadInvoice @Invoice_Number ='" + DInvDa.Invoice_Number + "',@ToInvoiceDate='',@FromInvoiceDate='',@ReportType='',@Flag=1").ToList();
