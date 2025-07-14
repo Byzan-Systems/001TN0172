@@ -217,15 +217,24 @@ namespace HDFCMSILWebMVC.Controllers
             {
                 // Mask sensitive fields
                 string maskedAccount = detailsCash[4]?.Length >= 4 ? "****" + detailsCash[4][^4..] : "****";
-                string maskedUTR = detailsCash[5]?.Length >= 4 ? "****" + detailsCash[5][^4..] : "****";
+                //string maskedUTR = detailsCash[5]?.Length >= 4 ? "****" + detailsCash[5][^4..] : "****";
 
                 // Use structured logging and exception object
+                string maskedUTR = MaskUtr(detailsCash[5]);
                 _logger.LogError(ex, "Exception in Fill_CashOpsDetails (FTPaymentController). Virtual Account: {VirtualAccountMasked}, UTR: {UTRMasked}",  maskedAccount, maskedUTR);
 
                 //_logger.LogError(ex.Message + " For Virtual Account No: " + detailsCash[4] + "" + " and UTR No: " + detailsCash[5] + " ; FTPaymentController;Fill_CashOpsDetails");
                 //clserr.WriteErrorToTxtFile(ex.Message, "FrmPaymentInformation", "Fill_CashOpsDetails");
             }
         }
+        private static string MaskUtr(string utr)
+        {
+            if (string.IsNullOrWhiteSpace(utr) || utr.Length < 8)
+                return "********"; // Mask everything if too short
+
+            return "****" + utr[^4..]; // Only if acceptable by policy
+        }
+
         private void Rectify()
         {
             try
