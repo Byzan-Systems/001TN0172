@@ -172,7 +172,7 @@ namespace HDFCMSILWebMVC.Controllers
                 {
                     string sanitizedFileName = strFileName.Replace("\n", "").Replace("\r", "");
                     string utrMasked = MaskSensitive(Details[11]);  // Show only last 4 if needed
-                    string amount = Details[3];
+                    string amount = (Details[3]).Replace("\n", "").Replace("\r", ""); ;
                     _logger.LogError("Duplicate UTR detected. UTR: {UTR}, Amount: {Amount}, File: {FileName}",utrMasked, amount, sanitizedFileName);
                     //_logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", sanitizedFileName);
                     //_logger.LogError("Duplicate UTR No.: " + Details[11] + " with same  Amount: " + Details[3], "CashOps_Payments", strFileName);
