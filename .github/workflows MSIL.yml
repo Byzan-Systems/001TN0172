@@ -1,5 +1,6 @@
 name: Security Vulnerabilities Scan (.NET 5 MVC on Windows)
- 
+permissions:
+  contents: read 
 on:
   push:
     branches: [ Audit-Details ]
