@@ -1,6 +1,7 @@
 # .github/workflows/sca-windows-owasp.yml
 name: SCA - OWASP on Windows
-
+permissions:
+  contents: read 
 on:
   push:
     branches: [ "master" ]
