@@ -1,7 +1,8 @@
 # .github/workflows/dotnet-security-checks.yml
 
 name: .NET Security Checks (SAST + SCA + SCR)
-
+permissions:
+  contents: read 
 on:
   push:
     branches: [ "master" ]
