@@ -40,7 +40,6 @@ namespace HDFCMSILWebMVC.Controllers
         {
             _logger = logger;
             Environment = _environment;
-
         }
 
         public void LoginLogDB(string pExpDescp, string pError_Id, string Type, string FrmUserID, string SessionID, string IsActive)
@@ -197,8 +196,8 @@ namespace HDFCMSILWebMVC.Controllers
 
 
                             //// comment validateLDAP if on UAT, otherwise check LDAP
-                            ////////if (ValidateLDAP(LoginViewModel.User_Name, LoginViewModel.Password) == true)
-                            ////////{
+                            //////if (ValidateLDAP(LoginViewModel.User_Name, LoginViewModel.Password) == true)
+                            //////{
 
                             // Dormancy Check\
                             int isdormant = DaysCheck(rec);
@@ -229,15 +228,15 @@ namespace HDFCMSILWebMVC.Controllers
                                 //else
                                 //{
 
-                                var strlogId = db.Set<MSIL_LoginLogout>().FromSqlRaw("select MSIL_LogoutDatetime,logID,SessionID,IsActive,IPAddress from MSIL_LoginLogout where User_Id='" + recIsactive.User_Name.ToString() + "' order by CONVERT(int, logID) desc").ToList();
+                                var strlogId = db.Set<MSIL_LoginLogout>().FromSqlRaw("select MSIL_LogoutDatetime,logID,SessionID,IsActive,IPAddress from MSIL_LoginLogout where User_Id='" + recIsactive.User_Id.ToString() + "' order by CONVERT(int, logID) desc").ToList();
                                 string curdatestr = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt");
-
+                                
                                 if (strlogId[0].MSIL_LogoutDatetime is null || string.IsNullOrWhiteSpace(strlogId[0].MSIL_LogoutDatetime.ToString()))
                                 {
-                                    TempData["alertMessageDormant"] = $"User {recIsactive.User_Name} is already logged in.";
+                                    TempData["alertMessageDormant"] = $"User {recIsactive.User_Id} is already logged in.";
                                     ViewBag.ShowConfirmLogout = true;
                                     ViewBag.LoginStatus = -1;
-
+                                    _logger.LogInformation($"User"+ recIsactive.User_Id + " is already logged in.");
                                 }
                                 else
                                 {
