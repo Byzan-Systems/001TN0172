@@ -236,7 +236,7 @@ namespace HDFCMSILWebMVC.Controllers
                                     TempData["alertMessageDormant"] = $"User {recIsactive.User_Id} is already logged in.";
                                     ViewBag.ShowConfirmLogout = true;
                                     ViewBag.LoginStatus = -1;
-                                    _logger.LogInformation($"User"+ recIsactive.User_Id + " is already logged in.");
+                                    _logger.LogInformation($"User {recIsactive.User_Id} is already logged in.");
                                 }
                                 else
                                 {
