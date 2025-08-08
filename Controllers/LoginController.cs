@@ -36,7 +36,6 @@ namespace HDFCMSILWebMVC.Controllers
         private readonly ILogger _logger;
         private IWebHostEnvironment Environment;
         public string sessionToken = "";
-        //private readonly AccessMenu Accmenu;
         public LoginController(ILogger<LoginController> logger, IWebHostEnvironment _environment)
         {
             _logger = logger;
