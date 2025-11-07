@@ -228,6 +228,7 @@ namespace HDFCMSILWebMVC.Controllers
                                 //else
                                 //{
 
+
                                 var strlogId = db.Set<MSIL_LoginLogout>().FromSqlRaw("select MSIL_LogoutDatetime,logID,SessionID,IsActive,IPAddress from MSIL_LoginLogout where User_Id='" + recIsactive.User_Id.ToString() + "' order by CONVERT(int, logID) desc").ToList();
                                 string curdatestr = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss tt");
                                 
