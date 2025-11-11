@@ -3,9 +3,9 @@ name: "CodeQL Analysis"
 on:
   workflow_dispatch:
   push:
-    branches: CodeQL-Analysis_SAST
+    branches: master
   pull_request:
-    branches: CodeQL-Analysis_SAST
+    branches: master
 
 permissions:
   actions: read
